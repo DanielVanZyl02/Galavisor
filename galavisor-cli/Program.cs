@@ -16,6 +16,7 @@ services.AddTransient<AddCommand>();
 services.AddTransient<ListCommand>();
 services.AddTransient<UpdateCommand>();
 services.AddTransient<DeleteCommand>();
+services.AddTransient<ReviewCommand>();
 
 // Build the service provider
 var serviceProvider = services.BuildServiceProvider();
@@ -34,6 +35,7 @@ app.Configure(config =>
     config.AddCommand<ListCommand>("list");
     config.AddCommand<UpdateCommand>("update");
     config.AddCommand<DeleteCommand>("delete");
+    config.AddCommand<ReviewCommand>("get-review");
 });
 
 return app.Run(args);

@@ -54,3 +54,6 @@ TestResult.xml
 nunit-*.xml
 
 galivisor-api/.vs
+
+**/local_config.json
+**/server_config.json

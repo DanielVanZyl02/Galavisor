@@ -1,0 +1,6 @@
+@GalavisorApi_HostAddress = http://localhost:5228
+
+GET {{GalavisorApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

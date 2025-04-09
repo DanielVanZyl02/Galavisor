@@ -23,6 +23,9 @@ class Program
         services.AddTransient<UpdateCommand>();
         services.AddTransient<DeleteCommand>();
         services.AddTransient<HelpCommand>();
+        services.AddTransient<ReviewCommand>();
+        services.AddTransient<GetReviewCommand>();
+
 
         var serviceProvider = services.BuildServiceProvider();
         var registrar = new DependencyInjectionRegistrar(services);
@@ -38,11 +41,17 @@ class Program
             config.AddCommand<DeleteCommand>(CommandsConstants.delete);
             config.AddCommand<ExitCommand>(CommandsConstants.exit);
             config.AddCommand<HelpCommand>(CommandsConstants.help);
+            config.AddCommand<ReviewCommand>(CommandsConstants.review);
+            config.AddCommand<GetReviewCommand>(CommandsConstants.getreview);
         });
 
         var knownCommands = GeneralUtils.getKnownCommands();
         ReadLine.HistoryEnabled = true;
-        AnsiConsole.MarkupLine("[green]Welcome to the Interactive CLI![/] Type 'exit' to quit.\n"); // please change this message
+        AnsiConsole.Write(
+            new FigletText("Galavisor")
+            .Color(Color.Teal));
+        
+        AnsiConsole.MarkupLine("[green]Welcome to the Galavisor CLI![/] Type 'exit' to quit.\n");
 
         while (true)
         {

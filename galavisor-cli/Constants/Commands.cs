@@ -10,5 +10,6 @@ public static class CommandsConstants
     public const string delete = "delete";
     public const string exit = "exit";
     public const string help = "help";
-
+    public const string review = "review";
+    public const string getreview = "get-review";
 }

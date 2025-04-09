@@ -1,5 +1,6 @@
 using GalavisorApi.Middleware;
 using GalavisorApi.Services;
+using GalavisorApi.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +10,8 @@ builder.Services.AddEndpointsApiExplorer();
 // builder.Services.AddDefaultAuthorization();
 // builder.Services.AddHttpClient<AuthService>();
 builder.Services.AddScoped<WeatherForecastService>();
+builder.Services.AddSingleton<ReviewService>();
+builder.Services.AddSingleton<ReviewRepository>();
 
 var app = builder.Build();
 

@@ -1,5 +1,7 @@
 using System.Diagnostics;
 
+namespace GalavisorCli.Utils;
+
 public static class SystemUtils{
     public static void OpenBrowser(string url)
     {

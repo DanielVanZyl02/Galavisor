@@ -3,6 +3,8 @@ using System.Text;
 using System.Text.Json;
 using GalavisorCli.Constants;
 
+namespace GalavisorCli.Utils;
+
 public static class HttpUtils
 {
     private static readonly HttpClient client = new HttpClient();

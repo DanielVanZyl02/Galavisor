@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text;
 using GalavisorCli.Constants;
+using  GalavisorCli.Utils;
 
 namespace GalavisorCli.Services;
 

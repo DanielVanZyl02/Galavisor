@@ -2,6 +2,7 @@ using Spectre.Console;
 using Spectre.Console.Cli;
 using GalavisorCli.Constants;
 using GalavisorCli.Services;
+using  GalavisorCli.Utils;
 
 namespace GalavisorCli.Commands;
 

@@ -3,39 +3,72 @@ using GalavisorCli.Commands;
 using GalavisorCli.Services;
 using Spectre.Console.Cli;
 using Spectre.Console.Cli.Extensions.DependencyInjection;
+using Spectre.Console;
+using GalavisorCli.Utils;
+using GalavisorCli.Constants;
 
-var services = new ServiceCollection();
+// docs: https://spectreconsole.net/
 
-// Register your services
-services.AddSingleton<AuthService>();
-
-// Register commands
-services.AddTransient<LoginCommand>();
-services.AddTransient<LogoutCommand>();
-services.AddTransient<AddCommand>();
-services.AddTransient<ListCommand>();
-services.AddTransient<UpdateCommand>();
-services.AddTransient<DeleteCommand>();
-services.AddTransient<ReviewCommand>();
-
-// Build the service provider
-var serviceProvider = services.BuildServiceProvider();
-
-// Create a type registrar using the service provider
-var registrar = new DependencyInjectionRegistrar(services);
-
-// Create the command app with the registrar
-var app = new CommandApp(registrar);
-
-app.Configure(config =>
+class Program
 {
-    config.AddCommand<LoginCommand>("login");
-    config.AddCommand<LogoutCommand>("logout");
-    config.AddCommand<AddCommand>("add");
-    config.AddCommand<ListCommand>("list");
-    config.AddCommand<UpdateCommand>("update");
-    config.AddCommand<DeleteCommand>("delete");
-    config.AddCommand<ReviewCommand>("get-review");
-});
+    static async Task Main(string[] args)
+    {
+        var services = new ServiceCollection();
+        services.AddSingleton<AuthService>();
 
-return app.Run(args);
+        services.AddTransient<LoginCommand>();
+        services.AddTransient<LogoutCommand>();
+        services.AddTransient<AddCommand>();
+        services.AddTransient<ListCommand>();
+        services.AddTransient<UpdateCommand>();
+        services.AddTransient<DeleteCommand>();
+        services.AddTransient<HelpCommand>();
+
+        var serviceProvider = services.BuildServiceProvider();
+        var registrar = new DependencyInjectionRegistrar(services);
+        var app = new CommandApp(registrar);
+
+        app.Configure(config =>
+        {
+            config.AddCommand<LoginCommand>(CommandsConstants.login);
+            config.AddCommand<LogoutCommand>(CommandsConstants.logout);
+            config.AddCommand<AddCommand>(CommandsConstants.add);
+            config.AddCommand<ListCommand>(CommandsConstants.list);
+            config.AddCommand<UpdateCommand>(CommandsConstants.update);
+            config.AddCommand<DeleteCommand>(CommandsConstants.delete);
+            config.AddCommand<ExitCommand>(CommandsConstants.exit);
+            config.AddCommand<HelpCommand>(CommandsConstants.help);
+        });
+
+        var knownCommands = GeneralUtils.getKnownCommands();
+        ReadLine.HistoryEnabled = true;
+        AnsiConsole.MarkupLine("[green]Welcome to the Interactive CLI![/] Type 'exit' to quit.\n"); // please change this message
+
+        while (true)
+        {
+            var input = ReadLine.Read("galavisor-cli> ");
+            if (string.IsNullOrWhiteSpace(input)) continue;
+
+            var inputArgs = CliHelper.ShellSplit(input);
+            if (inputArgs.Length == 0) continue;
+
+            ReadLine.AddHistory(input);
+
+            if (!knownCommands.Contains(inputArgs[0]))
+            {
+                var suggestion = CliHelper.SuggestCommand(inputArgs[0], knownCommands);
+                AnsiConsole.MarkupLine($"[red]Unknown command:[/] {inputArgs[0]}. Did you mean [green]{suggestion}[/]?");
+                continue;
+            }
+
+            try
+            {
+                await app.RunAsync(inputArgs);
+            }
+            catch (Exception ex)
+            {
+                AnsiConsole.MarkupLine($"[red]Error:[/] {ex.Message}");
+            }
+        }
+    }
+}

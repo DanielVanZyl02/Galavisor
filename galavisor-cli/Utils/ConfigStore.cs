@@ -1,5 +1,7 @@
 using System.Text.Json;
 
+namespace GalavisorCli.Utils;
+
 public static class ConfigStore
 {
     private static readonly string ConfigFile = "local_config.json";

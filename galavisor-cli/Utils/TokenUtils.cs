@@ -1,6 +1,8 @@
 using System.Text;
 using System.Text.Json;
 
+namespace GalavisorCli.Utils;
+
 public static class TokenUtils
 {
     private static readonly JsonSerializerOptions jsonOptions = new JsonSerializerOptions

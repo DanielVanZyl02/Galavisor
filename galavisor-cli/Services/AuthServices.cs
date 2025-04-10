@@ -16,7 +16,7 @@ public class AuthService
             }
             else
             {
-                var jsonResponse = await HttpUtils.SyncPostAsync(
+                var jsonResponse = await HttpUtils.Post(
                     $"{ConfigStore.Get(ConfigKeys.ServerUri)}/auth/login",
                     new Dictionary<string, string> { { "AuthCode", authCode } });
 

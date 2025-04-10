@@ -1,12 +1,12 @@
 using Spectre.Console.Cli;
 
-namespace GalavisorCli.Commands;
+namespace GalavisorCli.Commands.System;
 
-public class HelpCommand : Command
+public class ExitCommand : Command
 {
     public override int Execute(CommandContext context)
     {
-        // display help commands
+        Environment.Exit(0);
         return 0;
     }
 }

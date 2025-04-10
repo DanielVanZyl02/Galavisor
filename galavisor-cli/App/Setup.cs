@@ -6,13 +6,14 @@ using Spectre.Console.Cli.Extensions.DependencyInjection;
 using Spectre.Console;
 using GalavisorCli.Utils;
 using GalavisorCli.Constants;
+using GalavisorCli.Commands.Users;
+using GalavisorCli.Commands.System;
+using GalavisorCli.Commands.TodoList;
 
-// docs: https://spectreconsole.net/
+namespace GalavisorCli.App;
 
-class Program
-{
-    static async Task Main(string[] args)
-    {
+public static class Setup{
+    public static CommandApp SetupCli(){
         var services = new ServiceCollection();
         services.AddSingleton<AuthService>();
 
@@ -22,10 +23,8 @@ class Program
         services.AddTransient<ListCommand>();
         services.AddTransient<UpdateCommand>();
         services.AddTransient<DeleteCommand>();
+        services.AddTransient<ExitCommand>();
         services.AddTransient<HelpCommand>();
-        services.AddTransient<ReviewCommand>();
-        services.AddTransient<GetReviewCommand>();
-
 
         var serviceProvider = services.BuildServiceProvider();
         var registrar = new DependencyInjectionRegistrar(services);
@@ -41,43 +40,12 @@ class Program
             config.AddCommand<DeleteCommand>(CommandsConstants.delete);
             config.AddCommand<ExitCommand>(CommandsConstants.exit);
             config.AddCommand<HelpCommand>(CommandsConstants.help);
-            config.AddCommand<ReviewCommand>(CommandsConstants.review);
-            config.AddCommand<GetReviewCommand>(CommandsConstants.getreview);
         });
 
-        var knownCommands = GeneralUtils.getKnownCommands();
+        var knownCommands = GeneralUtils.GetKnownCommands();
         ReadLine.HistoryEnabled = true;
-        AnsiConsole.Write(
-            new FigletText("Galavisor")
-            .Color(Color.Teal));
-        
-        AnsiConsole.MarkupLine("[green]Welcome to the Galavisor CLI![/] Type 'exit' to quit.\n");
+        AnsiConsole.MarkupLine("[green]Welcome to the Interactive CLI![/] Type 'exit' to quit.\n"); // please change this message
 
-        while (true)
-        {
-            var input = ReadLine.Read("galavisor-cli> ");
-            if (string.IsNullOrWhiteSpace(input)) continue;
-
-            var inputArgs = CliHelper.ShellSplit(input);
-            if (inputArgs.Length == 0) continue;
-
-            ReadLine.AddHistory(input);
-
-            if (!knownCommands.Contains(inputArgs[0]))
-            {
-                var suggestion = CliHelper.SuggestCommand(inputArgs[0], knownCommands);
-                AnsiConsole.MarkupLine($"[red]Unknown command:[/] {inputArgs[0]}. Did you mean [green]{suggestion}[/]?");
-                continue;
-            }
-
-            try
-            {
-                await app.RunAsync(inputArgs);
-            }
-            catch (Exception ex)
-            {
-                AnsiConsole.MarkupLine($"[red]Error:[/] {ex.Message}");
-            }
-        }
+        return app;
     }
 }

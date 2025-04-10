@@ -22,6 +22,9 @@ public class AuthService
 
                 if (jsonResponse.TryGetProperty("jwt", out var jwtToken))
                 {
+                    ConfigStore.Set(ConfigKeys.JwtToken, jwtToken.GetString() ?? "");
+                    string googleSub = TokenUtils.DecodeJWT("sub", jwtToken.GetString() ?? "");
+                    ConfigStore.Set(ConfigKeys.GoogleSub, googleSub);
 
                     string name = TokenUtils.DecodeJWT("name", jwtToken.GetString() ?? "");
                     ConfigStore.Set(ConfigKeys.GoogleName, name);

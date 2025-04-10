@@ -7,7 +7,7 @@ namespace GalavisorCli.Utils;
 
 public static class HttpUtils
 {
-    private static readonly HttpClient client = new();
+    private static readonly HttpClient client = new HttpClient();
 
     public static async Task<JsonElement> SyncGetAsync(string url)
     {

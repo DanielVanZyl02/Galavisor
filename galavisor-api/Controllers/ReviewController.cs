@@ -30,6 +30,13 @@ public class ReviewController : ControllerBase
         return Ok(await _reviewService.GetAllReviews());
     }
 
+    [HttpGet("planets/{planetId}")]
+    public async Task<ActionResult<List<ReviewModel>>> GetReviewByPlanet(int planetId)
+    {
+        var review = await _reviewService.GetReviewByPlanetId(planetId);
+        return review != null ? Ok(review) : NotFound();
+    }
+
     [HttpGet("{id}")]
     public async Task<ActionResult<ReviewModel>> GetReview(int id)
     {

@@ -29,7 +29,10 @@ public class ReviewService
     {
         return await _reviewRepository.GetById(id);
     }
-
+    public async Task<List<ReviewModel>> GetReviewByPlanetId(int planetId)
+    {
+        return await _reviewRepository.GetByPlanetId(planetId);
+    }
     public async Task<bool> UpdateReview(ReviewModel review)
     {
         return await _reviewRepository.Update(review);

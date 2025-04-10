@@ -20,13 +20,23 @@ public class ReviewRepository
 
     public async Task<ReviewModel> Add(ReviewModel review)
     {
+        
+        review.UserId = 1; //Logic need to be added to get id of logged in user
         using var connection = _db.CreateConnection();
         var sql = @"
             INSERT INTO review (planetid, userid, rating, comment)
             VALUES (@PlanetId, @UserId, @Rating, @Comment)
             RETURNING reviewid";
         
-        var reviewId = await connection.ExecuteScalarAsync<int>(sql, review);
+        var parameters = new
+        {
+            review.PlanetId,
+            review.UserId,
+            review.Rating,
+            review.Comment
+        };
+
+        var reviewId = await connection.ExecuteScalarAsync<int>(sql, parameters);
         review.ReviewId = reviewId;
         return review;
     }
@@ -43,6 +53,22 @@ public class ReviewRepository
               FROM review 
               WHERE reviewid = @Id", 
             new { Id = id });
+    }
+
+    public async Task<List<ReviewModel>> GetByPlanetId(int planetId)
+    {
+        using var connection = _db.CreateConnection();
+        var reviews = await connection.QueryAsync<ReviewModel>(
+            @"SELECT reviewid AS ReviewId, 
+                    planetid AS PlanetId, 
+                    userid AS UserId, 
+                    rating AS Rating, 
+                    comment AS Comment 
+              FROM review 
+              WHERE planetId = @Id", 
+            new { Id = planetId });
+
+        return reviews.ToList();
     }
 
     public async Task<List<ReviewModel>> GetAll()

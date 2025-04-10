@@ -15,10 +15,13 @@ internal sealed class ReviewCommand : AsyncCommand<ReviewCommand.Settings>
 {
     public sealed class Settings : CommandSettings
     {
-        [CommandArgument(0, "<RATING>")]
+        [CommandArgument(0, "<PLANET>")]
+        public int planetId { get; set; }
+
+        [CommandArgument(1, "<RATING>")]
         public int rating { get; set; }
 
-        [CommandArgument(1, "[COMMENT]")]
+        [CommandArgument(2, "[COMMENT]")]
         public string? comment { get; set; }
     }
 
@@ -27,7 +30,8 @@ internal sealed class ReviewCommand : AsyncCommand<ReviewCommand.Settings>
         var requestBody = new
         {
             rating = settings.rating, 
-            comment = settings.comment
+            comment = settings.comment,
+            planetId = settings.planetId
         };
 
         try
@@ -76,38 +80,66 @@ internal sealed class GetReviewCommand : AsyncCommand<GetReviewCommand.Settings>
     public sealed class Settings : CommandSettings
     {
         [CommandOption("-i | --id <id>")]
+        [DefaultValue(-1)]
         public int id { get; set; }
+        [CommandOption("-p | --planet <planetId>")]
+        [DefaultValue(-1)]
+        public int planetId { get; set; }
     }
 
     public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
     {
         try
         {
+            var requestBody = "";
+            if(settings.id != -1){
+                requestBody = "/" + settings.id.ToString();
+            }else if(settings.planetId != -1){
+                requestBody = "/planets/" + settings.planetId.ToString();
+            }else if(settings.id != -1 && settings.planetId != -1){
+                AnsiConsole.MarkupLine($"[red]Request failed:[/] Cannot search by planet and id");
+                return 1;
+            }
+
             using var httpClient = new HttpClient();
-            var response = await httpClient.GetAsync("http://localhost:5228/reviews");
+            var response = await httpClient.GetAsync("http://localhost:5228/reviews" + requestBody);
 
             response.EnsureSuccessStatusCode();
             var responseJson = await response.Content.ReadAsStringAsync();
-            var reviews = JsonSerializer.Deserialize<List<ReviewModel>>(responseJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+            var table = new Table
+            {
+                Border = TableBorder.Rounded,
+                BorderStyle = Style.Parse("green")
+            };
+
+            table.AddColumn("Review ID");
+            table.AddColumn("Rating");
+            table.AddColumn("Comment");
+
+            if(settings.id != -1)
+            {
+                var review = JsonSerializer.Deserialize<ReviewModel>(responseJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                if (review != null)
+                {
+                    table.AddRow(review.ReviewId.ToString(), review.Rating.ToString(), review.Comment ?? "(no comment)");
+                }
+                AnsiConsole.Write(table);
+            }
+            else
+            {
+                var reviews = JsonSerializer.Deserialize<List<ReviewModel>>(responseJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
                 if (reviews != null)
                 {
-                    var table = new Table
-                    {
-                        Border = TableBorder.Rounded,
-                        BorderStyle = Style.Parse("green")
-                    };
-
-                    table.AddColumn("Review ID");
-                    table.AddColumn("Rating");
-                    table.AddColumn("Comment");
-
                     foreach (var review in reviews)
                     {
                         table.AddRow(review.ReviewId.ToString(), review.Rating.ToString(), review.Comment ?? "(no comment)");
                     }
                     AnsiConsole.Write(table);
                 }
+            }
             return 0;
         }
         catch (HttpRequestException ex)

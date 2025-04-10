@@ -4,7 +4,7 @@ using GalavisorCli.Constants;
 using GalavisorCli.Services;
 using  GalavisorCli.Utils;
 
-namespace GalavisorCli.Commands;
+namespace GalavisorCli.Commands.Users;
 
 public class LoginCommand : AsyncCommand
 {

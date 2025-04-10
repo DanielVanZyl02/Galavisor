@@ -6,6 +6,9 @@ using Spectre.Console.Cli.Extensions.DependencyInjection;
 using Spectre.Console;
 using GalavisorCli.Utils;
 using GalavisorCli.Constants;
+using GalavisorCli.Commands.Users;
+using GalavisorCli.Commands.System;
+using GalavisorCli.Commands.TodoList;
 
 namespace GalavisorCli.App;
 
@@ -20,6 +23,7 @@ public static class Setup{
         services.AddTransient<ListCommand>();
         services.AddTransient<UpdateCommand>();
         services.AddTransient<DeleteCommand>();
+        services.AddTransient<ExitCommand>();
         services.AddTransient<HelpCommand>();
 
         var serviceProvider = services.BuildServiceProvider();

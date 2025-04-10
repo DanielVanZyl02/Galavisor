@@ -25,6 +25,7 @@ public static class Setup{
         services.AddTransient<DeleteCommand>();
         services.AddTransient<ExitCommand>();
         services.AddTransient<HelpCommand>();
+        services.AddTransient<ConfigCommand>();
 
         var serviceProvider = services.BuildServiceProvider();
         var registrar = new DependencyInjectionRegistrar(services);
@@ -32,14 +33,15 @@ public static class Setup{
 
         app.Configure(config =>
         {
-            config.AddCommand<LoginCommand>(CommandsConstants.login);
-            config.AddCommand<LogoutCommand>(CommandsConstants.logout);
+            config.AddCommand<LoginCommand>(CommandsConstants.login).WithDescription("login to the system");
+            config.AddCommand<LogoutCommand>(CommandsConstants.logout).WithDescription("logout of the system");
+            config.AddCommand<ConfigCommand>(CommandsConstants.config).WithDescription("See your config information");
             config.AddCommand<AddCommand>(CommandsConstants.add);
             config.AddCommand<ListCommand>(CommandsConstants.list);
             config.AddCommand<UpdateCommand>(CommandsConstants.update);
             config.AddCommand<DeleteCommand>(CommandsConstants.delete);
-            config.AddCommand<ExitCommand>(CommandsConstants.exit);
-            config.AddCommand<HelpCommand>(CommandsConstants.help);
+            config.AddCommand<ExitCommand>(CommandsConstants.exit).WithDescription("Exit the cli");;
+            config.AddCommand<HelpCommand>(CommandsConstants.help).WithDescription("See all commands available in the cli");;
         });
 
         var knownCommands = GeneralUtils.GetKnownCommands();

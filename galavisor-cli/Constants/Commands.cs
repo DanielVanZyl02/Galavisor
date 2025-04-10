@@ -4,6 +4,7 @@ public static class CommandsConstants
 {
     public const string login = "login";
     public const string logout = "logout";
+    public const string config = "config";
     public const string list = "list";
     public const string add = "add";
     public const string update = "update";

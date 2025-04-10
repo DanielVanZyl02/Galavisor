@@ -8,6 +8,7 @@ public static class GeneralUtils{
         return [ 
             CommandsConstants.login, 
             CommandsConstants.logout, 
+            CommandsConstants.config, 
             CommandsConstants.add, 
             CommandsConstants.list, 
             CommandsConstants.update, 

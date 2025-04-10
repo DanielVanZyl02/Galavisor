@@ -3,7 +3,7 @@ using Spectre.Console.Cli;
 using GalavisorCli.Constants;
 using  GalavisorCli.Utils;
 
-namespace GalavisorCli.Commands;
+namespace GalavisorCli.Commands.Users;
 
 public class LogoutCommand : Command
 {

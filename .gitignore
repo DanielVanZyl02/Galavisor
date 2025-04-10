@@ -57,3 +57,9 @@ galivisor-api/.vs
 
 **/local_config.json
 **/server_config.json
+
+#Terraform
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+terraform.tfvars

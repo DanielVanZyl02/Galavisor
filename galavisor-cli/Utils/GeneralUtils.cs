@@ -3,7 +3,7 @@ using GalavisorCli.Constants;
 namespace GalavisorCli.Utils;
 
 public static class GeneralUtils{
-    public static string[] getKnownCommands()
+    public static string[] GetKnownCommands()
     {
         return [ 
             CommandsConstants.login, 

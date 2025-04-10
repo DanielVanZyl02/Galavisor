@@ -4,7 +4,7 @@ using GalavisorCli.Constants;
 using GalavisorCli.Services;
 using  GalavisorCli.Utils;
 
-namespace GalavisorCli.Commands;
+namespace GalavisorCli.Commands.TodoList;
 
 public class UpdateCommand : Command<UpdateCommand.Settings>
 {

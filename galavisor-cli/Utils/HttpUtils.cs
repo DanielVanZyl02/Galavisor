@@ -9,31 +9,31 @@ public static class HttpUtils
 {
     private static readonly HttpClient client = new HttpClient();
 
-    public static async Task<JsonElement> SyncGetAsync(string url)
+    public static async Task<JsonElement> Get(string url)
     {
         var request = CreateRequest(HttpMethod.Get, url);
         return await SendRequestAsync(request);
     }
 
-    public static async Task<JsonElement> SyncPostAsync(string url, object requestBody)
+    public static async Task<JsonElement> Post(string url, object requestBody)
     {
         var request = CreateJsonRequest(HttpMethod.Post, url, requestBody);
         return await SendRequestAsync(request);
     }
 
-    public static async Task<JsonElement> SyncPutAsync(string url, object requestBody)
+    public static async Task<JsonElement> Put(string url, object requestBody)
     {
         var request = CreateJsonRequest(HttpMethod.Put, url, requestBody);
         return await SendRequestAsync(request);
     }
 
-    public static async Task<JsonElement> SyncPatchAsync(string url, object requestBody)
+    public static async Task<JsonElement> Patch(string url, object requestBody)
     {
         var request = CreateJsonRequest(HttpMethod.Patch, url, requestBody);
         return await SendRequestAsync(request);
     }
 
-    public static async Task<JsonElement> SyncDeleteAsync(string url)
+    public static async Task<JsonElement> Delete(string url)
     {
         var request = CreateRequest(HttpMethod.Delete, url);
         return await SendRequestAsync(request);

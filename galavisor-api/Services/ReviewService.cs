@@ -1,45 +1,42 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Linq;
 using GalavisorApi.Models;
 using GalavisorApi.Repositories;
 
 namespace GalavisorApi.Services;
 public class ReviewService
 {
-    private readonly ReviewRepository reviewRepository;
+    private readonly ReviewRepository _reviewRepository;
 
     public ReviewService(ReviewRepository repo)
     {
-        reviewRepository = repo;
+        _reviewRepository = repo;
     }
 
-    public ReviewModel AddReview(int rating, string? comment)
+    public async Task<ReviewModel> AddReview(ReviewModel review)
     {
-        var review = reviewRepository.Add(rating, comment);
-        return MapToModel(review);
+        var addedReview = await _reviewRepository.Add(review);
+        return addedReview;
     }
 
-    public List<ReviewModel> GetAllReviews()
+    public async Task<List<ReviewModel>> GetAllReviews()
     {
-        return reviewRepository.GetAll().Select(MapToModel).ToList();
+        return await _reviewRepository.GetAll();
     }
 
-    public ReviewModel? GetReviewById(int id)
+    public async Task<ReviewModel?> GetReviewById(int id)
     {
-        var review = reviewRepository.GetById(id);
-        return review != null ? MapToModel(review) : null;
+        return await _reviewRepository.GetById(id);
     }
 
-    public bool DeleteReview(int id)
+    public async Task<bool> UpdateReview(ReviewModel review)
     {
-        return reviewRepository.Delete(id);
+        return await _reviewRepository.Update(review);
     }
 
-    private ReviewModel MapToModel(ReviewModel review)
+    public async Task<bool> DeleteReview(int id)
     {
-        return new ReviewModel
-        {
-            ReviewId = review.ReviewId,
-            Rating = review.Rating,
-            Comment = review.Comment
-        };
+        return await _reviewRepository.Delete(id);
     }
 }

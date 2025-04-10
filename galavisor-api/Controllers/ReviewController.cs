@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 using GalavisorApi.Services;
 using GalavisorApi.Models;
 
@@ -8,37 +10,47 @@ namespace GalavisorApi.Controllers;
 [Route("reviews")]
 public class ReviewController : ControllerBase
 {
-    private readonly ReviewService reviewService;
+    private readonly ReviewService _reviewService;
 
     public ReviewController(ReviewService service)
     {
-        reviewService = service;
+        _reviewService = service;
     }
 
     [HttpPost]
-    public ActionResult<ReviewModel> AddReview([FromBody] ReviewModel request)
+    public async Task<ActionResult<ReviewModel>> AddReview([FromBody] ReviewModel request)
     {
-        var result = reviewService.AddReview(request.Rating, request.Comment);
+        var result = await _reviewService.AddReview(request);
         return CreatedAtAction(nameof(GetReview), new { id = result.ReviewId }, result);
     }
 
     [HttpGet]
-    public ActionResult<List<ReviewModel>> GetAllReviews()
+    public async Task<ActionResult<List<ReviewModel>>> GetAllReviews()
     {
-        return Ok(reviewService.GetAllReviews());
+        return Ok(await _reviewService.GetAllReviews());
     }
 
     [HttpGet("{id}")]
-    public ActionResult<ReviewModel> GetReview(int id)
+    public async Task<ActionResult<ReviewModel>> GetReview(int id)
     {
-        var review = reviewService.GetReviewById(id);
+        var review = await _reviewService.GetReviewById(id);
         return review != null ? Ok(review) : NotFound();
     }
 
-    [HttpDelete("{id}")]
-    public IActionResult DeleteReview(int id)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateReview(int id, [FromBody] ReviewModel request)
     {
-        var deleted = reviewService.DeleteReview(id);
+        if (id != request.ReviewId)
+            return BadRequest();
+            
+        var updated = await _reviewService.UpdateReview(request);
+        return updated ? NoContent() : NotFound();
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteReview(int id)
+    {
+        var deleted = await _reviewService.DeleteReview(id);
         return deleted ? NoContent() : NotFound();
     }
 }

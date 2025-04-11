@@ -10,7 +10,7 @@ using GalavisorCli.Constants;
 using  GalavisorCli.Utils;
 using GalavisorCli.Models;
 
-namespace GalavisorCli.Commands;
+namespace GalavisorCli.Commands.Reviews;
 internal sealed class ReviewCommand : AsyncCommand<ReviewCommand.Settings>
 {
     public sealed class Settings : CommandSettings

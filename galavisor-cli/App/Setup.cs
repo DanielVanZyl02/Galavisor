@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using GalavisorCli.Commands;
 using GalavisorCli.Services;
 using Spectre.Console.Cli;
 using Spectre.Console.Cli.Extensions.DependencyInjection;
@@ -9,6 +8,7 @@ using GalavisorCli.Constants;
 using GalavisorCli.Commands.Users;
 using GalavisorCli.Commands.System;
 using GalavisorCli.Commands.TodoList;
+using GalavisorCli.Commands.Reviews;
 
 namespace GalavisorCli.App;
 
@@ -26,6 +26,8 @@ public static class Setup{
         services.AddTransient<ExitCommand>();
         services.AddTransient<HelpCommand>();
         services.AddTransient<ConfigCommand>();
+        services.AddTransient<ReviewCommand>();
+        services.AddTransient<GetReviewCommand>();
 
         var serviceProvider = services.BuildServiceProvider();
         var registrar = new DependencyInjectionRegistrar(services);
@@ -41,11 +43,16 @@ public static class Setup{
             config.AddCommand<UpdateCommand>(CommandsConstants.update);
             config.AddCommand<DeleteCommand>(CommandsConstants.delete);
             config.AddCommand<ExitCommand>(CommandsConstants.exit).WithDescription("Exit the cli");;
-            config.AddCommand<HelpCommand>(CommandsConstants.help).WithDescription("See all commands available in the cli");;
+            config.AddCommand<HelpCommand>(CommandsConstants.help).WithDescription("See all commands available in the cli");
+            config.AddCommand<ReviewCommand>(CommandsConstants.review);
+            config.AddCommand<GetReviewCommand>(CommandsConstants.getreview);
         });
 
         var knownCommands = GeneralUtils.GetKnownCommands();
         ReadLine.HistoryEnabled = true;
+        AnsiConsole.Write(
+            new FigletText("Galavisor")
+            .Color(Color.Teal));
         AnsiConsole.MarkupLine("[green]Welcome to the Interactive CLI![/] Type 'exit' to quit.\n"); // please change this message
 
         return app;

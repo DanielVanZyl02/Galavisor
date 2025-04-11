@@ -13,4 +13,5 @@ public static class ConfigKeys
     public const string DatabasePassword = "DatabasePassword";
     public const string DatabaseUsername = "DatabaseUsername";
     public const string DatabaseUrl = "DatabaseUrl";
+    public const string DatabaseConnectionString = "DatabaseConnectionString";
 }

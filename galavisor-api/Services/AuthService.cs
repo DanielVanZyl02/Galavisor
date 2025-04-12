@@ -17,6 +17,8 @@ public class AuthService(HttpClient httpClient, UserRepository userRepository)
         PropertyNameCaseInsensitive = true
     };
 
+    private readonly UserRepository _userRepository = userRepository;
+
     public async Task<string> AuthenticateUserAsync(string authCode)
     {
         string jwt = await GetJwtAsync(authCode);
@@ -35,6 +37,11 @@ public class AuthService(HttpClient httpClient, UserRepository userRepository)
             var name = DecodeJWT("name", jwt);
             return await _userRepository.CreateUser(sub, name);
         }
+    }
+  
+    public async Task<bool> IsSubAdmin(string sub){
+        var User = await _userRepository.GetBySub(sub);
+        return User != null && User.RoleName == "Admin";
     }
 
     private async Task<string> GetJwtAsync(string authCode)

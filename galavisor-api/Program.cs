@@ -18,6 +18,7 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSingleton<ReviewService>();
 builder.Services.AddSingleton<ReviewRepository>();
+builder.Services.AddSingleton<ActivityService>();
 
 var app = builder.Build();
 

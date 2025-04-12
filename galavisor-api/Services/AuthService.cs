@@ -2,13 +2,16 @@ using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Web;
 using GalavisorApi.Constants;
+using GalavisorApi.Repositories;
 
 namespace GalavisorApi.Services;
 
-public class AuthService(HttpClient httpClient, IConfiguration config)
+public class AuthService(HttpClient httpClient, IConfiguration config, UserRepository userRepository)
 {
     private readonly HttpClient _httpClient = httpClient;
     private readonly IConfiguration _config = config;
+
+    private readonly UserRepository _userRepository = userRepository;
 
     public async Task<string> AuthenticateUserAsync(string authCode)
     {
@@ -16,6 +19,11 @@ public class AuthService(HttpClient httpClient, IConfiguration config)
 
         var jwtResponse = new Dictionary<string, string> { ["jwt"] = jwt };
         return JsonSerializer.Serialize(jwtResponse);
+    }
+
+    public async Task<bool> IsSubAdmin(string sub){
+        var User = await _userRepository.GetBySub(sub);
+        return User != null && User.RoleName == "Admin";
     }
 
     private async Task<string> GetJwtAsync(string authCode)

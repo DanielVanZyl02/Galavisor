@@ -1,14 +1,21 @@
 using System.Net.Http.Headers;
+using System.Text;
 using System.Text.Json;
 using System.Web;
 using GalavisorApi.Constants;
+using GalavisorApi.Models;
+using GalavisorApi.Repositories;
 
 namespace GalavisorApi.Services;
 
-public class AuthService(HttpClient httpClient, IConfiguration config)
+public class AuthService(HttpClient httpClient, UserRepository userRepository)
 {
     private readonly HttpClient _httpClient = httpClient;
-    private readonly IConfiguration _config = config;
+    private readonly UserRepository _userRepository = userRepository;
+    private static readonly JsonSerializerOptions jsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
 
     public async Task<string> AuthenticateUserAsync(string authCode)
     {
@@ -16,6 +23,18 @@ public class AuthService(HttpClient httpClient, IConfiguration config)
 
         var jwtResponse = new Dictionary<string, string> { ["jwt"] = jwt };
         return JsonSerializer.Serialize(jwtResponse);
+    }
+
+    public async Task<UserModel> GetOrCreateUser(string jwt)
+    {
+        var sub = DecodeJWT("sub", jwt);
+        var User = await _userRepository.GetBySub(sub);
+        if(User != null){
+            return User;
+        } else{
+            var name = DecodeJWT("name", jwt);
+            return await _userRepository.CreateUser(sub, name);
+        }
     }
 
     private async Task<string> GetJwtAsync(string authCode)
@@ -45,33 +64,28 @@ public class AuthService(HttpClient httpClient, IConfiguration config)
 
         return tokenMap?["id_token"].GetString() ?? "";
     }
-
-    /*private User DecodeJwt(string jwt)
+    private static string DecodeJWT(string key, string jwt)
     {
         var parts = jwt.Split('.');
         if (parts.Length != 3)
+        {
             throw new ArgumentException("Invalid JWT token");
+        }
 
-        string payload = parts[1];
-        byte[] jsonBytes = Convert.FromBase64String(PadBase64(payload));
-        string json = Encoding.UTF8.GetString(jsonBytes);
+        string payloadJson = DecodeBase64(parts[1]);
+        var payloadMap = JsonSerializer.Deserialize<Dictionary<string, object>>(payloadJson, jsonOptions);
 
-        var payloadMap = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
+        if (payloadMap != null && payloadMap.TryGetValue(key, out object? value))
+        {
+            return value?.ToString() ?? throw new Exception("Key not found in JWT payload");
+        }
 
-        var sub = payloadMap["sub"].ToString();
-        var email = payloadMap["email"].ToString();
-        var name = payloadMap["name"].ToString();
-
-        return new User(sub, name, email);
+        throw new Exception("Key not found in JWT payload");
     }
 
-    private string PadBase64(string base64)
+    private static string DecodeBase64(string base64String)
     {
-        return base64.Length % 4 switch
-        {
-            2 => base64 + "==",
-            3 => base64 + "=",
-            _ => base64
-        };
-    }*/
+        byte[] decodedBytes = Convert.FromBase64String(base64String);
+        return Encoding.UTF8.GetString(decodedBytes);
+    }
 }

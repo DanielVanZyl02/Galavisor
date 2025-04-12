@@ -6,14 +6,9 @@ namespace GalavisorApi.Controllers;
 
 [ApiController]
 [Route("auth")]
-public class AuthController : ControllerBase
+public class AuthController(AuthService authService) : ControllerBase
 {
-    private readonly AuthService _authService;
-
-    public AuthController(AuthService authService)
-    {
-        _authService = authService;
-    }
+    private readonly AuthService _authService = authService;
 
     [AllowAnonymous]
     [HttpPost("login")]
@@ -21,20 +16,31 @@ public class AuthController : ControllerBase
     {
         if (string.IsNullOrWhiteSpace(request.AuthCode))
         {
-            return BadRequest(new { message = "authCode is required" });
+            return BadRequest(new { message = "Authentication failed", error = "authCode is required" });
         }
 
         try
         {
             var jwtJson = await _authService.AuthenticateUserAsync(request.AuthCode);
-            return Ok(jwtJson);
+            if(jwtJson != null){
+                var User = await _authService.GetOrCreateUser(jwtJson);
+                return Ok(new { message = "Success", jwt = jwtJson, user = User});
+            } else{
+                return BadRequest(new { message = "Authentication failed", error = "jwt returned from google was null"});
+            }
         }
         catch (Exception ex)
         {
-            // Log ex.Message if needed
-            Console.WriteLine(ex.Message);
             return StatusCode(500, new { message = "Authentication failed", error = ex.Message });
         }
+    }
+
+    [Authorize]
+    [HttpGet("debug-jwt")]
+    public IActionResult ShowAllClaims()
+    {
+        var claims = HttpContext.User.Claims.Select(c => new { c.Type, c.Value });
+        return Ok(claims);
     }
 }
 

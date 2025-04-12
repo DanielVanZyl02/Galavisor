@@ -1,3 +1,5 @@
+using System.Text.Json;
+using GalavisorApi.Models;
 using GalavisorCli.Constants;
 using  GalavisorCli.Utils;
 
@@ -20,18 +22,23 @@ public class AuthService
                     $"{ConfigStore.Get(ConfigKeys.ServerUri)}/auth/login",
                     new Dictionary<string, string> { { "AuthCode", authCode } });
 
-                if (jsonResponse.TryGetProperty("jwt", out var jwtToken))
-                {
-                    ConfigStore.Set(ConfigKeys.JwtToken, jwtToken.GetString() ?? "");
-                    string googleSub = TokenUtils.DecodeJWT("sub", jwtToken.GetString() ?? "");
-                    ConfigStore.Set(ConfigKeys.GoogleSub, googleSub);
-
-                    string name = TokenUtils.DecodeJWT("name", jwtToken.GetString() ?? "");
-                    ConfigStore.Set(ConfigKeys.GoogleName, name);
-                    return $"Authentication successful! Hi {name}, welcome to the TODO App!";
-                }
-                else
-                {
+                if (jsonResponse.TryGetProperty("message", out var message) && jsonResponse.TryGetProperty("error", out var error)){
+                    return $"{message}, ${error}";
+                } else if(jsonResponse.TryGetProperty("message", out message) && jsonResponse.TryGetProperty("jwt", out var jwt)){
+                    if(jsonResponse.TryGetProperty("user", out var User)){
+                        var DeserializedUser = User.Deserialize<UserModel>();
+                        if(DeserializedUser != null){
+                            ConfigStore.Set(ConfigKeys.JwtToken, jwt.GetString() ?? "");
+                            ConfigStore.Set(ConfigKeys.GoogleName, DeserializedUser.Name);
+                            ConfigStore.Set(ConfigKeys.HomePlanet, DeserializedUser.PlanetName);
+                            return $"Authentication successful! Hi {DeserializedUser.Name}, welcome to the TODO App!";
+                        } else{
+                            return "Something went wrong whilst accessing your data, please try logging in again";
+                        }
+                    } else{
+                        return "Authentication failed as user was not found";
+                    }
+                } else{
                     return "Authentication failed as jwt token was not found";
                 }
             }

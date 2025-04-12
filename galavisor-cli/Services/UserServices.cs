@@ -10,7 +10,7 @@ public class UserService
         try
         {
             var jsonResponse = await HttpUtils.Patch(
-                $"{ConfigStore.Get(ConfigKeys.ServerUri)}/user",
+                $"{ConfigStore.Get(ConfigKeys.ServerUri)}/users",
                 new Dictionary<string, string> { 
                     { "Username", Username }, 
                     { "HomePlanet", HomePlanet} 
@@ -36,9 +36,9 @@ public class UserService
         try
         {
             var jsonResponse = await HttpUtils.Patch(
-                $"{ConfigStore.Get(ConfigKeys.ServerUri)}/user/{id}",
+                $"{ConfigStore.Get(ConfigKeys.ServerUri)}/users/{id}",
                 new Dictionary<string, bool> { 
-                    { "active", active }, 
+                    { "Active", active }, 
                 });
 
             if (jsonResponse.TryGetProperty("message", out var message))
@@ -61,9 +61,9 @@ public class UserService
         try
         {
             var jsonResponse = await HttpUtils.Patch(
-                $"{ConfigStore.Get(ConfigKeys.ServerUri)}/user/{id}",
+                $"{ConfigStore.Get(ConfigKeys.ServerUri)}/users/{id}",
                 new Dictionary<string, string> { 
-                    { "role", role }, 
+                    { "Role", role }, 
                 });
 
             if (jsonResponse.TryGetProperty("message", out var message))

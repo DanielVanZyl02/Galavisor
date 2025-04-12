@@ -13,4 +13,8 @@ public static class CommandsConstants
     public const string help = "help";
     public const string review = "review";
     public const string getreview = "get-review";
+    public const string addactivity = "add-activity";
+    public const string getactivity = "get-activity";
+    public const string updateactivity = "update-activity";
+    public const string deleteactivity = "delete-activity";
 }

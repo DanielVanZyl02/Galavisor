@@ -24,8 +24,8 @@ builder.Services.AddSingleton<PlanetService>();
 builder.Services.AddSingleton<PlanetRepository>();
 
 var app = builder.Build();
-// app.UseHttpsRedirection();
-// app.UseAuthorization();
+app.UseHttpsRedirection();
+app.UseAuthorization();
 app.MapControllers();
 
 app.Run();

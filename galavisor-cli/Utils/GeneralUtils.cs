@@ -16,7 +16,9 @@ public static class GeneralUtils{
             CommandsConstants.exit, 
             CommandsConstants.help,
             CommandsConstants.review,
-            CommandsConstants.getreview
+            CommandsConstants.getreview,
+            CommandsConstants.updatereview,
+            CommandsConstants.deletereview
         ];
     }
 }

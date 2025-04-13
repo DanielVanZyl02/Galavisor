@@ -55,22 +55,7 @@ public class ReviewRepository
               WHERE reviewid = @Id", 
             new { Id = id });
     }
-
-    // public async Task<List<ReviewModel>> GetByPlanetId(int planetId)
-    // {
-    //     using var connection = _db.CreateConnection();
-    //     var reviews = await connection.QueryAsync<ReviewModel>(
-    //         @"SELECT reviewid AS ReviewId, 
-    //                 planetid AS PlanetId, 
-    //                 userid AS UserId, 
-    //                 rating AS Rating, 
-    //                 comment AS Comment 
-    //           FROM review 
-    //           WHERE planetId = @Id", 
-    //         new { Id = planetId });
-
-    //     return reviews.ToList();
-    // }
+    
     public async Task<List<ReviewModel>> GetByPlanetId(int planetId, int? ratingEq = null, int? ratingGte = null, int? ratingLte = null)
     {
         using var connection = _db.CreateConnection();
@@ -93,19 +78,6 @@ public class ReviewRepository
         return reviews.ToList();
     }
 
-    // public async Task<List<ReviewModel>> GetAll()
-    // {
-    //     using var connection = _db.CreateConnection();
-    //     var reviews = await connection.QueryAsync<ReviewModel>(
-    //         @"SELECT reviewid AS ReviewId, 
-    //                 planetid AS PlanetId, 
-    //                 userid AS UserId, 
-    //                 rating AS Rating, 
-    //                 comment AS Comment 
-    //           FROM review");
-        
-    //     return reviews.ToList();
-    // }
 
     public async Task<List<ReviewModel>> GetAll(int? ratingEq = null, int? ratingGte = null, int? ratingLte = null)
     {
@@ -120,11 +92,10 @@ public class ReviewRepository
             FROM review");
         
         var parameters = new DynamicParameters();
-        
-        // Only add WHERE clause if we have rating filters
+
         if (ratingEq.HasValue || ratingGte.HasValue || ratingLte.HasValue)
         {
-            queryBuilder.Append(" WHERE 1=1"); // This allows us to simply append AND clauses
+            queryBuilder.Append(" WHERE 1=1");
             AddRatingFilters(queryBuilder, parameters, ratingEq, ratingGte, ratingLte);
         }
         

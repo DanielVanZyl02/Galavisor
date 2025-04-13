@@ -160,7 +160,7 @@ internal sealed class GetReviewCommand : AsyncCommand<GetReviewCommand.Settings>
             };
 
             table.AddColumn("Review ID");
-            // table.AddColumn("Planet ID");
+
             table.AddColumn("Rating");
             table.AddColumn("Comment");
 
@@ -172,7 +172,6 @@ internal sealed class GetReviewCommand : AsyncCommand<GetReviewCommand.Settings>
                 {
                     table.AddRow(
                         review.ReviewId.ToString(), 
-                        // review.PlanetId.ToString(),
                         review.Rating.ToString(), 
                         review.Comment ?? "(no comment)"
                     );
@@ -189,7 +188,6 @@ internal sealed class GetReviewCommand : AsyncCommand<GetReviewCommand.Settings>
                     {
                         table.AddRow(
                             review.ReviewId.ToString(), 
-                            // review.PlanetId.ToString(),
                             review.Rating.ToString(), 
                             review.Comment ?? "(no comment)"
                         );

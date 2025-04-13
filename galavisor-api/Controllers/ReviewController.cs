@@ -76,19 +76,6 @@ public class ReviewController : ControllerBase
             return StatusCode(500, $"Internal server error: {ex.Message}");
         }
     }
-    // [HttpGet("planets/{planetId}")]
-    // public async Task<ActionResult<List<ReviewModel>>> GetReviewByPlanet(int planetId)
-    // {
-    //     var review = await _reviewService.GetReviewByPlanetId(planetId);
-    //     return review != null ? Ok(review) : NotFound();
-    // }
-
-    // [HttpGet("{id}")]
-    // public async Task<ActionResult<ReviewModel>> GetReview(int id)
-    // {
-    //     var review = await _reviewService.GetReviewById(id);
-    //     return review != null ? Ok(review) : NotFound();
-    // }
 
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateReview(int id, [FromBody] ReviewModel request)

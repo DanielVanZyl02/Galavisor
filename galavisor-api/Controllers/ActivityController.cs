@@ -7,44 +7,90 @@ using GalavisorApi.Models;
 namespace GalavisorApi.Controllers;
 
 [ApiController]
-[Route("activities")]
+[Route("api/[controller]")]
 public class ActivityController : ControllerBase
 {
     private readonly ActivityService _activityService;
 
-    public ActivityController(ActivityService service)
+    public ActivityController(ActivityService activityService)
     {
-        _activityService = service;
+        _activityService = activityService;
     }
 
-    [HttpGet("planets/{planetId}")]
-    public async Task<ActionResult<List<ActivityModel>>> GetActivitiesByPlanet(int planetId)
+    [HttpGet("planet/{planetName}")]
+    public async Task<ActionResult<List<ActivityModel>>> GetActivitiesByPlanet(string planetName)
     {
-        var activities = await _activityService.GetActivitiesByPlanet(planetId);
+        var activities = await _activityService.GetActivitiesByPlanet(planetName);
         return Ok(activities);
     }
 
     [HttpPost]
-    public async Task<ActionResult<ActivityModel>> AddActivity([FromBody] ActivityModel activity)
+    public async Task<ActionResult<object>> AddActivity([FromBody] ActivityModel activity)
     {
-        var result = await _activityService.AddActivity(activity);
-        return CreatedAtAction(nameof(GetActivitiesByPlanet), new { planetId = result.ActivityId }, result);
+        var (newActivity, isNewlyCreated) = await _activityService.AddActivity(activity);
+        
+        // Build a response with status information
+        var response = new 
+        {
+            activity = newActivity,
+            status = new
+            {
+                isNewlyCreated
+            }
+        };
+        
+        return StatusCode(201, response);
     }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateActivity(int id, [FromBody] ActivityModel activity)
+    [HttpPut("{currentName}")]
+    public async Task<IActionResult> UpdateActivity(string currentName, [FromBody] string newName)
     {
-        if (id != activity.ActivityId)
-            return BadRequest();
+        var success = await _activityService.UpdateActivity(currentName, newName);
+        if (!success)
+            return NotFound();
+        return NoContent();
+    }
+
+    [HttpDelete("{activityName}")]
+    public async Task<IActionResult> DeleteActivity(string activityName)
+    {
+        var success = await _activityService.DeleteActivity(activityName);
+        if (!success)
+            return NotFound();
+        return NoContent();
+    }
+
+    [HttpPost("link")]
+    public async Task<ActionResult<object>> LinkActivityToPlanet([FromBody] ActivityModel activity)
+    {
+        if (string.IsNullOrEmpty(activity.Name) || string.IsNullOrEmpty(activity.PlanetName))
+        {
+            return BadRequest("Activity name and planet name are required");
+        }
+        
+        try
+        {
+            bool isNewlyLinked = await _activityService.LinkActivityToPlanet(activity.Name, activity.PlanetName);
             
-        var updated = await _activityService.UpdateActivity(activity);
-        return updated ? NoContent() : NotFound();
-    }
-
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteActivity(int id)
-    {
-        var deleted = await _activityService.DeleteActivity(id);
-        return deleted ? NoContent() : NotFound();
+            // Build a response with status information
+            var response = new 
+            {
+                activity = new ActivityModel 
+                { 
+                    Name = activity.Name,
+                    PlanetName = activity.PlanetName
+                },
+                status = new
+                {
+                    isNewlyLinked
+                }
+            };
+            
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            return NotFound(ex.Message);
+        }
     }
 } 

@@ -17,4 +17,5 @@ public static class CommandsConstants
     public const string getactivity = "get-activity";
     public const string updateactivity = "update-activity";
     public const string deleteactivity = "delete-activity";
+    public const string linkactivity = "link-activity";
 }

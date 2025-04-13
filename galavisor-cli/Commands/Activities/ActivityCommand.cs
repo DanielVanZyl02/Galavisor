@@ -17,6 +17,7 @@ internal sealed class ActivityCommand : AsyncCommand<ActivityCommand.Settings>
     public sealed class Settings : CommandSettings
     {
         [CommandArgument(0, "<NAME>")]
+        [Description("Name of the activity to add")]
         public string Name { get; set; } = string.Empty;
     }
 
@@ -24,31 +25,49 @@ internal sealed class ActivityCommand : AsyncCommand<ActivityCommand.Settings>
     {
         var requestBody = new
         {
-            name = settings.Name
+            name = settings.Name,
+            planetName = string.Empty
         };
 
         try
         {
             using var httpClient = new HttpClient();
-            var response = await httpClient.PostAsJsonAsync("http://localhost:5228/activities", requestBody);
+            var response = await httpClient.PostAsJsonAsync("http://localhost:5228/api/activity", requestBody);
 
             response.EnsureSuccessStatusCode();
             var responseJson = await response.Content.ReadAsStringAsync();
-            var activity = JsonSerializer.Deserialize<ActivityModel>(responseJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            
+            var responseObj = JsonSerializer.Deserialize<JsonElement>(responseJson);
+            var activity = responseObj.GetProperty("activity").Deserialize<ActivityModel>(new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var status = responseObj.GetProperty("status");
+            var isNewlyCreated = status.GetProperty("isNewlyCreated").GetBoolean();
+            
+            var table = new Table();
+            table.AddColumn("Field");
+            table.AddColumn("Value");
 
             if (activity != null)
             {
-                var table = new Table();
-                table.AddColumn("Field");
-                table.AddColumn("Value");
-
-                table.AddRow("Activity ID", activity.ActivityId.ToString());
                 table.AddRow("Name", activity.Name);
+                
+                string title;
+                Style panelStyle;
+                
+                if (isNewlyCreated)
+                {
+                    title = "Activity Added";
+                    panelStyle = Style.Parse("green");
+                }
+                else
+                {
+                    title = "Activity Already Exists";
+                    panelStyle = Style.Parse("yellow");
+                }
 
                 AnsiConsole.Write(new Panel(table)
-                    .Header("Activity Added", Justify.Center)
+                    .Header(title, Justify.Center)
                     .Border(BoxBorder.Rounded)
-                    .BorderStyle(Style.Parse("green")));
+                    .BorderStyle(panelStyle));
             }
 
             return 0;
@@ -70,23 +89,16 @@ internal sealed class GetActivityCommand : AsyncCommand<GetActivityCommand.Setti
 {
     public sealed class Settings : CommandSettings
     {
-        [CommandOption("-p | --planet <planetId>")]
-        [DefaultValue(-1)]
-        public int PlanetId { get; set; }
+        [CommandArgument(0, "<PLANET>")]
+        public string PlanetName { get; set; } = string.Empty;
     }
 
     public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
     {
         try
         {
-            if (settings.PlanetId == -1)
-            {
-                AnsiConsole.MarkupLine($"[red]Request failed:[/] Planet ID is required");
-                return 1;
-            }
-
             using var httpClient = new HttpClient();
-            var response = await httpClient.GetAsync($"http://localhost:5228/activities/planets/{settings.PlanetId}");
+            var response = await httpClient.GetAsync($"http://localhost:5228/api/activity/planet/{settings.PlanetName}");
 
             response.EnsureSuccessStatusCode();
             var responseJson = await response.Content.ReadAsStringAsync();
@@ -97,18 +109,21 @@ internal sealed class GetActivityCommand : AsyncCommand<GetActivityCommand.Setti
                 BorderStyle = Style.Parse("green")
             };
 
-            table.AddColumn("Activity ID");
             table.AddColumn("Name");
 
             var activities = JsonSerializer.Deserialize<List<ActivityModel>>(responseJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-            if (activities != null)
+            if (activities != null && activities.Any())
             {
                 foreach (var activity in activities)
                 {
-                    table.AddRow(activity.ActivityId.ToString(), activity.Name);
+                    table.AddRow(activity.Name);
                 }
                 AnsiConsole.Write(table);
+            }
+            else
+            {
+                AnsiConsole.MarkupLine($"[yellow]No activities found for planet {settings.PlanetName}[/]");
             }
 
             return 0;
@@ -130,28 +145,22 @@ internal sealed class UpdateActivityCommand : AsyncCommand<UpdateActivityCommand
 {
     public sealed class Settings : CommandSettings
     {
-        [CommandArgument(0, "<ID>")]
-        public int Id { get; set; }
+        [CommandArgument(0, "<CURRENT_NAME>")]
+        public string CurrentName { get; set; } = string.Empty;
 
-        [CommandArgument(1, "<NAME>")]
-        public string Name { get; set; } = string.Empty;
+        [CommandArgument(1, "<NEW_NAME>")]
+        public string NewName { get; set; } = string.Empty;
     }
 
     public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
     {
-        var requestBody = new
-        {
-            activityId = settings.Id,
-            name = settings.Name
-        };
-
         try
         {
             using var httpClient = new HttpClient();
-            var response = await httpClient.PutAsJsonAsync($"http://localhost:5228/activities/{settings.Id}", requestBody);
+            var response = await httpClient.PutAsJsonAsync($"http://localhost:5228/api/activity/{settings.CurrentName}", settings.NewName);
 
             response.EnsureSuccessStatusCode();
-            AnsiConsole.MarkupLine("[green]Activity updated successfully[/]");
+            AnsiConsole.MarkupLine($"[green]Activity '{settings.CurrentName}' updated to '{settings.NewName}' successfully[/]");
             return 0;
         }
         catch (HttpRequestException ex)
@@ -166,8 +175,9 @@ internal sealed class DeleteActivityCommand : AsyncCommand<DeleteActivityCommand
 {
     public sealed class Settings : CommandSettings
     {
-        [CommandArgument(0, "<ID>")]
-        public int Id { get; set; }
+        [CommandArgument(0, "<NAME>")]
+        [Description("Name of the activity to delete")]
+        public string Name { get; set; } = string.Empty;
     }
 
     public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
@@ -175,15 +185,95 @@ internal sealed class DeleteActivityCommand : AsyncCommand<DeleteActivityCommand
         try
         {
             using var httpClient = new HttpClient();
-            var response = await httpClient.DeleteAsync($"http://localhost:5228/activities/{settings.Id}");
+            var response = await httpClient.DeleteAsync($"http://localhost:5228/api/activity/{settings.Name}");
 
             response.EnsureSuccessStatusCode();
-            AnsiConsole.MarkupLine("[green]Activity deleted successfully[/]");
+            AnsiConsole.MarkupLine($"[green]Activity '{settings.Name}' deleted successfully[/]");
             return 0;
         }
         catch (HttpRequestException ex)
         {
             AnsiConsole.MarkupLine($"[red]Request failed:[/] {ex.Message}");
+            return 1;
+        }
+    }
+}
+
+internal sealed class LinkActivityCommand : AsyncCommand<LinkActivityCommand.Settings>
+{
+    public sealed class Settings : CommandSettings
+    {
+        [CommandArgument(0, "<ACTIVITY>")]
+        [Description("Name of the existing activity to link")]
+        public string ActivityName { get; set; } = string.Empty;
+
+        [CommandArgument(1, "<PLANET>")]
+        [Description("Name of the planet to link the activity to")]
+        public string PlanetName { get; set; } = string.Empty;
+    }
+
+    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
+    {
+        var requestBody = new
+        {
+            name = settings.ActivityName,
+            planetName = settings.PlanetName
+        };
+
+        try
+        {
+            using var httpClient = new HttpClient();
+            var response = await httpClient.PostAsJsonAsync("http://localhost:5228/api/activity/link", requestBody);
+
+            response.EnsureSuccessStatusCode();
+            var responseJson = await response.Content.ReadAsStringAsync();
+            
+            // Parse the response
+            var responseObj = JsonSerializer.Deserialize<JsonElement>(responseJson);
+            var activity = responseObj.GetProperty("activity").Deserialize<ActivityModel>(new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var status = responseObj.GetProperty("status");
+            var isNewlyLinked = status.GetProperty("isNewlyLinked").GetBoolean();
+            
+            var table = new Table();
+            table.AddColumn("Field");
+            table.AddColumn("Value");
+
+            if (activity != null)
+            {
+                table.AddRow("Activity", activity.Name);
+                table.AddRow("Planet", activity.PlanetName);
+                
+                string title;
+                Style panelStyle;
+                
+                if (isNewlyLinked)
+                {
+                    title = "Activity Linked to Planet";
+                    panelStyle = Style.Parse("green");
+                }
+                else 
+                {
+                    title = "Activity Already Linked";
+                    table.AddRow("Status", "Activity was already linked to this planet");
+                    panelStyle = Style.Parse("yellow");
+                }
+
+                AnsiConsole.Write(new Panel(table)
+                    .Header(title, Justify.Center)
+                    .Border(BoxBorder.Rounded)
+                    .BorderStyle(panelStyle));
+            }
+
+            return 0;
+        }
+        catch (HttpRequestException ex)
+        {
+            AnsiConsole.MarkupLine($"[red]Request failed:[/] {ex.Message}");
+            return 1;
+        }
+        catch (JsonException ex)
+        {
+            AnsiConsole.MarkupLine($"[red]Failed to parse response:[/] {ex.Message}");
             return 1;
         }
     }

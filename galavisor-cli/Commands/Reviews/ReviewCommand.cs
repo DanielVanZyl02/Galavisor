@@ -108,14 +108,12 @@ internal sealed class GetReviewCommand : AsyncCommand<GetReviewCommand.Settings>
     {
         try
         {
-            // Check for conflicting parameters
             if (settings.id != -1 && settings.planetId != -1)
             {
                 AnsiConsole.MarkupLine($"[red]Request failed:[/] Cannot search by planet and id");
                 return 1;
             }
 
-            // Build the base URL
             var baseUrl = "http://localhost:5228/reviews";
             if (settings.id != -1)
             {
@@ -126,7 +124,6 @@ internal sealed class GetReviewCommand : AsyncCommand<GetReviewCommand.Settings>
                 baseUrl += "/planets/" + settings.planetId.ToString();
             }
 
-            // Add query parameters
             var queryParams = new List<string>();
             
             if (settings.ratingEqual != -1)
@@ -144,7 +141,6 @@ internal sealed class GetReviewCommand : AsyncCommand<GetReviewCommand.Settings>
                 queryParams.Add($"ratingLte={settings.ratingLessThanOrEqual}");
             }
             
-            // Add query string to URL if parameters exist
             var requestUrl = baseUrl;
             if (queryParams.Count > 0)
             {
@@ -199,8 +195,6 @@ internal sealed class GetReviewCommand : AsyncCommand<GetReviewCommand.Settings>
                         );
                     }
                     AnsiConsole.Write(table);
-
-                    // Show count of reviews
                     AnsiConsole.MarkupLine($"[green]Found {reviews.Count} review(s) matching your criteria.[/]");
                 }
                 else

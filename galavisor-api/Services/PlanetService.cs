@@ -59,7 +59,7 @@ public class PlanetService
 
         using var httpClient = new HttpClient();
         httpClient.DefaultRequestHeaders.Clear();
-        httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer "+ConfigStore.Get(ConfigKeys.DatabaseConnectionString));
+        httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer "+ConfigStore.Get(ConfigKeys.AIKEY));
 
         var response = await httpClient.PostAsync("https://openrouter.ai/api/v1/chat/completions", content);
 

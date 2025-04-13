@@ -22,6 +22,11 @@ public static class GeneralUtils{
             CommandsConstants.getweather,
             CommandsConstants.addplanet,
             CommandsConstants.updateplanet
+            CommandsConstants.addactivity,
+            CommandsConstants.getactivity,
+            CommandsConstants.updateactivity,
+            CommandsConstants.deleteactivity,
+            CommandsConstants.linkactivity
         ];
     }
 }

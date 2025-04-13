@@ -15,6 +15,7 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSingleton<ReviewService>();
 builder.Services.AddSingleton<ReviewRepository>();
+builder.Services.AddSingleton<ActivityService>();
 
 builder.Services.AddSingleton<PlanetService>();
 builder.Services.AddSingleton<PlanetRepository>();

@@ -13,4 +13,9 @@ public static class CommandsConstants
     public const string help = "help";
     public const string review = "review";
     public const string getreview = "get-review";
+    public const string planets = "planets";
+    public const string getplanet = "get-planet";
+    public const string getweather = "get-weather";
+    public const string addplanet = "add-planet";
+    public const string updateplanet = "update-planet";
 }

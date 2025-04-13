@@ -9,6 +9,7 @@ using GalavisorCli.Commands.Users;
 using GalavisorCli.Commands.System;
 using GalavisorCli.Commands.TodoList;
 using GalavisorCli.Commands.Reviews;
+using GalavisorCli.Commands.Planets;
 
 namespace GalavisorCli.App;
 
@@ -28,6 +29,11 @@ public static class Setup{
         services.AddTransient<ConfigCommand>();
         services.AddTransient<ReviewCommand>();
         services.AddTransient<GetReviewCommand>();
+        services.AddTransient<GetPlanetsCommand>();
+        services.AddTransient<GetPlanetCommand>();
+        services.AddTransient<GetPlanetWeatherCommand>();
+        services.AddTransient<AddPlanetCommand>();
+        services.AddTransient<UpdatePlanetCommand>();
 
         var serviceProvider = services.BuildServiceProvider();
         var registrar = new DependencyInjectionRegistrar(services);
@@ -46,6 +52,10 @@ public static class Setup{
             config.AddCommand<HelpCommand>(CommandsConstants.help).WithDescription("See all commands available in the cli");
             config.AddCommand<ReviewCommand>(CommandsConstants.review);
             config.AddCommand<GetReviewCommand>(CommandsConstants.getreview);
+            config.AddCommand<GetPlanetsCommand>(CommandsConstants.planets);
+            config.AddCommand<GetPlanetCommand>(CommandsConstants.getplanet);
+            config.AddCommand<GetPlanetWeatherCommand>(CommandsConstants.getweather);
+            config.AddCommand<AddPlanetCommand>(CommandsConstants.addplanet);
         });
 
         var knownCommands = GeneralUtils.GetKnownCommands();

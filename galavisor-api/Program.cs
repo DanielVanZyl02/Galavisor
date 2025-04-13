@@ -12,18 +12,15 @@ builder.Services.AddSingleton(new DatabaseConnection(connectionString));
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-// builder.Services.AddGoogleJwtAuthentication();
-// builder.Services.AddDefaultAuthorization();
-// builder.Services.AddHttpClient<AuthService>();
 
 builder.Services.AddSingleton<ReviewService>();
 builder.Services.AddSingleton<ReviewRepository>();
 
+builder.Services.AddSingleton<PlanetService>();
+builder.Services.AddSingleton<PlanetRepository>();
+
 var app = builder.Build();
 
-// app.UseHttpsRedirection();
-
-// app.UseAuthorization();
 app.MapControllers();
 
 app.Run();

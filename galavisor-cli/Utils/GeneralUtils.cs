@@ -16,7 +16,12 @@ public static class GeneralUtils{
             CommandsConstants.exit, 
             CommandsConstants.help,
             CommandsConstants.review,
-            CommandsConstants.getreview
+            CommandsConstants.getreview,
+            CommandsConstants.planets,
+            CommandsConstants.getplanet,
+            CommandsConstants.getweather,
+            CommandsConstants.addplanet,
+            CommandsConstants.updateplanet
         ];
     }
 }

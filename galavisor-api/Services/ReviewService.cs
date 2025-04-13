@@ -20,20 +20,20 @@ public class ReviewService
         return addedReview;
     }
 
-    public async Task<List<ReviewModel>> GetAllReviews()
+    public async Task<List<ReviewModel>> GetAllReviews(int? ratingEq = null, int? ratingGte = null, int? ratingLte = null)
     {
-        return await _reviewRepository.GetAll();
+        return await _reviewRepository.GetAll(ratingEq, ratingGte, ratingLte);
     }
 
     public async Task<ReviewModel?> GetReviewById(int id)
     {
         return await _reviewRepository.GetById(id);
     }
-    public async Task<List<ReviewModel>> GetReviewByPlanetId(int planetId)
+    public async Task<List<ReviewModel>> GetReviewByPlanetId(int planetId, int? ratingEq = null, int? ratingGte = null, int? ratingLte = null)
     {
-        return await _reviewRepository.GetByPlanetId(planetId);
+        return await _reviewRepository.GetByPlanetId(planetId, ratingEq, ratingGte, ratingLte);
     }
-    public async Task<bool> UpdateReview(ReviewModel review)
+    public async Task<ReviewModel> UpdateReview(ReviewModel review)
     {
         return await _reviewRepository.Update(review);
     }

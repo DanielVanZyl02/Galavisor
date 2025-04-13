@@ -19,11 +19,12 @@ builder.Services.AddSingleton<UserService>();
 builder.Services.AddSingleton<ReviewService>();
 builder.Services.AddSingleton<ReviewRepository>();
 builder.Services.AddSingleton<UserRepository>();
+builder.Services.AddSingleton<ActivityService>();
+builder.Services.AddSingleton<PlanetService>();
+builder.Services.AddSingleton<PlanetRepository>();
 
 var app = builder.Build();
-
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
 app.MapControllers();
 

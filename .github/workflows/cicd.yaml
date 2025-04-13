@@ -1,0 +1,43 @@
+name: CICD
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build_and_deploy:
+    runs-on: [ubuntu-latest]
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+      - name: Set up .NET 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Setup Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          cd galavisor-api
+          echo "$SERVER_CONFIG" > server_config.json
+          ls
+          chmod 600 server_config.json
+          
+      - name: Restore API
+        run: |
+          cd galavisor-api
+          dotnet restore
+
+      - name: Build API
+        run: |
+          cd galavisor-api
+          dotnet publish --runtime linux-x64
+
+      - name: Deploy
+        run: |
+          scp -r -o StrictHostKeyChecking=no -i "~/.ssh/id_rsa" galavisor-api/bin/Release/net9.0/linux-x64/publish ec2-user@ec2-54-75-118-89.eu-west-1.compute.amazonaws.com:~/
+    env:
+      SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}}
+      SERVER_CONFIG: ${{secrets.SERVER_CONFIG}}

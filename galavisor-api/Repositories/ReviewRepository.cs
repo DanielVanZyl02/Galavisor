@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using Dapper;
 using System.Data;
+using System.Text;
 using GalavisorApi.Models;
 using GalavisorApi.Data;
 
@@ -54,57 +55,121 @@ public class ReviewRepository
               WHERE reviewid = @Id", 
             new { Id = id });
     }
-
-    public async Task<List<ReviewModel>> GetByPlanetId(int planetId)
+    
+    public async Task<List<ReviewModel>> GetByPlanetId(int planetId, int? ratingEq = null, int? ratingGte = null, int? ratingLte = null)
     {
         using var connection = _db.CreateConnection();
-        var reviews = await connection.QueryAsync<ReviewModel>(
-            @"SELECT reviewid AS ReviewId, 
-                    planetid AS PlanetId, 
-                    userid AS UserId, 
-                    rating AS Rating, 
-                    comment AS Comment 
-              FROM review 
-              WHERE planetId = @Id", 
-            new { Id = planetId });
-
+        
+        var queryBuilder = new StringBuilder(@"
+            SELECT reviewid AS ReviewId, 
+                   planetid AS PlanetId, 
+                   userid AS UserId, 
+                   rating AS Rating, 
+                   comment AS Comment 
+            FROM review 
+            WHERE planetId = @PlanetId");
+        
+        var parameters = new DynamicParameters();
+        parameters.Add("PlanetId", planetId);
+        
+        AddRatingFilters(queryBuilder, parameters, ratingEq, ratingGte, ratingLte);
+        
+        var reviews = await connection.QueryAsync<ReviewModel>(queryBuilder.ToString(), parameters);
         return reviews.ToList();
     }
 
-    public async Task<List<ReviewModel>> GetAll()
+
+    public async Task<List<ReviewModel>> GetAll(int? ratingEq = null, int? ratingGte = null, int? ratingLte = null)
     {
         using var connection = _db.CreateConnection();
-        var reviews = await connection.QueryAsync<ReviewModel>(
-            @"SELECT reviewid AS ReviewId, 
-                    planetid AS PlanetId, 
-                    userid AS UserId, 
-                    rating AS Rating, 
-                    comment AS Comment 
-              FROM review");
         
+        var queryBuilder = new StringBuilder(@"
+            SELECT reviewid AS ReviewId, 
+                   planetid AS PlanetId, 
+                   userid AS UserId, 
+                   rating AS Rating, 
+                   comment AS Comment 
+            FROM review");
+        
+        var parameters = new DynamicParameters();
+
+        if (ratingEq.HasValue || ratingGte.HasValue || ratingLte.HasValue)
+        {
+            queryBuilder.Append(" WHERE 1=1");
+            AddRatingFilters(queryBuilder, parameters, ratingEq, ratingGte, ratingLte);
+        }
+        
+        var reviews = await connection.QueryAsync<ReviewModel>(queryBuilder.ToString(), parameters);
         return reviews.ToList();
     }
 
-    public async Task<bool> Update(ReviewModel review)
+    public async Task<ReviewModel> Update(ReviewModel review)
     {
         using var connection = _db.CreateConnection();
-        var sql = @"
-            UPDATE reviews 
-            SET planet_id = @PlanetId, 
-                user_id = @UserId, 
-                rating = @Rating, 
-                comment = @Comment
-            WHERE review_id = @ReviewId";
         
-        var result = await connection.ExecuteAsync(sql, review);
-        return result > 0;
+        var updateFields = new List<string>();
+        var parameters = new DynamicParameters();
+
+        parameters.Add("ReviewId", review.ReviewId);
+        
+        if (review.Rating.HasValue)
+        {
+            updateFields.Add("rating = @Rating");
+            parameters.Add("Rating", review.Rating);
+        }
+        
+        if (!string.IsNullOrEmpty(review.Comment))
+        {
+            updateFields.Add("comment = @Comment");
+            parameters.Add("Comment", review.Comment);
+        }
+        
+        if (updateFields.Count == 0)
+            return null;
+        
+        var sql = $@"
+            UPDATE review 
+            SET {string.Join(", ", updateFields)}
+            WHERE reviewid = @ReviewId;
+            
+            SELECT reviewid as ReviewId, 
+                planetid as PlanetId, 
+                userid as UserId, 
+                rating as Rating, 
+                comment as Comment
+            FROM review
+            WHERE reviewid = @ReviewId;";
+        
+        var updatedReview = await connection.QuerySingleOrDefaultAsync<ReviewModel>(sql, parameters);
+        return updatedReview;
     }
 
     public async Task<bool> Delete(int id)
     {
         using var connection = _db.CreateConnection();
         var result = await connection.ExecuteAsync(
-            "DELETE FROM reviews WHERE reviewid = @Id", new { Id = id });
+            "DELETE FROM review WHERE reviewid = @Id", new { Id = id });
         return result > 0;
+    }
+
+    private void AddRatingFilters(StringBuilder queryBuilder, DynamicParameters parameters, int? ratingEq, int? ratingGte, int? ratingLte)
+    {
+        if (ratingEq.HasValue)
+        {
+            queryBuilder.Append(" AND rating = @RatingEq");
+            parameters.Add("RatingEq", ratingEq.Value);
+        }
+        
+        if (ratingGte.HasValue)
+        {
+            queryBuilder.Append(" AND rating >= @RatingGte");
+            parameters.Add("RatingGte", ratingGte.Value);
+        }
+        
+        if (ratingLte.HasValue)
+        {
+            queryBuilder.Append(" AND rating <= @RatingLte");
+            parameters.Add("RatingLte", ratingLte.Value);
+        }
     }
 }

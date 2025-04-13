@@ -10,6 +10,8 @@ using GalavisorCli.Commands.System;
 using GalavisorCli.Commands.TodoList;
 using GalavisorCli.Commands.Reviews;
 using GalavisorCli.Commands.Auth;
+using GalavisorCli.Commands.Planets;
+using GalavisorCli.Commands.Activities;
 
 namespace GalavisorCli.App;
 
@@ -39,6 +41,22 @@ public static class Setup{
         services.AddTransient<ReviewCommand>();
         services.AddTransient<GetReviewCommand>();
 
+        services.AddTransient<UpdateReviewCommand>();
+        services.AddTransient<DeleteReviewCommand>();
+
+        services.AddTransient<GetPlanetsCommand>();
+        services.AddTransient<GetPlanetCommand>();
+        services.AddTransient<GetPlanetWeatherCommand>();
+        services.AddTransient<AddPlanetCommand>();
+        services.AddTransient<UpdatePlanetCommand>();
+        services.AddTransient<ActivityCommand>();
+        services.AddTransient<GetActivityCommand>();
+        services.AddTransient<UpdateActivityCommand>();
+        services.AddTransient<DeleteActivityCommand>();
+        services.AddTransient<LinkActivityCommand>();
+        services.AddTransient<DeletePlanetCommand>();
+
+
         var serviceProvider = services.BuildServiceProvider();
         var registrar = new DependencyInjectionRegistrar(services);
         var app = new CommandApp(registrar);
@@ -64,6 +82,21 @@ public static class Setup{
             config.AddCommand<HelpCommand>(CommandsConstants.help).WithDescription("See all commands available in the cli");
             config.AddCommand<ReviewCommand>(CommandsConstants.review);
             config.AddCommand<GetReviewCommand>(CommandsConstants.getreview);
+
+            config.AddCommand<UpdateReviewCommand>(CommandsConstants.updatereview);
+            config.AddCommand<DeleteReviewCommand>(CommandsConstants.deletereview);
+
+            config.AddCommand<GetPlanetsCommand>(CommandsConstants.planets);
+            config.AddCommand<GetPlanetCommand>(CommandsConstants.getplanet);
+            config.AddCommand<GetPlanetWeatherCommand>(CommandsConstants.getweather);
+            config.AddCommand<AddPlanetCommand>(CommandsConstants.addplanet);
+            config.AddCommand<ActivityCommand>(CommandsConstants.addactivity).WithDescription("Add a new activity to the database");
+            config.AddCommand<GetActivityCommand>(CommandsConstants.getactivity).WithDescription("Get activities by planet");
+            config.AddCommand<UpdateActivityCommand>(CommandsConstants.updateactivity).WithDescription("Update an activity's name");
+            config.AddCommand<DeleteActivityCommand>(CommandsConstants.deleteactivity).WithDescription("Delete an activity");
+            config.AddCommand<LinkActivityCommand>(CommandsConstants.linkactivity).WithDescription("Link an existing activity to a planet");
+            config.AddCommand<UpdatePlanetCommand>(CommandsConstants.updateplanet);
+            config.AddCommand<DeletePlanetCommand>(CommandsConstants.deleteplanet);
         });
 
         var knownCommands = GeneralUtils.GetKnownCommands();

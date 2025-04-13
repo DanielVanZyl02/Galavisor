@@ -23,6 +23,12 @@ public static class GeneralUtils{
             CommandsConstants.addplanet,
             CommandsConstants.updateplanet,
             CommandsConstants.deleteplanet
+            CommandsConstants.updateplanet
+            CommandsConstants.addactivity,
+            CommandsConstants.getactivity,
+            CommandsConstants.updateactivity,
+            CommandsConstants.deleteactivity,
+            CommandsConstants.linkactivity
         ];
     }
 }

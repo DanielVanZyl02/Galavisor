@@ -5,7 +5,7 @@ namespace GalavisorCli.Utils;
 
 public static class TokenUtils
 {
-    private static readonly JsonSerializerOptions jsonOptions = new JsonSerializerOptions
+    private static readonly JsonSerializerOptions jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
     };

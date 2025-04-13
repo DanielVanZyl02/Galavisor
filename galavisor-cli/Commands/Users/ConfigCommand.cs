@@ -1,4 +1,5 @@
 using GalavisorCli.Constants;
+using GalavisorCli.Services;
 using GalavisorCli.Utils;
 using Spectre.Console;
 using Spectre.Console.Cli;
@@ -22,11 +23,11 @@ public class ConfigSettings : CommandSettings
     public string? HomePlanet { get; set; }
 }
 
-public class ConfigCommand : Command<ConfigSettings>
+public class ConfigCommand : AsyncCommand<ConfigSettings>
 {
-    public override int Execute([NotNull] CommandContext context, [NotNull] ConfigSettings settings)
+    public override async Task<int> ExecuteAsync([NotNull] CommandContext context, [NotNull] ConfigSettings settings)
     {
-        if(ConfigStore.Exists(ConfigKeys.JwtToken)){
+        if(!ConfigStore.Exists(ConfigKeys.JwtToken)){
             AnsiConsole.MarkupLine("[red]Please login to use this command.[/]");
             return 0;
         }
@@ -73,9 +74,39 @@ public class ConfigCommand : Command<ConfigSettings>
 
         if (!updated)return 0;
 
-        ConfigStore.Set(ConfigKeys.GoogleName, Username);
-        ConfigStore.Set(ConfigKeys.HomePlanet, HomePlanet);
-        AnsiConsole.MarkupLine($"[green]Config updated for HomePlanet to {HomePlanet} and for Username to {Username}.[/]");
+        var User = await UserService.UpdateUserConfig(Username, HomePlanet);
+
+        User.Switch(
+            Message => {
+                AnsiConsole.MarkupLine($"[red]Encountered some error, please try again later: {Message}.[/]");
+            },
+            User => {
+                ConfigStore.Set(ConfigKeys.GoogleName, User.Name);
+                ConfigStore.Set(ConfigKeys.HomePlanet, User.PlanetName);
+                AnsiConsole.MarkupLine($"[green]Config updated for HomePlanet to {User.PlanetName} and for Username to {User.Name}.[/]");
+
+                var table = new Table();
+                table.AddColumn("[bold]User ID[/]");
+                table.AddColumn("[bold]Name[/]");
+                table.AddColumn("[bold]Planet Name[/]");
+                table.AddColumn("[bold]Role[/]");
+                table.AddColumn("[bold]Active[/]");
+                table.AddColumn("[bold]Google Subject[/]");
+
+                table.AddRow(
+                    User.UserId.ToString(),
+                    User.Name,
+                    User.PlanetName,
+                    User.RoleName,
+                    User.IsActive ? "[green]Active[/]" : "[red]Inactive[/]",
+                    User.GoogleSubject
+                );
+
+                AnsiConsole.Write(table);
+            }
+        );
+
+        
         return 0;
     }
 }

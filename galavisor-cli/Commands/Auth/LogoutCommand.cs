@@ -3,7 +3,7 @@ using Spectre.Console.Cli;
 using GalavisorCli.Constants;
 using  GalavisorCli.Utils;
 
-namespace GalavisorCli.Commands.Users;
+namespace GalavisorCli.Commands.Auth;
 
 public class LogoutCommand : Command
 {
@@ -11,6 +11,8 @@ public class LogoutCommand : Command
     {
         if(ConfigStore.Exists(ConfigKeys.JwtToken)){
             ConfigStore.Remove(ConfigKeys.JwtToken);
+            ConfigStore.Remove(ConfigKeys.GoogleName);
+            ConfigStore.Remove(ConfigKeys.HomePlanet);
             AnsiConsole.MarkupLine("[green]You have been logged out successfully.[/]");
             return 0;
         } else {

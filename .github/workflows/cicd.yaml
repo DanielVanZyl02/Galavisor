@@ -14,15 +14,6 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 9.0.x
-      - name: Restore API
-        run: |
-          cd galavisor-api
-          dotnet restore
-
-      - name: Build API
-        run: |
-          cd galavisor-api
-          dotnet publish --runtime linux-x64
 
       - name: Setup Key
         run: |
@@ -33,6 +24,17 @@ jobs:
           echo "$SERVER_CONFIG" > server_config.json
           ls
           chmod 600 server_config.json
+          
+      - name: Restore API
+        run: |
+          cd galavisor-api
+          dotnet restore
+
+      - name: Build API
+        run: |
+          cd galavisor-api
+          dotnet publish --runtime linux-x64
+
       - name: Deploy
         run: |
           scp -r -o StrictHostKeyChecking=no -i "~/.ssh/id_rsa" galavisor-api/bin/Release/net9.0/linux-x64/publish ec2-user@ec2-54-75-118-89.eu-west-1.compute.amazonaws.com:~/

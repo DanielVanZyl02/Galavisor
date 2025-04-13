@@ -44,6 +44,7 @@ public static class Setup{
         services.AddTransient<UpdateActivityCommand>();
         services.AddTransient<DeleteActivityCommand>();
         services.AddTransient<LinkActivityCommand>();
+        services.AddTransient<DeletePlanetCommand>();
 
 
         var serviceProvider = services.BuildServiceProvider();
@@ -76,6 +77,8 @@ public static class Setup{
             config.AddCommand<UpdateActivityCommand>(CommandsConstants.updateactivity).WithDescription("Update an activity's name");
             config.AddCommand<DeleteActivityCommand>(CommandsConstants.deleteactivity).WithDescription("Delete an activity");
             config.AddCommand<LinkActivityCommand>(CommandsConstants.linkactivity).WithDescription("Link an existing activity to a planet");
+            config.AddCommand<UpdatePlanetCommand>(CommandsConstants.updateplanet);
+            config.AddCommand<DeletePlanetCommand>(CommandsConstants.deleteplanet);
         });
 
         var knownCommands = GeneralUtils.GetKnownCommands();

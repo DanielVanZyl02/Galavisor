@@ -23,6 +23,8 @@ public static class GeneralUtils{
             CommandsConstants.getplanet,
             CommandsConstants.getweather,
             CommandsConstants.addplanet,
+            CommandsConstants.updateplanet,
+            CommandsConstants.deleteplanet
             CommandsConstants.updateplanet
             CommandsConstants.addactivity,
             CommandsConstants.getactivity,

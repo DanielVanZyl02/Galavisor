@@ -76,7 +76,7 @@ internal sealed class GetPlanetCommand : AsyncCommand<GetPlanetCommand.Settings>
 
             response.EnsureSuccessStatusCode();
             var responseJson = await response.Content.ReadAsStringAsync();
-            var planet = JsonSerializer.Deserialize<List<PlanetModel>>(responseJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true})[0];
+            var planet = JsonSerializer.Deserialize<PlanetModel>(responseJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true});
             if(planet != null) 
             {
                 var table = new Table();
@@ -121,7 +121,6 @@ internal sealed class GetPlanetWeatherCommand : AsyncCommand<GetPlanetWeatherCom
         try {
             using var httpClient = new HttpClient();
             var response = await httpClient.PostAsJsonAsync($"http://localhost:5228/planets/weather/{settings.planetId}", new {});
-
             response.EnsureSuccessStatusCode();
             var responseJson = await response.Content.ReadAsStringAsync();
             using JsonDocument doc = JsonDocument.Parse(responseJson);
@@ -132,7 +131,7 @@ internal sealed class GetPlanetWeatherCommand : AsyncCommand<GetPlanetWeatherCom
                 .GetProperty("content")
                 .GetString();
 
-            if(content != "") {
+            if(content != null && content != "") {
                 var table = new Table();
                 table.AddColumn("Report");
                 table.AddRow(content);
@@ -162,16 +161,16 @@ internal sealed class AddPlanetCommand : AsyncCommand<AddPlanetCommand.Settings>
     public sealed class Settings : CommandSettings
     {
         [CommandArgument(0, "<PLANET NAME>")]
-        public string planetName { get; set; }
+        public required string planetName { get; set; }
 
         [CommandArgument(1, "<ATMOSPHERE>")]
-        public string Atmosphere { get; set; }
+        public required string Atmosphere { get; set; }
 
         [CommandArgument(2, "<TEMPERATURE>")]
-        public int Temperature { get; set; }
+        public required int Temperature { get; set; }
 
         [CommandArgument(3, "<COLOUR>")]
-        public string Colour { get; set; }
+        public required string Colour { get; set; }
     }
 
     public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
@@ -211,6 +210,110 @@ internal sealed class AddPlanetCommand : AsyncCommand<AddPlanetCommand.Settings>
                     .BorderStyle(Style.Parse("green")));
             }
 
+            return 0;
+        }
+        catch (HttpRequestException ex)
+        {
+            AnsiConsole.MarkupLine($"[red]Request failed:[/] {ex.Message}");
+            return 1;
+        }
+        catch (JsonException ex)
+        {
+            AnsiConsole.MarkupLine($"[red]Failed to parse response:[/] {ex.Message}");
+            return 1;
+        }
+    }
+}
+
+internal sealed class UpdatePlanetCommand : AsyncCommand<UpdatePlanetCommand.Settings>
+{
+    public sealed class Settings : CommandSettings
+    {
+        [CommandArgument(0, "<PLANET ID>")]
+        public int planetId { get; set; }
+    }
+
+    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
+    {
+
+        try {
+            using var httpClient = new HttpClient();
+            
+            //Getting the new planet to change
+            var response = await httpClient.GetAsync($"http://localhost:5228/planets/{settings.planetId}");
+            response.EnsureSuccessStatusCode();
+            var responseJson = await response.Content.ReadAsStringAsync();
+            var planet = JsonSerializer.Deserialize<PlanetModel>(responseJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true});
+
+            // response = await httpClient.GetAsync($"http://localhost:5228/planets/update/{settings.planetId}");
+            // response.EnsureSuccessStatusCode();
+            // responseJson = await response.Content.ReadAsStringAsync();
+            // planet = JsonSerializer.Deserialize<PlanetModel>(responseJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true});
+            // if(planet != null) 
+            // {
+            //     var table = new Table();
+            //     table.AddColumn("Id");
+            //     table.AddColumn("Name");
+            //     table.AddColumn("Atmosphere");
+            //     table.AddColumn("Temperature (C°)");
+            //     table.AddColumn("Colour");
+
+            //     table.AddRow(planet.PlanetId.ToString(), planet.Name.ToString(), planet.Atmosphere.ToString(), planet.Temperature.ToString(), planet.Colour.ToString());
+            //     AnsiConsole.Write(new Panel(table)
+            //         .Header($"Planet {planet.Name.ToString()}", Justify.Center)
+            //         .Border(BoxBorder.Rounded)
+            //         .BorderStyle(Style.Parse("green")));
+            // }
+            return 0;
+        }
+        catch (HttpRequestException ex)
+        {
+            AnsiConsole.MarkupLine($"[red]Request failed:[/] {ex.Message}");
+            return 1;
+        }
+        catch (JsonException ex)
+        {
+            AnsiConsole.MarkupLine($"[red]Failed to parse response:[/] {ex.Message}");
+            return 1;
+        }
+    }
+}
+
+internal sealed class DeletePlanetCommand : AsyncCommand<DeletePlanetCommand.Settings>
+{
+    public sealed class Settings : CommandSettings
+    {
+        [CommandArgument(0, "<PLANET ID>")]
+        public int planetId { get; set; }
+    }
+
+    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
+    {
+
+        try {
+            using var httpClient = new HttpClient();
+            var response = await httpClient.GetAsync($"http://localhost:5228/planets/{settings.planetId}");
+            var _ = await httpClient.DeleteAsync($"http://localhost:5228/planets/delete/{settings.planetId}");
+
+
+            response.EnsureSuccessStatusCode();
+            var responseJson = await response.Content.ReadAsStringAsync();
+            var planet = JsonSerializer.Deserialize<PlanetModel>(responseJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true});
+            if(planet != null) 
+            {
+                var table = new Table();
+                table.AddColumn("Id");
+                table.AddColumn("Name");
+                table.AddColumn("Atmosphere");
+                table.AddColumn("Temperature (C°)");
+                table.AddColumn("Colour");
+
+                table.AddRow(planet.PlanetId.ToString(), planet.Name.ToString(), planet.Atmosphere.ToString(), planet.Temperature.ToString(), planet.Colour.ToString());
+                AnsiConsole.Write(new Panel(table)
+                    .Header($"Deleted {planet.Name.ToString()}", Justify.Center)
+                    .Border(BoxBorder.Rounded)
+                    .BorderStyle(Style.Parse("green")));
+            }
             return 0;
         }
         catch (HttpRequestException ex)

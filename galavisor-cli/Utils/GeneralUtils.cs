@@ -19,6 +19,17 @@ public static class GeneralUtils{
             CommandsConstants.getreview,
             CommandsConstants.updatereview,
             CommandsConstants.deletereview
+            CommandsConstants.planets,
+            CommandsConstants.getplanet,
+            CommandsConstants.getweather,
+            CommandsConstants.addplanet,
+            CommandsConstants.updateplanet
+            CommandsConstants.addactivity,
+            CommandsConstants.getactivity,
+            CommandsConstants.updateactivity,
+            CommandsConstants.deleteactivity,
+            CommandsConstants.linkactivity
+
         ];
     }
 }

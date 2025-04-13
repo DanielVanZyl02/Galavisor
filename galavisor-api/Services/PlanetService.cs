@@ -24,15 +24,14 @@ public class PlanetService
         return await _planetRepository.GetAll();
     }
 
-    public async Task<List<PlanetModel>> GetPlanetById(int id)
+    public async Task<PlanetModel> GetPlanetById(int id)
     {
         return await _planetRepository.GetById(id);
     }
 
     public async Task<string> GetPlanetWeatherById(int id)
     {
-        var planet = (await _planetRepository.GetById(id))[0];
-
+        var planet = await _planetRepository.GetById(id);
         string name = planet.Name;
         string atmosphere = planet.Atmosphere;
         int temperature = planet.Temperature;
@@ -52,18 +51,18 @@ public class PlanetService
             {
                 new {role = "user", content = initialPrompt}
             },
-            model = "nvidia/llama-3.1-nemotron-nano-8b-v1:free"
+            model = "meta-llama/llama-3.2-1b-instruct:free"
         };
         var jsonPayload = JsonSerializer.Serialize(payload);
         var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
         using var httpClient = new HttpClient();
         httpClient.DefaultRequestHeaders.Clear();
-        httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer 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");
+        httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer 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");
 
         var response = await httpClient.PostAsync("https://openrouter.ai/api/v1/chat/completions", content);
-        var message = await response.Content.ReadAsStringAsync();
 
+        var message = await response.Content.ReadAsStringAsync();
         return message;
 
     }
@@ -71,5 +70,15 @@ public class PlanetService
     public async Task<PlanetModel> AddPlanet(PlanetModel planet)
     {
         return await _planetRepository.Add(planet);
+    }
+
+    public async Task<bool> DeletePlanet(int planetId)
+    {
+        return await _planetRepository.Delete(planetId);
+    }
+
+    public async Task<bool> UpdatePlanet(PlanetModel planet)
+    {
+        return await _planetRepository.Update(planet);
     }
 }

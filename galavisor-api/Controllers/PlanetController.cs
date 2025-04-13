@@ -25,7 +25,7 @@ public class PlanetController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult<List<PlanetModel>>> getPlanetById(int id)
+    public async Task<ActionResult<PlanetModel>> getPlanetById(int id)
     {
         return Ok(await _planetService.GetPlanetById(id));
     }
@@ -40,5 +40,17 @@ public class PlanetController : ControllerBase
     public async Task<ActionResult<PlanetModel>> addPlanet([FromBody] PlanetModel request)
     {   
         return Ok(await _planetService.AddPlanet(request));
+    }
+
+    [HttpDelete("delete/{id}")]
+    public async Task<ActionResult<bool>> addPlanet(int id)
+    {   
+        return Ok(await _planetService.DeletePlanet(id));
+    }
+
+    [HttpPatch("update/{id}")]
+    public async Task<ActionResult<bool>> updatePlanet([FromBody] PlanetModel planet)
+    {   
+        return Ok(await _planetService.UpdatePlanet(planet));
     }
 }

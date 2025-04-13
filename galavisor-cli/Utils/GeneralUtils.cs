@@ -17,6 +17,11 @@ public static class GeneralUtils{
             CommandsConstants.help,
             CommandsConstants.review,
             CommandsConstants.getreview,
+            CommandsConstants.planets,
+            CommandsConstants.getplanet,
+            CommandsConstants.getweather,
+            CommandsConstants.addplanet,
+            CommandsConstants.updateplanet
             CommandsConstants.addactivity,
             CommandsConstants.getactivity,
             CommandsConstants.updateactivity,

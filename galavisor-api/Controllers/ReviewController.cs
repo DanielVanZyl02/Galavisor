@@ -25,39 +25,75 @@ public class ReviewController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<ReviewModel>>> GetAllReviews()
+    public async Task<ActionResult<IEnumerable<ReviewModel>>> GetReviews(
+        [FromQuery] int? ratingEq,
+        [FromQuery] int? ratingGte,
+        [FromQuery] int? ratingLte)
     {
-        return Ok(await _reviewService.GetAllReviews());
-    }
-
-    [HttpGet("planets/{planetId}")]
-    public async Task<ActionResult<List<ReviewModel>>> GetReviewByPlanet(int planetId)
-    {
-        var review = await _reviewService.GetReviewByPlanetId(planetId);
-        return review != null ? Ok(review) : NotFound();
+        try
+        {
+            var reviews = await _reviewService.GetAllReviews(ratingEq, ratingGte, ratingLte);
+            return Ok(reviews);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
     }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<ReviewModel>> GetReview(int id)
     {
-        var review = await _reviewService.GetReviewById(id);
-        return review != null ? Ok(review) : NotFound();
+        try
+        {
+            var review = await _reviewService.GetReviewById(id);
+            if (review == null)
+            {
+                return NotFound($"Review with ID {id} not found");
+            }
+            return Ok(review);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
+    }
+
+    [HttpGet("planets/{planetId}")]
+    public async Task<ActionResult<IEnumerable<ReviewModel>>> GetReviewsByPlanet(
+        int planetId,
+        [FromQuery] int? ratingEq,
+        [FromQuery] int? ratingGte,
+        [FromQuery] int? ratingLte)
+    {
+        try
+        {
+            var reviews = await _reviewService.GetReviewByPlanetId(planetId, ratingEq, ratingGte, ratingLte);
+            return Ok(reviews);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Internal server error: {ex.Message}");
+        }
     }
 
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateReview(int id, [FromBody] ReviewModel request)
     {
-        if (id != request.ReviewId)
-            return BadRequest();
+        request.ReviewId = id;
+        
+        var updatedReview = await _reviewService.UpdateReview(request);
+        
+        if (updatedReview == null)
+            return NotFound();
             
-        var updated = await _reviewService.UpdateReview(request);
-        return updated ? NoContent() : NotFound();
+        return Ok(updatedReview);
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteReview(int id)
     {
         var deleted = await _reviewService.DeleteReview(id);
-        return deleted ? NoContent() : NotFound();
+        return deleted ? Ok($"Review {id} succesfully deleted") : NotFound($"Review {id} not found") ;
     }
 }

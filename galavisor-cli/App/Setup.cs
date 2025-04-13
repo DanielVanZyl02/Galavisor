@@ -30,6 +30,10 @@ public static class Setup{
         services.AddTransient<ConfigCommand>();
         services.AddTransient<ReviewCommand>();
         services.AddTransient<GetReviewCommand>();
+
+        services.AddTransient<UpdateReviewCommand>();
+        services.AddTransient<DeleteReviewCommand>();
+
         services.AddTransient<GetPlanetsCommand>();
         services.AddTransient<GetPlanetCommand>();
         services.AddTransient<GetPlanetWeatherCommand>();
@@ -40,6 +44,7 @@ public static class Setup{
         services.AddTransient<UpdateActivityCommand>();
         services.AddTransient<DeleteActivityCommand>();
         services.AddTransient<LinkActivityCommand>();
+
 
         var serviceProvider = services.BuildServiceProvider();
         var registrar = new DependencyInjectionRegistrar(services);
@@ -58,6 +63,10 @@ public static class Setup{
             config.AddCommand<HelpCommand>(CommandsConstants.help).WithDescription("See all commands available in the cli");
             config.AddCommand<ReviewCommand>(CommandsConstants.review);
             config.AddCommand<GetReviewCommand>(CommandsConstants.getreview);
+
+            config.AddCommand<UpdateReviewCommand>(CommandsConstants.updatereview);
+            config.AddCommand<DeleteReviewCommand>(CommandsConstants.deletereview);
+
             config.AddCommand<GetPlanetsCommand>(CommandsConstants.planets);
             config.AddCommand<GetPlanetCommand>(CommandsConstants.getplanet);
             config.AddCommand<GetPlanetWeatherCommand>(CommandsConstants.getweather);

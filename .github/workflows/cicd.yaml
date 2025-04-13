@@ -14,10 +14,14 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 9.0.x
-      - name: Build API
+      - name: Restore API
         run: |
           cd galavisor-api
           dotnet restore
+
+      - name: Build API
+        run: |
+          cd galavisor-api
           dotnet publish --runtime linux-x64
 
       - name: Setup Key

@@ -4,13 +4,10 @@ using GalavisorCli.Constants;
 using GalavisorCli.Services;
 using  GalavisorCli.Utils;
 
-namespace GalavisorCli.Commands.Users;
+namespace GalavisorCli.Commands.Auth;
 
-public class LoginCommand : AsyncCommand
+public class LoginCommand() : AsyncCommand
 {
-    private readonly AuthService _service;
-    public LoginCommand(AuthService service) => _service = service;
-
     public override async Task<int> ExecuteAsync(CommandContext context)
     {
         if(ConfigStore.Exists(ConfigKeys.JwtToken)){

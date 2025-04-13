@@ -18,6 +18,7 @@ public static class AuthenticationExtensions
                     ValidIssuers = ["https://accounts.google.com", "accounts.google.com"],
                     ValidateAudience = false
                 };
+                options.MapInboundClaims = false;
             });
 
         return services;

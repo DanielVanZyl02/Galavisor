@@ -88,7 +88,7 @@ public static class HttpUtils
         }
         else if (statusCode >= 400)
         {
-            throw new Exception($"Error: {statusCode} - {await response.Content.ReadAsStringAsync()}");
+            throw new Exception($"{statusCode} - {await response.Content.ReadAsStringAsync()}");
         }
 
         string responseBody = await response.Content.ReadAsStringAsync();

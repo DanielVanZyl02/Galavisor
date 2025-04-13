@@ -8,16 +8,16 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace GalavisorCli.Commands.Users;
 
-public class ToggleRoleSettings : CommandSettings
+public class EnableAccountSettings : CommandSettings
 {
     [CommandOption("--id <ID>")]
     [Description("ID of the account to enable")]
     public int? Id { get; set; }
 }
 
-public class ToggleRoleCommand : AsyncCommand<ToggleRoleSettings>
+public class EnableAccountCommand : AsyncCommand<EnableAccountSettings>
 {
-    public override async Task<int> ExecuteAsync([NotNull] CommandContext context, [NotNull] ToggleRoleSettings settings)
+    public override async Task<int> ExecuteAsync([NotNull] CommandContext context, [NotNull] EnableAccountSettings settings)
     {
         if (!ConfigStore.Exists(ConfigKeys.JwtToken))
         {
@@ -27,22 +27,25 @@ public class ToggleRoleCommand : AsyncCommand<ToggleRoleSettings>
 
         var userId = settings.Id ?? -1;
         if(settings.Id == null || userId == -1){
-            userId = AnsiConsole.Ask<int>("Enter the [green]User ID[/] of the account you want to update:");
+            userId = AnsiConsole.Ask<int>("Enter the [green]User ID[/] of the account you want to enable:c");
         }
-        
-        var newRole = AnsiConsole.Prompt(
-            new SelectionPrompt<string>()
-                .Title("What role do you want to assign?")
-                .AddChoices("Admin", "Traveler")
-        );
 
-        if (!AnsiConsole.Confirm($"Are you sure you want to change the role of [cyan]{userId}[/] to [yellow]{newRole}[/]?"))
+        if (!AnsiConsole.Confirm($"[yellow]Are you sure you want to enable the account with ID: {settings.Id}?[/]"))
         {
-            AnsiConsole.MarkupLine("[grey]Operation cancelled.[/]");
+            AnsiConsole.MarkupLine("[grey]No changes have been made.[/]");
             return 0;
         }
 
-        var result = await UserService.UpdateUserRole(userId, newRole);
+        var enteredUsername = AnsiConsole.Ask<string>("Enter your [green]username[/]:");
+        var currentUsername = ConfigStore.Exists(ConfigKeys.GoogleName) ? ConfigStore.Get(ConfigKeys.GoogleName) : "not-set";
+
+        if (!enteredUsername.Equals(currentUsername))
+        {
+            AnsiConsole.MarkupLine("[grey]That is not the correct username of the currently logged-in user.[/]");
+            return 0;
+        }
+
+        var result = await UserService.UpdateUserActiveStatus(userId, true);
 
         result.Switch(
             message =>
@@ -51,7 +54,8 @@ public class ToggleRoleCommand : AsyncCommand<ToggleRoleSettings>
             },
             user =>
             {
-                AnsiConsole.MarkupLine($"[green]Success:[/] User [cyan]{user.UserId}[/] is now a(n) [yellow]{user.RoleName}[/].");
+                AnsiConsole.MarkupLine($"[bold green]{user.Name}'s account has been enabled.[/]");
+                AnsiConsole.MarkupLine("[grey]They can now log in and continue using their account.[/]");
 
                 var table = new Table();
                 table.AddColumn("[bold]User ID[/]");

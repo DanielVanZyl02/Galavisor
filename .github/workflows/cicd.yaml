@@ -29,7 +29,6 @@ jobs:
           chmod 600 server_config.json
       - name: Deploy
         run: |
-          cd target
           scp -o StrictHostKeyChecking=no -i "~/.ssh/id_rsa" bin\Release\net9.0\linux-x64\publish ec2-user@ec2-54-75-118-89.eu-west-1.compute.amazonaws.com:~/
     env:
       SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}}

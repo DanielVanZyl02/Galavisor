@@ -28,8 +28,9 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-          echo "$SERVER_CONFIG" > server_config.json
           chmod 600 ~/.ssh/id_rsa
+          cd galavisor-api
+          echo "$SERVER_CONFIG" > server_config.json
           chmod 600 server_config.json
       - name: Deploy
         run: |

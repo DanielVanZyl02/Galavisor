@@ -16,7 +16,12 @@ public static class GeneralUtils{
             CommandsConstants.exit, 
             CommandsConstants.help,
             CommandsConstants.review,
-            CommandsConstants.getreview
+            CommandsConstants.getreview,
+            CommandsConstants.addactivity,
+            CommandsConstants.getactivity,
+            CommandsConstants.updateactivity,
+            CommandsConstants.deleteactivity,
+            CommandsConstants.linkactivity
         ];
     }
 }

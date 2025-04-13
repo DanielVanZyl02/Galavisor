@@ -9,6 +9,7 @@ using GalavisorCli.Commands.Users;
 using GalavisorCli.Commands.System;
 using GalavisorCli.Commands.TodoList;
 using GalavisorCli.Commands.Reviews;
+using GalavisorCli.Commands.Activities;
 
 namespace GalavisorCli.App;
 
@@ -28,6 +29,11 @@ public static class Setup{
         services.AddTransient<ConfigCommand>();
         services.AddTransient<ReviewCommand>();
         services.AddTransient<GetReviewCommand>();
+        services.AddTransient<ActivityCommand>();
+        services.AddTransient<GetActivityCommand>();
+        services.AddTransient<UpdateActivityCommand>();
+        services.AddTransient<DeleteActivityCommand>();
+        services.AddTransient<LinkActivityCommand>();
 
         var serviceProvider = services.BuildServiceProvider();
         var registrar = new DependencyInjectionRegistrar(services);
@@ -46,6 +52,11 @@ public static class Setup{
             config.AddCommand<HelpCommand>(CommandsConstants.help).WithDescription("See all commands available in the cli");
             config.AddCommand<ReviewCommand>(CommandsConstants.review);
             config.AddCommand<GetReviewCommand>(CommandsConstants.getreview);
+            config.AddCommand<ActivityCommand>(CommandsConstants.addactivity).WithDescription("Add a new activity to the database");
+            config.AddCommand<GetActivityCommand>(CommandsConstants.getactivity).WithDescription("Get activities by planet");
+            config.AddCommand<UpdateActivityCommand>(CommandsConstants.updateactivity).WithDescription("Update an activity's name");
+            config.AddCommand<DeleteActivityCommand>(CommandsConstants.deleteactivity).WithDescription("Delete an activity");
+            config.AddCommand<LinkActivityCommand>(CommandsConstants.linkactivity).WithDescription("Link an existing activity to a planet");
         });
 
         var knownCommands = GeneralUtils.GetKnownCommands();

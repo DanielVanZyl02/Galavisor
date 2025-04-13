@@ -56,6 +56,25 @@ public class EnableAccountCommand : AsyncCommand<EnableAccountSettings>
             {
                 AnsiConsole.MarkupLine($"[bold green]{user.Name}'s account has been enabled.[/]");
                 AnsiConsole.MarkupLine("[grey]They can now log in and continue using their account.[/]");
+
+                var table = new Table();
+                table.AddColumn("[bold]User ID[/]");
+                table.AddColumn("[bold]Name[/]");
+                table.AddColumn("[bold]Planet Name[/]");
+                table.AddColumn("[bold]Role[/]");
+                table.AddColumn("[bold]Active[/]");
+                table.AddColumn("[bold]Google Subject[/]");
+
+                table.AddRow(
+                    user.UserId.ToString(),
+                    user.Name,
+                    user.PlanetName,
+                    user.RoleName,
+                    user.IsActive ? "[green]Active[/]" : "[red]Inactive[/]",
+                    user.GoogleSubject
+                );
+
+                AnsiConsole.Write(table);
             }
         );
 

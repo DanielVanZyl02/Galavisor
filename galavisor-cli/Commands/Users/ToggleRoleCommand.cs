@@ -52,6 +52,25 @@ public class ToggleRoleCommand : AsyncCommand<ToggleRoleSettings>
             user =>
             {
                 AnsiConsole.MarkupLine($"[green]Success:[/] User [cyan]{user.UserId}[/] is now a(n) [yellow]{user.RoleName}[/].");
+
+                var table = new Table();
+                table.AddColumn("[bold]User ID[/]");
+                table.AddColumn("[bold]Name[/]");
+                table.AddColumn("[bold]Planet Name[/]");
+                table.AddColumn("[bold]Role[/]");
+                table.AddColumn("[bold]Active[/]");
+                table.AddColumn("[bold]Google Subject[/]");
+
+                table.AddRow(
+                    user.UserId.ToString(),
+                    user.Name,
+                    user.PlanetName,
+                    user.RoleName,
+                    user.IsActive ? "[green]Active[/]" : "[red]Inactive[/]",
+                    user.GoogleSubject
+                );
+
+                AnsiConsole.Write(table);
             }
         );
 

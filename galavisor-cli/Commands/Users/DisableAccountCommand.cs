@@ -75,11 +75,49 @@ public class DisableAccountCommand : AsyncCommand<DisableAccountSettings>
                     ConfigStore.Remove(ConfigKeys.JwtToken);
                     AnsiConsole.MarkupLine($"[bold red]Your account '{enteredUsername}' has been disabled.[/]");
                     AnsiConsole.MarkupLine("[grey]You have 30 days to re-enable it again by logging in.[/]");
+
+                    var table = new Table();
+                    table.AddColumn("[bold]User ID[/]");
+                    table.AddColumn("[bold]Name[/]");
+                    table.AddColumn("[bold]Planet Name[/]");
+                    table.AddColumn("[bold]Role[/]");
+                    table.AddColumn("[bold]Active[/]");
+                    table.AddColumn("[bold]Google Subject[/]");
+
+                    table.AddRow(
+                        user.UserId.ToString(),
+                        user.Name,
+                        user.PlanetName,
+                        user.RoleName,
+                        user.IsActive ? "[green]Active[/]" : "[red]Inactive[/]",
+                        user.GoogleSubject
+                    );
+
+                    AnsiConsole.Write(table);
                 }
                 else
                 {
                     AnsiConsole.MarkupLine($"[bold red]{user.Name}'s account has been disabled.[/]");
                     AnsiConsole.MarkupLine("[grey]They have 30 days to re-enable it again by logging in.[/]");
+
+                    var table = new Table();
+                    table.AddColumn("[bold]User ID[/]");
+                    table.AddColumn("[bold]Name[/]");
+                    table.AddColumn("[bold]Planet Name[/]");
+                    table.AddColumn("[bold]Role[/]");
+                    table.AddColumn("[bold]Active[/]");
+                    table.AddColumn("[bold]Google Subject[/]");
+
+                    table.AddRow(
+                        user.UserId.ToString(),
+                        user.Name,
+                        user.PlanetName,
+                        user.RoleName,
+                        user.IsActive ? "[green]Active[/]" : "[red]Inactive[/]",
+                        user.GoogleSubject
+                    );
+
+                    AnsiConsole.Write(table);
                 }
             }
         );

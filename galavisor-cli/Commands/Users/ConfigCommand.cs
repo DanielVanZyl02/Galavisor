@@ -84,6 +84,25 @@ public class ConfigCommand : AsyncCommand<ConfigSettings>
                 ConfigStore.Set(ConfigKeys.GoogleName, User.Name);
                 ConfigStore.Set(ConfigKeys.HomePlanet, User.PlanetName);
                 AnsiConsole.MarkupLine($"[green]Config updated for HomePlanet to {User.PlanetName} and for Username to {User.Name}.[/]");
+
+                var table = new Table();
+                table.AddColumn("[bold]User ID[/]");
+                table.AddColumn("[bold]Name[/]");
+                table.AddColumn("[bold]Planet Name[/]");
+                table.AddColumn("[bold]Role[/]");
+                table.AddColumn("[bold]Active[/]");
+                table.AddColumn("[bold]Google Subject[/]");
+
+                table.AddRow(
+                    User.UserId.ToString(),
+                    User.Name,
+                    User.PlanetName,
+                    User.RoleName,
+                    User.IsActive ? "[green]Active[/]" : "[red]Inactive[/]",
+                    User.GoogleSubject
+                );
+
+                AnsiConsole.Write(table);
             }
         );
 

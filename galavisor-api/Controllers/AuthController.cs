@@ -20,8 +20,8 @@ public class AuthController(AuthService authService, UserService userService) : 
             return BadRequest(new { message = "Authentication failed", error = "authCode is required" });
         }
 
-        try
-        {
+        // try
+        // {
             var jwt = await _authService.AuthenticateUserAsync(request.AuthCode);
             if(jwt != null){
                 var User = await _authService.GetOrCreateUser(jwt);
@@ -30,11 +30,11 @@ public class AuthController(AuthService authService, UserService userService) : 
             } else{
                 return BadRequest(new { message = "Authentication failed", error = "jwt returned from google was null"});
             }
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new { message = "Authentication failed", error = ex.Message });
-        }
+        // }
+        // catch (Exception ex)
+        // {
+        //     return StatusCode(500, new { message = "Authentication failed", error = ex.Message });
+        // }
     }
 }
 

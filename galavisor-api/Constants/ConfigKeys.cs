@@ -14,4 +14,5 @@ public static class ConfigKeys
     public const string DatabaseUsername = "DatabaseUsername";
     public const string DatabaseUrl = "DatabaseUrl";
     public const string DatabaseConnectionString = "DatabaseConnectionString";
+    public const string AIKEY = "AIKEY";
 }

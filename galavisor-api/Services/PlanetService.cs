@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Net.Http.Headers;
 using GalavisorApi.Models;
 using GalavisorApi.Repositories;
+using GalavisorApi.Constants;
 
 namespace GalavisorApi.Services;
 
@@ -58,7 +59,7 @@ public class PlanetService
 
         using var httpClient = new HttpClient();
         httpClient.DefaultRequestHeaders.Clear();
-        httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer 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");
+        httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer "+ConfigStore.Get(ConfigKeys.DatabaseConnectionString));
 
         var response = await httpClient.PostAsync("https://openrouter.ai/api/v1/chat/completions", content);
 

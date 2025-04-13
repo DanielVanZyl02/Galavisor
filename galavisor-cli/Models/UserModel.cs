@@ -1,10 +1,24 @@
 namespace GalavisorApi.Models;
 
+using System.Text.Json.Serialization;
+
 public class UserModel
 {
-    public int UserId { get; set; }
+    [JsonPropertyName("userId")]
+    public required int UserId { get; set; }
+
+    [JsonPropertyName("name")]
     public required string Name { get; set; }
+
+    [JsonPropertyName("planetName")]
     public required string PlanetName { get; set; }
+
+    [JsonPropertyName("roleName")]
     public required string RoleName { get; set; }
-    public bool IsActive { get; set; }
+
+    [JsonPropertyName("isActive")]
+    public required bool IsActive { get; set; }
+
+    [JsonPropertyName("googleSubject")]
+    public required string GoogleSubject { get; set; }
 }

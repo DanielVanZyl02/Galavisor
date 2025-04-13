@@ -4,7 +4,6 @@ using GalavisorApi.Repositories;
 using GalavisorApi.Data;
 using GalavisorApi.Constants;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = ConfigStore.Get(ConfigKeys.DatabaseConnectionString);
@@ -15,9 +14,11 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddGoogleJwtAuthentication();
 builder.Services.AddDefaultAuthorization();
 builder.Services.AddHttpClient<AuthService>();
-
+builder.Services.AddSingleton<AuthService>();
+builder.Services.AddSingleton<UserService>();
 builder.Services.AddSingleton<ReviewService>();
 builder.Services.AddSingleton<ReviewRepository>();
+builder.Services.AddSingleton<UserRepository>();
 
 var app = builder.Build();
 

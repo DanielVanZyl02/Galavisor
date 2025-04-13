@@ -6,9 +6,18 @@ public static class GeneralUtils{
     public static string[] GetKnownCommands()
     {
         return [ 
+            // Auth
             CommandsConstants.login, 
             CommandsConstants.logout, 
-            CommandsConstants.config, 
+
+            // Users
+            CommandsConstants.config,
+            CommandsConstants.config,
+            CommandsConstants.disable,
+            CommandsConstants.enable,
+            CommandsConstants.role,
+            CommandsConstants.users,
+
             CommandsConstants.add, 
             CommandsConstants.list, 
             CommandsConstants.update, 

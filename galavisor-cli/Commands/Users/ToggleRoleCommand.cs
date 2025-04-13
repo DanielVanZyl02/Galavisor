@@ -1,13 +1,35 @@
+using GalavisorCli.Constants;
+using GalavisorCli.Services;
+using GalavisorCli.Utils;
 using Spectre.Console;
 using Spectre.Console.Cli;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
-public class ToggleRoleCommand : Command<CommandSettings>
-{
-    public override int Execute([NotNull] CommandContext context, [NotNull] CommandSettings settings)
-    {
-        var userId = AnsiConsole.Ask<string>("Enter the [green]User ID[/] of the account you want to update:");
+namespace GalavisorCli.Commands.Users;
 
+public class ToggleRoleSettings : CommandSettings
+{
+    [CommandOption("--id <ID>")]
+    [Description("ID of the account to enable")]
+    public int? Id { get; set; }
+}
+
+public class ToggleRoleCommand : AsyncCommand<ToggleRoleSettings>
+{
+    public override async Task<int> ExecuteAsync([NotNull] CommandContext context, [NotNull] ToggleRoleSettings settings)
+    {
+        if (!ConfigStore.Exists(ConfigKeys.JwtToken))
+        {
+            AnsiConsole.MarkupLine("[red]Please login to use this command.[/]");
+            return 0;
+        }
+
+        var userId = settings.Id ?? -1;
+        if(settings.Id == null || userId == -1){
+            userId = AnsiConsole.Ask<int>("Enter the [green]User ID[/] of the account you want to update:");
+        }
+        
         var newRole = AnsiConsole.Prompt(
             new SelectionPrompt<string>()
                 .Title("What role do you want to assign?")
@@ -20,7 +42,19 @@ public class ToggleRoleCommand : Command<CommandSettings>
             return 0;
         }
 
-        AnsiConsole.MarkupLine($"[green]Success:[/] User [cyan]{userId}[/] is now a(n) [yellow]{newRole}[/].");
+        var result = await UserService.UpdateUserRole(userId, newRole);
+
+        result.Switch(
+            message =>
+            {
+                AnsiConsole.MarkupLine($"[red]Encountered an error: {message}[/]");
+            },
+            user =>
+            {
+                AnsiConsole.MarkupLine($"[green]Success:[/] User [cyan]{user.UserId}[/] is now a(n) [yellow]{user.RoleName}[/].");
+            }
+        );
+
         return 0;
     }
 }

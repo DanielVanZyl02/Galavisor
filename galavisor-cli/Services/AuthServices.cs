@@ -31,7 +31,7 @@ public class AuthService
                             ConfigStore.Set(ConfigKeys.JwtToken, jwt.GetString() ?? "");
                             ConfigStore.Set(ConfigKeys.GoogleName, DeserializedUser.Name);
                             ConfigStore.Set(ConfigKeys.HomePlanet, DeserializedUser.PlanetName);
-                            return $"Authentication successful! Hi {DeserializedUser.Name}, welcome to the TODO App!";
+                            return $"Authentication successful! Hi {DeserializedUser.Name}, welcome to the Galavisor App!";
                         } else{
                             return "Something went wrong whilst accessing your data, please try logging in again";
                         }

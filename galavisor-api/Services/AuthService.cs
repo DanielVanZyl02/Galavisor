@@ -17,14 +17,9 @@ public class AuthService(HttpClient httpClient, UserRepository userRepository)
         PropertyNameCaseInsensitive = true
     };
 
-    private readonly UserRepository _userRepository = userRepository;
-
     public async Task<string> AuthenticateUserAsync(string authCode)
     {
-        string jwt = await GetJwtAsync(authCode);
-
-        var jwtResponse = new Dictionary<string, string> { ["jwt"] = jwt };
-        return JsonSerializer.Serialize(jwtResponse);
+        return await GetJwtAsync(authCode);
     }
 
     public async Task<UserModel> GetOrCreateUser(string jwt)

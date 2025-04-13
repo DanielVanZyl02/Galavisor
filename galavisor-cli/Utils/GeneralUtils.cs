@@ -21,7 +21,8 @@ public static class GeneralUtils{
             CommandsConstants.getplanet,
             CommandsConstants.getweather,
             CommandsConstants.addplanet,
-            CommandsConstants.updateplanet
+            CommandsConstants.updateplanet,
+            CommandsConstants.deleteplanet
         ];
     }
 }

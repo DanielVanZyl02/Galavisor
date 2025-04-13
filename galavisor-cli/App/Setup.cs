@@ -34,6 +34,7 @@ public static class Setup{
         services.AddTransient<GetPlanetWeatherCommand>();
         services.AddTransient<AddPlanetCommand>();
         services.AddTransient<UpdatePlanetCommand>();
+        services.AddTransient<DeletePlanetCommand>();
 
         var serviceProvider = services.BuildServiceProvider();
         var registrar = new DependencyInjectionRegistrar(services);
@@ -56,6 +57,8 @@ public static class Setup{
             config.AddCommand<GetPlanetCommand>(CommandsConstants.getplanet);
             config.AddCommand<GetPlanetWeatherCommand>(CommandsConstants.getweather);
             config.AddCommand<AddPlanetCommand>(CommandsConstants.addplanet);
+            config.AddCommand<UpdatePlanetCommand>(CommandsConstants.updateplanet);
+            config.AddCommand<DeletePlanetCommand>(CommandsConstants.deleteplanet);
         });
 
         var knownCommands = GeneralUtils.GetKnownCommands();

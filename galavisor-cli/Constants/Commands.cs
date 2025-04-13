@@ -18,4 +18,5 @@ public static class CommandsConstants
     public const string getweather = "get-weather";
     public const string addplanet = "add-planet";
     public const string updateplanet = "update-planet";
+    public const string deleteplanet = "delete-planet";
 }

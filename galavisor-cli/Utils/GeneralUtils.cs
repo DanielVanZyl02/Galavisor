@@ -40,7 +40,6 @@ public static class GeneralUtils{
             CommandsConstants.updateactivity,
             CommandsConstants.deleteactivity,
             CommandsConstants.linkactivity
-
         ];
     }
 }

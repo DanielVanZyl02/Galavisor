@@ -14,8 +14,11 @@ using GalavisorCli.Models;
 namespace GalavisorCli.Commands.Reviews;
 internal sealed class ReviewCommand : AsyncCommand<ReviewCommand.Settings>
 {
+    [Description("Post a review for a specified planet")]
     public sealed class Settings : CommandSettings
     {
+        
+
         [CommandArgument(0, "<PLANET>")]
         public int planetId { get; set; }
 

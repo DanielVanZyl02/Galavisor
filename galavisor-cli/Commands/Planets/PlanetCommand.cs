@@ -22,7 +22,7 @@ internal sealed class GetPlanetsCommand : AsyncCommand<GetPlanetsCommand.Setting
         try
         {
             using var httpClient = new HttpClient();
-            var response = await httpClient.GetAsync("http://localhost:5228/planets");
+            var response = await httpClient.GetAsync($"{ConfigStore.Get(ConfigKeys.ServerUri)}/planets");
 
             response.EnsureSuccessStatusCode();
             var responseJson = await response.Content.ReadAsStringAsync();
@@ -72,7 +72,7 @@ internal sealed class GetPlanetCommand : AsyncCommand<GetPlanetCommand.Settings>
 
         try {
             using var httpClient = new HttpClient();
-            var response = await httpClient.GetAsync($"http://localhost:5228/planets/{settings.planetId}");
+            var response = await httpClient.GetAsync($"{ConfigStore.Get(ConfigKeys.ServerUri)}/planets/{settings.planetId}");
 
             response.EnsureSuccessStatusCode();
             var responseJson = await response.Content.ReadAsStringAsync();
@@ -120,7 +120,7 @@ internal sealed class GetPlanetWeatherCommand : AsyncCommand<GetPlanetWeatherCom
 
         try {
             using var httpClient = new HttpClient();
-            var response = await httpClient.PostAsJsonAsync($"http://localhost:5228/planets/weather/{settings.planetId}", new {});
+            var response = await httpClient.PostAsJsonAsync($"{ConfigStore.Get(ConfigKeys.ServerUri)}/planets/weather/{settings.planetId}", new {});
             response.EnsureSuccessStatusCode();
             var responseJson = await response.Content.ReadAsStringAsync();
             using JsonDocument doc = JsonDocument.Parse(responseJson);
@@ -186,7 +186,7 @@ internal sealed class AddPlanetCommand : AsyncCommand<AddPlanetCommand.Settings>
         try
         {
             using var httpClient = new HttpClient();
-            var response = await httpClient.PostAsJsonAsync("http://localhost:5228/planets/add", requestBody);
+            var response = await httpClient.PostAsJsonAsync($"{ConfigStore.Get(ConfigKeys.ServerUri)}/planets/add", requestBody);
 
             response.EnsureSuccessStatusCode();
             var responseJson = await response.Content.ReadAsStringAsync();
@@ -240,12 +240,12 @@ internal sealed class UpdatePlanetCommand : AsyncCommand<UpdatePlanetCommand.Set
             using var httpClient = new HttpClient();
             
             //Getting the new planet to change
-            var response = await httpClient.GetAsync($"http://localhost:5228/planets/{settings.planetId}");
+            var response = await httpClient.GetAsync($"{ConfigStore.Get(ConfigKeys.ServerUri)}/planets/{settings.planetId}");
             response.EnsureSuccessStatusCode();
             var responseJson = await response.Content.ReadAsStringAsync();
             var planet = JsonSerializer.Deserialize<PlanetModel>(responseJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true});
 
-            // response = await httpClient.GetAsync($"http://localhost:5228/planets/update/{settings.planetId}");
+            // response = await httpClient.GetAsync($"{ConfigStore.Get(ConfigKeys.ServerUri)}/planets/update/{settings.planetId}");
             // response.EnsureSuccessStatusCode();
             // responseJson = await response.Content.ReadAsStringAsync();
             // planet = JsonSerializer.Deserialize<PlanetModel>(responseJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true});
@@ -292,8 +292,8 @@ internal sealed class DeletePlanetCommand : AsyncCommand<DeletePlanetCommand.Set
 
         try {
             using var httpClient = new HttpClient();
-            var response = await httpClient.GetAsync($"http://localhost:5228/planets/{settings.planetId}");
-            var _ = await httpClient.DeleteAsync($"http://localhost:5228/planets/delete/{settings.planetId}");
+            var response = await httpClient.GetAsync($"{ConfigStore.Get(ConfigKeys.ServerUri)}/planets/{settings.planetId}");
+            var _ = await httpClient.DeleteAsync($"{ConfigStore.Get(ConfigKeys.ServerUri)}/planets/delete/{settings.planetId}");
 
 
             response.EnsureSuccessStatusCode();

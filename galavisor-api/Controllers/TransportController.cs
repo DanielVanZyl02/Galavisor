@@ -26,6 +26,7 @@ public class TransportController : ControllerBase
         return Ok(transport);
     }
 
+    [Authorize]
     [HttpPost]
     public async Task<ActionResult<object>> AddTransport([FromBody] TransportModel transport)
     {
@@ -44,6 +45,7 @@ public class TransportController : ControllerBase
         return StatusCode(201, response);
     }
 
+    [Authorize]
     [HttpPut("{currentName}")]
     public async Task<IActionResult> UpdateTransport(string currentName, [FromBody] string newName)
     {
@@ -53,6 +55,7 @@ public class TransportController : ControllerBase
         return NoContent();
     }
 
+    [Authorize]
     [HttpDelete("{transportName}")]
     public async Task<IActionResult> DeleteTransport(string transportName)
     {
@@ -62,6 +65,7 @@ public class TransportController : ControllerBase
         return NoContent();
     }
 
+    [Authorize]
     [HttpPost("link")]
     public async Task<ActionResult<object>> LinkTransportToPlanet([FromBody] TransportModel transport)
     {
@@ -96,6 +100,7 @@ public class TransportController : ControllerBase
         }
     }
 
+    [Authorize]
     [HttpGet]
     public async Task<ActionResult<List<TransportModel>>> GetAllTransport()
     {

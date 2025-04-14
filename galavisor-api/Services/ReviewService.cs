@@ -20,18 +20,28 @@ public class ReviewService
         return addedReview;
     }
 
-    public async Task<List<ReviewModel>> GetAllReviews(int? ratingEq = null, int? ratingGte = null, int? ratingLte = null)
+    public async Task<List<ReviewModel>> GetAllReviews(int userId, int? ratingEq = null, int? ratingGte = null, int? ratingLte = null)
     {
-        return await _reviewRepository.GetAll(ratingEq, ratingGte, ratingLte);
+        if(userId == -1){
+            return await _reviewRepository.GetAll(ratingEq, ratingGte, ratingLte);
+        }else{
+            return await _reviewRepository.GetAll(ratingEq, ratingGte, ratingLte, userId);
+        }
+        
     }
 
     public async Task<ReviewModel?> GetReviewById(int id)
     {
         return await _reviewRepository.GetById(id);
     }
-    public async Task<List<ReviewModel>> GetReviewByPlanetId(int planetId, int? ratingEq = null, int? ratingGte = null, int? ratingLte = null)
+    public async Task<List<ReviewModel>> GetReviewByPlanetId(int planetId, int userId, int? ratingEq = null, int? ratingGte = null, int? ratingLte = null)
     {
-        return await _reviewRepository.GetByPlanetId(planetId, ratingEq, ratingGte, ratingLte);
+        if(userId == -1){
+            return await _reviewRepository.GetByPlanetId(planetId, ratingEq, ratingGte, ratingLte);
+        }else{
+            return await _reviewRepository.GetByPlanetId(planetId, ratingEq, ratingGte, ratingLte, userId);
+        }
+        
     }
     public async Task<ReviewModel> UpdateReview(ReviewModel review)
     {

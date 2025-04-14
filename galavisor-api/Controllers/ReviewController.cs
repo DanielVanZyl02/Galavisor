@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Authorization;
+
 using GalavisorApi.Services;
 using GalavisorApi.Models;
 
@@ -17,6 +19,7 @@ public class ReviewController : ControllerBase
         _reviewService = service;
     }
 
+    [Authorize]
     [HttpPost]
     public async Task<ActionResult<ReviewModel>> AddReview([FromBody] ReviewModel request)
     {
@@ -24,6 +27,7 @@ public class ReviewController : ControllerBase
         return CreatedAtAction(nameof(GetReview), new { id = result.ReviewId }, result);
     }
 
+    [Authorize]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<ReviewModel>>> GetReviews(
         [FromQuery] int? ratingEq,
@@ -33,7 +37,7 @@ public class ReviewController : ControllerBase
         try
         {
             var reviews = await _reviewService.GetAllReviews(ratingEq, ratingGte, ratingLte);
-            return Ok(reviews);
+            return Ok(new {message = "Success", reviews = reviews});
         }
         catch (Exception ex)
         {
@@ -41,6 +45,7 @@ public class ReviewController : ControllerBase
         }
     }
 
+    [Authorize]
     [HttpGet("{id}")]
     public async Task<ActionResult<ReviewModel>> GetReview(int id)
     {
@@ -59,6 +64,7 @@ public class ReviewController : ControllerBase
         }
     }
 
+    [Authorize]
     [HttpGet("planets/{planetId}")]
     public async Task<ActionResult<IEnumerable<ReviewModel>>> GetReviewsByPlanet(
         int planetId,
@@ -77,6 +83,7 @@ public class ReviewController : ControllerBase
         }
     }
 
+    [Authorize]
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateReview(int id, [FromBody] ReviewModel request)
     {
@@ -90,6 +97,7 @@ public class ReviewController : ControllerBase
         return Ok(updatedReview);
     }
 
+    [Authorize]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteReview(int id)
     {

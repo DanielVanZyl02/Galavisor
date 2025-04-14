@@ -147,11 +147,12 @@ internal sealed class GetReviewCommand : AsyncCommand<GetReviewCommand.Settings>
                 requestUrl += "?" + string.Join("&", queryParams);
             }
 
-            using var httpClient = new HttpClient();
-            var response = await httpClient.GetAsync(requestUrl);
+            // using var httpClient = new HttpClient();
+            var response = await HttpUtils.Get(requestUrl);
 
-            response.EnsureSuccessStatusCode();
-            var responseJson = await response.Content.ReadAsStringAsync();
+            // response.EnsureSuccessStatusCode();
+            // var responseJson = await response.TryGetProperty("reviews" as )
+
 
             var table = new Table
             {
@@ -166,25 +167,10 @@ internal sealed class GetReviewCommand : AsyncCommand<GetReviewCommand.Settings>
 
             if (settings.id != -1)
             {
-                var review = JsonSerializer.Deserialize<ReviewModel>(responseJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                if(response.TryGetProperty("reviews", out var reviews)){
+                    var review = reviews.Deserialize<ReviewModel>();
 
-                if (review != null)
-                {
-                    table.AddRow(
-                        review.ReviewId.ToString(), 
-                        review.Rating.ToString(), 
-                        review.Comment ?? "(no comment)"
-                    );
-                }
-                AnsiConsole.Write(table);
-            }
-            else
-            {
-                var reviews = JsonSerializer.Deserialize<List<ReviewModel>>(responseJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-                if (reviews != null && reviews.Count > 0)
-                {
-                    foreach (var review in reviews)
+                    if (review != null)
                     {
                         table.AddRow(
                             review.ReviewId.ToString(), 
@@ -193,11 +179,30 @@ internal sealed class GetReviewCommand : AsyncCommand<GetReviewCommand.Settings>
                         );
                     }
                     AnsiConsole.Write(table);
-                    AnsiConsole.MarkupLine($"[green]Found {reviews.Count} review(s) matching your criteria.[/]");
                 }
-                else
-                {
-                    AnsiConsole.MarkupLine("[yellow]No reviews found matching the criteria.[/]");
+            }
+            else
+            {
+                if(response.TryGetProperty("reviews", out var reviewList)){
+                    var reviews = reviewList.Deserialize<List<ReviewModel>>();
+
+                    if (reviews != null && reviews.Count > 0)
+                    {
+                        foreach (var review in reviews)
+                        {
+                            table.AddRow(
+                                review.ReviewId.ToString(), 
+                                review.Rating.ToString(), 
+                                review.Comment ?? "(no comment)"
+                            );
+                        }
+                        AnsiConsole.Write(table);
+                        AnsiConsole.MarkupLine($"[green]Found {reviews.Count} review(s) matching your criteria.[/]");
+                    }
+                    else
+                    {
+                        AnsiConsole.MarkupLine("[yellow]No reviews found matching the criteria.[/]");
+                    }
                 }
             }
             return 0;

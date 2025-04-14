@@ -126,4 +126,15 @@ public class TransportService{
         
         return false;
     }
+
+    public async Task<List<TransportModel>> GetAllTransport()
+    {
+        const string sql = @"
+            SELECT TransportID, Name, '' as PlanetName 
+            FROM Transport
+            ORDER BY Name";
+        
+        var transport = await _db.QueryAsync<TransportModel>(sql);
+        return transport.ToList();
+    }
 }

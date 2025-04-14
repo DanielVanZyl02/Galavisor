@@ -95,4 +95,12 @@ public class TransportController : ControllerBase
             return NotFound(ex.Message);
         }
     }
+
+    [HttpGet]
+    public async Task<ActionResult<List<TransportModel>>> GetAllTransport()
+    {
+        var transport = await _transportService.GetAllTransport();
+        return Ok(transport);
+    }
+
 }

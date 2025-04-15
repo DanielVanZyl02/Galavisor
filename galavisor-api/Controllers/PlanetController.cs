@@ -49,7 +49,7 @@ public class PlanetController(PlanetService planetService, AuthService authServi
 
     }
     [Authorize]
-    [HttpPost("delete/{id}")]
+    [HttpDelete("delete/{id}")]
     public async Task<ActionResult<bool>> deletePlanet(int id)
     {
         var GoogleSubject = HttpContext.User.FindFirst("sub")!.Value ?? "";

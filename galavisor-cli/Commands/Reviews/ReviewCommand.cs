@@ -14,8 +14,11 @@ using GalavisorCli.Models;
 namespace GalavisorCli.Commands.Reviews;
 internal sealed class ReviewCommand : AsyncCommand<ReviewCommand.Settings>
 {
+    [Description("Post a review for a specified planet")]
     public sealed class Settings : CommandSettings
     {
+        
+
         [CommandArgument(0, "<PLANET>")]
         public int planetId { get; set; }
 
@@ -37,27 +40,27 @@ internal sealed class ReviewCommand : AsyncCommand<ReviewCommand.Settings>
 
         try
         {
-            using var httpClient = new HttpClient();
-            var response = await httpClient.PostAsJsonAsync($"{ConfigStore.Get(ConfigKeys.ServerUri)}/reviews", requestBody);
 
-            response.EnsureSuccessStatusCode();
-            var responseJson = await response.Content.ReadAsStringAsync();
-            var review = JsonSerializer.Deserialize<ReviewModel>(responseJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var response = await HttpUtils.Post($"{ConfigStore.Get(ConfigKeys.ServerUri)}/reviews", requestBody);
 
-            if (review != null)
-            {
-                var table = new Table();
-                table.AddColumn("Field");
-                table.AddColumn("Value");
+            if(response.TryGetProperty("review", out var createdReview)){
+                var review = createdReview.Deserialize<ReviewModel>();
+                if (review != null)
+                {
+                    var table = new Table();
+                    table.AddColumn("Field");
+                    table.AddColumn("Value");
 
-                table.AddRow("Review ID", review.ReviewId.ToString());
-                table.AddRow("Rating", review.Rating.ToString());
-                table.AddRow("Comment", review.Comment ?? "(none)");
+                    table.AddRow("Review ID", review.ReviewId.ToString());
+                    table.AddRow("Planet", review.PlanetName);
+                    table.AddRow("Rating", review.Rating.ToString());
+                    table.AddRow("Comment", review.Comment ?? "(none)");
 
-                AnsiConsole.Write(new Panel(table)
-                    .Header("Review Posted", Justify.Center)
-                    .Border(BoxBorder.Rounded)
-                    .BorderStyle(Style.Parse("green")));
+                    AnsiConsole.Write(new Panel(table)
+                        .Header("Review Posted", Justify.Center)
+                        .Border(BoxBorder.Rounded)
+                        .BorderStyle(Style.Parse("green")));
+                }                
             }
 
             return 0;
@@ -83,6 +86,8 @@ internal sealed class GetReviewCommand : AsyncCommand<GetReviewCommand.Settings>
         [CommandArgument(0, "[ID]")]
         [DefaultValue(-1)]
         public int id { get; set; }
+        [CommandOption("--posted")]
+        public bool posted { get; set; }
 
         [CommandOption("--planet-id <PLANET_ID>")]
         [DefaultValue(-1)]
@@ -126,6 +131,10 @@ internal sealed class GetReviewCommand : AsyncCommand<GetReviewCommand.Settings>
 
             var queryParams = new List<string>();
             
+            if(settings.posted){
+                queryParams.Add($"posted={settings.posted}");
+            }
+
             if (settings.ratingEqual != -1)
             {
                 queryParams.Add($"ratingEq={settings.ratingEqual}");
@@ -147,11 +156,7 @@ internal sealed class GetReviewCommand : AsyncCommand<GetReviewCommand.Settings>
                 requestUrl += "?" + string.Join("&", queryParams);
             }
 
-            using var httpClient = new HttpClient();
-            var response = await httpClient.GetAsync(requestUrl);
-
-            response.EnsureSuccessStatusCode();
-            var responseJson = await response.Content.ReadAsStringAsync();
+            var response = await HttpUtils.Get(requestUrl);
 
             var table = new Table
             {
@@ -160,44 +165,53 @@ internal sealed class GetReviewCommand : AsyncCommand<GetReviewCommand.Settings>
             };
 
             table.AddColumn("Review ID");
-
+            table.AddColumn("User");
+            table.AddColumn("Planet");
             table.AddColumn("Rating");
             table.AddColumn("Comment");
 
             if (settings.id != -1)
             {
-                var review = JsonSerializer.Deserialize<ReviewModel>(responseJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                if(response.TryGetProperty("reviews", out var reviews)){
+                    var review = reviews.Deserialize<ReviewModel>();
 
-                if (review != null)
-                {
-                    table.AddRow(
-                        review.ReviewId.ToString(), 
-                        review.Rating.ToString(), 
-                        review.Comment ?? "(no comment)"
-                    );
-                }
-                AnsiConsole.Write(table);
-            }
-            else
-            {
-                var reviews = JsonSerializer.Deserialize<List<ReviewModel>>(responseJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-                if (reviews != null && reviews.Count > 0)
-                {
-                    foreach (var review in reviews)
+                    if (review != null)
                     {
                         table.AddRow(
-                            review.ReviewId.ToString(), 
+                            review.ReviewId.ToString(),
+                            review.UserName ?? "(no user name)",
+                            review.PlanetName ?? "(no planet name)",
                             review.Rating.ToString(), 
                             review.Comment ?? "(no comment)"
                         );
                     }
                     AnsiConsole.Write(table);
-                    AnsiConsole.MarkupLine($"[green]Found {reviews.Count} review(s) matching your criteria.[/]");
                 }
-                else
-                {
-                    AnsiConsole.MarkupLine("[yellow]No reviews found matching the criteria.[/]");
+            }
+            else
+            {
+                if(response.TryGetProperty("reviews", out var reviewList)){
+                    var reviews = reviewList.Deserialize<List<ReviewModel>>();
+
+                    if (reviews != null && reviews.Count > 0)
+                    {
+                        foreach (var review in reviews)
+                        {
+                            table.AddRow(
+                                review.ReviewId.ToString(),
+                                review.UserName ?? "(no user name)",
+                                review.PlanetName ?? "(no planet name)",
+                                review.Rating.ToString(), 
+                                review.Comment ?? "(no comment)"
+                            );
+                        }
+                        AnsiConsole.Write(table);
+                        AnsiConsole.MarkupLine($"[green]Found {reviews.Count} review(s) matching your criteria.[/]");
+                    }
+                    else
+                    {
+                        AnsiConsole.MarkupLine("[yellow]No reviews found matching the criteria.[/]");
+                    }
                 }
             }
             return 0;
@@ -244,27 +258,26 @@ internal sealed class UpdateReviewCommand : AsyncCommand<UpdateReviewCommand.Set
                 comment = !string.IsNullOrEmpty(settings.comment) ? settings.comment : null
             };
 
-            using var httpClient = new HttpClient();
-            var response = await httpClient.PutAsJsonAsync($"{ConfigStore.Get(ConfigKeys.ServerUri)}/reviews/{settings.reviewId}", requestBody);
+            var response = await HttpUtils.Put($"{ConfigStore.Get(ConfigKeys.ServerUri)}/reviews/{settings.reviewId}", requestBody);
 
-            response.EnsureSuccessStatusCode();
-            var responseJson = await response.Content.ReadAsStringAsync();
-            var review = JsonSerializer.Deserialize<ReviewModel>(responseJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            if(response.TryGetProperty("review", out var updatedReview)){
+                var review = updatedReview.Deserialize<ReviewModel>();
+                if (review != null)
+                {
+                    var table = new Table();
+                    table.AddColumn("Field");
+                    table.AddColumn("Value");
 
-            if (review != null)
-            {
-                var table = new Table();
-                table.AddColumn("Field");
-                table.AddColumn("Value");
+                    table.AddRow("Review ID", review.ReviewId.ToString());
+                    table.AddRow("Planet", review.PlanetName);
+                    table.AddRow("Rating", review.Rating.ToString());
+                    table.AddRow("Comment", review.Comment ?? "(none)");
 
-                table.AddRow("Review ID", review.ReviewId.ToString());
-                table.AddRow("Rating", review.Rating.ToString());
-                table.AddRow("Comment", review.Comment ?? "(none)");
-
-                AnsiConsole.Write(new Panel(table)
-                    .Header("Review Updated", Justify.Center)
-                    .Border(BoxBorder.Rounded)
-                    .BorderStyle(Style.Parse("green")));
+                    AnsiConsole.Write(new Panel(table)
+                        .Header("Review Updated", Justify.Center)
+                        .Border(BoxBorder.Rounded)
+                        .BorderStyle(Style.Parse("green")));
+                }
             }
             return 0;
         }
@@ -293,16 +306,17 @@ internal sealed class DeleteReviewCommand : AsyncCommand<DeleteReviewCommand.Set
     {
         try
         {
-            using var httpClient = new HttpClient();
-            var response = await httpClient.DeleteAsync($"{ConfigStore.Get(ConfigKeys.ServerUri)}/reviews/{settings.reviewId}");
-
-            var responseJson = await response.Content.ReadAsStringAsync();
-            if(response.StatusCode  == HttpStatusCode.NotFound){
-                AnsiConsole.MarkupLine($"[red] {responseJson} [/]");
-            }else{
-                AnsiConsole.MarkupLine($"[green] {responseJson} [/]");
-            }
+            var response = await HttpUtils.Delete($"{ConfigStore.Get(ConfigKeys.ServerUri)}/reviews/{settings.reviewId}");
             
+            if(response.TryGetProperty("status", out var status) && response.TryGetProperty("message", out var message)){
+                var responseStatus = status.Deserialize<string>();
+                var responseMessage = message.Deserialize<string>();
+                if(responseStatus == "Fail"){
+                    AnsiConsole.MarkupLine($"[red] {responseMessage} [/]");
+                }else{
+                    AnsiConsole.MarkupLine($"[green] {responseMessage} [/]");
+                }
+            }
             return 0;
         }
         catch (HttpRequestException ex)

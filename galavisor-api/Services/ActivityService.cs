@@ -127,4 +127,15 @@ public class ActivityService
         var affected = await _db.ExecuteAsync(sql, new { ActivityName = activityName });
         return affected > 0;
     }
+
+    public async Task<List<ActivityModel>> GetAllActivities()
+    {
+        const string sql = @"
+            SELECT ActivityID, Name, '' as PlanetName 
+            FROM Activity
+            ORDER BY Name";
+        
+        var activity = await _db.QueryAsync<ActivityModel>(sql);
+        return activity.ToList();
+    }
 } 

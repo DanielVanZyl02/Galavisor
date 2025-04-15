@@ -1,7 +1,5 @@
-using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 using GalavisorApi.Services;
+using Microsoft.AspNetCore.Mvc;
 using GalavisorApi.Models;
 using Microsoft.AspNetCore.Authorization;
 
@@ -9,55 +7,76 @@ namespace GalavisorApi.Controllers;
 
 [ApiController]
 [Route("planets")]
-
-public class PlanetController : ControllerBase
+public class PlanetController(PlanetService planetService, AuthService authService) : ControllerBase
 {
-    private readonly PlanetService _planetService;
+    private readonly PlanetService _planetService = planetService;
+    private readonly AuthService _authService = authService;
 
-    public PlanetController(PlanetService service)
-    {
-        _planetService = service;
-    }
-
-    [AllowAnonymous]
+    [Authorize]
     [HttpGet]
     public async Task<ActionResult<List<PlanetModel>>> getAllPlanets()
     {
         return Ok(await _planetService.GetAllPlanets());
     }
 
-    [AllowAnonymous]
+    [Authorize]
     [HttpGet("{id}")]
     public async Task<ActionResult<PlanetModel>> getPlanetById(int id)
     {
         return Ok(await _planetService.GetPlanetById(id));
     }
 
-    [AllowAnonymous]
+    [Authorize]
     [HttpPost("weather/{id}")]
     public async Task<ActionResult<string>> getPlanetWeatherById(int id)
     {
         return Ok(await _planetService.GetPlanetWeatherById(id));
     }
 
-    [AllowAnonymous]
+    [Authorize]
     [HttpPost("add")]
     public async Task<ActionResult<PlanetModel>> addPlanet([FromBody] PlanetModel request)
     {
-        return Ok(await _planetService.AddPlanet(request));
-    }
+        var GoogleSubject = HttpContext.User.FindFirst("sub")!.Value ?? "";
+        if (await _authService.IsSubAdmin(GoogleSubject))
+        {
+            return Ok(await _planetService.AddPlanet(request));
+        }
+        else
+        {
+            return StatusCode(403, new { message = "Get failed", error = "You cannot access this command, only available to admins" });
+        }
 
-    [AllowAnonymous]
+    }
+    [Authorize]
     [HttpDelete("delete/{id}")]
-    public async Task<ActionResult<bool>> addPlanet(int id)
+    public async Task<ActionResult<bool>> deletePlanet(int id)
     {
-        return Ok(await _planetService.DeletePlanet(id));
+        var GoogleSubject = HttpContext.User.FindFirst("sub")!.Value ?? "";
+        if (await _authService.IsSubAdmin(GoogleSubject))
+        {
+            return Ok(await _planetService.DeletePlanet(id));
+        }
+        else
+        {
+            return StatusCode(403, new { message = "Get failed", error = "You cannot access this command, only available to admins" });
+        }
+
     }
 
-    [AllowAnonymous]
+    [Authorize]
     [HttpPatch("update/{id}")]
     public async Task<ActionResult<bool>> updatePlanet([FromBody] PlanetModel planet)
     {
-        return Ok(await _planetService.UpdatePlanet(planet));
+        var GoogleSubject = HttpContext.User.FindFirst("sub")!.Value ?? "";
+        if (await _authService.IsSubAdmin(GoogleSubject))
+        {
+            return Ok(await _planetService.UpdatePlanet(planet));
+        }
+        else
+        {
+            return StatusCode(403, new { message = "Get failed", error = "You cannot access this command, only available to admins" });
+        }
+
     }
 }

@@ -22,7 +22,7 @@ public static class CommandsConstants
     public const string review = "review";
     public const string getreview = "get-review";
 
-    public const string updatereview = "update-review";
+    public const string updatereview = "edit-review";
     public const string deletereview = "delete-review";
 
     public const string planets = "planets";
@@ -36,4 +36,10 @@ public static class CommandsConstants
     public const string deleteactivity = "delete-activity";
     public const string linkactivity = "link-activity";
     public const string deleteplanet = "delete-planet";
+
+    public const string addtransport = "add-transport";
+    public const string gettransport = "get-transport";
+    public const string updatetransport = "update-transport";
+    public const string deletetransport = "delete-transport";
+    public const string linktransport = "link-transport";
 }

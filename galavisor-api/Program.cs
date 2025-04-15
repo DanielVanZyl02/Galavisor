@@ -22,6 +22,7 @@ builder.Services.AddSingleton<UserRepository>();
 builder.Services.AddSingleton<ActivityService>();
 builder.Services.AddSingleton<PlanetService>();
 builder.Services.AddSingleton<PlanetRepository>();
+builder.Services.AddSingleton<TransportService>();
 
 var app = builder.Build();
 // app.UseHttpsRedirection();

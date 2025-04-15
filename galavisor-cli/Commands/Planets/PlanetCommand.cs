@@ -246,6 +246,7 @@ internal sealed class UpdatePlanetCommand : AsyncCommand<UpdatePlanetCommand.Set
             response.EnsureSuccessStatusCode();
             var responseJson = await response.Content.ReadAsStringAsync();
             var planet = JsonSerializer.Deserialize<PlanetModel>(responseJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            response = await httpClient.PatchAsJsonAsync($"{ConfigStore.Get(ConfigKeys.ServerUri)}/planets/update/{settings.planetId}", planet);
 
             if (AnsiConsole.Confirm($"Current Name: {planet.Name}\nDo you want to update the planet's name?"))
             {

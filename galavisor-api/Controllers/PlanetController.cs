@@ -68,6 +68,15 @@ public class PlanetController(PlanetService planetService, AuthService authServi
     [HttpPatch("update/{id}")]
     public async Task<ActionResult<bool>> updatePlanet([FromBody] PlanetModel planet)
     {
-        return Ok(await _planetService.UpdatePlanet(planet));
+        var GoogleSubject = HttpContext.User.FindFirst("sub")!.Value ?? "";
+        if (await _authService.IsSubAdmin(GoogleSubject))
+        {
+            return Ok(await _planetService.UpdatePlanet(planet));
+        }
+        else
+        {
+            return StatusCode(403, new { message = "Get failed", error = "You cannot access this command, only available to admins" });
+        }
+
     }
 }

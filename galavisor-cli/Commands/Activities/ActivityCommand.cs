@@ -87,15 +87,29 @@ internal sealed class GetActivityCommand : AsyncCommand<GetActivityCommand.Setti
 {
     public sealed class Settings : CommandSettings
     {
-        [CommandArgument(0, "<PLANET>")]
-        public string PlanetName { get; set; } = string.Empty;
+        [CommandOption("-p|--planet <PLANET>")]
+        [Description("Get activities for a specific planet")]
+        public string? PlanetName { get; set; }
+
+        [CommandOption("-a|--all")]
+        [Description("Get all activities")]
+        public bool GetAll { get; set; }
     }
 
     public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
     {
+        if (!settings.GetAll && string.IsNullOrEmpty(settings.PlanetName))
+        {
+            AnsiConsole.MarkupLine("[red]Error:[/] You must specify either --all or --planet");
+            return 1;
+        }
+
         try
         {
-            var url = $"{ConfigStore.Get(ConfigKeys.ServerUri)}/api/activity/planet/{HttpUtility.UrlEncode(settings.PlanetName)}";
+            var url = settings.GetAll ? 
+                $"{ConfigStore.Get(ConfigKeys.ServerUri)}/api/activity" : 
+                $"{ConfigStore.Get(ConfigKeys.ServerUri)}/api/activity/planet/{HttpUtility.UrlEncode(settings.PlanetName)}";
+            
             var response = await HttpUtils.Get(url);
             
             var table = new Table
@@ -110,7 +124,10 @@ internal sealed class GetActivityCommand : AsyncCommand<GetActivityCommand.Setti
 
             if (activities != null && activities.Any())
             {
-                string title = $"Activities for Planet: {settings.PlanetName}";
+                string title = settings.GetAll ? 
+                    "All Activities" : 
+                    $"Activities for Planet: {settings.PlanetName}";
+                
                 AnsiConsole.MarkupLine($"[green]{title}[/]");
                 
                 foreach (var activity in activities)
@@ -121,7 +138,11 @@ internal sealed class GetActivityCommand : AsyncCommand<GetActivityCommand.Setti
             }
             else
             {
-                AnsiConsole.MarkupLine($"[yellow]No activities found for planet {settings.PlanetName}[/]");
+                string message = settings.GetAll ? 
+                    "No activities found" : 
+                    $"No activities found for planet {settings.PlanetName}";
+                    
+                AnsiConsole.MarkupLine($"[yellow]{message}[/]");
             }
 
             return 0;

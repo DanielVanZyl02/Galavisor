@@ -13,7 +13,7 @@ using GalavisorCli.Models;
 
 namespace GalavisorCli.Commands.Activities;
 
-internal sealed class ActivityCommand : AsyncCommand<ActivityCommand.Settings>
+internal sealed class AddActivityCommand : AsyncCommand<AddActivityCommand.Settings>
 {
     public sealed class Settings : CommandSettings
     {

@@ -158,7 +158,7 @@ public static class Setup
         helpCommand.RegisterCommand<DeletePlanetCommand.Settings>("planet delete");
 
         // Activity commands
-        helpCommand.RegisterCommand<ActivityCommand.Settings>("activity add");
+        helpCommand.RegisterCommand<AddActivityCommand.Settings>("activity add");
         helpCommand.RegisterCommand<GetActivityCommand.Settings>("activities");
         helpCommand.RegisterCommand<UpdateActivityCommand.Settings>("activity update");
         helpCommand.RegisterCommand<DeleteActivityCommand.Settings>("activity delete");

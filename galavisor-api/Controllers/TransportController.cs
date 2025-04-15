@@ -52,7 +52,8 @@ public class TransportController : ControllerBase
         var success = await _transportService.UpdateTransport(currentName, newName);
         if (!success)
             return NotFound();
-        return NoContent();
+        
+        return Ok(new { message = $"Transport '{currentName}' updated to '{newName}' successfully" });
     }
 
     [Authorize]
@@ -62,7 +63,8 @@ public class TransportController : ControllerBase
         var success = await _transportService.DeleteTransport(transportName);
         if (!success)
             return NotFound();
-        return NoContent();
+        
+        return Ok(new { message = $"Transport '{transportName}' deleted successfully" });
     }
 
     [Authorize]

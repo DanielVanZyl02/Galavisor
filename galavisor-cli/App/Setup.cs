@@ -12,6 +12,7 @@ using GalavisorCli.Commands.Reviews;
 using GalavisorCli.Commands.Auth;
 using GalavisorCli.Commands.Planets;
 using GalavisorCli.Commands.Activities;
+using GalavisorCli.Commands.Transport;
 
 namespace GalavisorCli.App;
 
@@ -56,6 +57,12 @@ public static class Setup{
         services.AddTransient<LinkActivityCommand>();
         services.AddTransient<DeletePlanetCommand>();
 
+        // Transport commands
+        services.AddTransient<TransportCommand>();
+        services.AddTransient<GetTransportCommand>();
+        services.AddTransient<UpdateTransportCommand>();
+        services.AddTransient<DeleteTransportCommand>();
+        services.AddTransient<LinkTransportCommand>();
 
         var serviceProvider = services.BuildServiceProvider();
         var registrar = new DependencyInjectionRegistrar(services);
@@ -97,6 +104,13 @@ public static class Setup{
             config.AddCommand<LinkActivityCommand>(CommandsConstants.linkactivity).WithDescription("Link an existing activity to a planet");
             config.AddCommand<UpdatePlanetCommand>(CommandsConstants.updateplanet);
             config.AddCommand<DeletePlanetCommand>(CommandsConstants.deleteplanet);
+
+            // Transport commands
+            config.AddCommand<TransportCommand>(CommandsConstants.addtransport).WithDescription("Add a new transport option");
+            config.AddCommand<GetTransportCommand>(CommandsConstants.gettransport).WithDescription("Get transport options (use with --all or --planet)");
+            config.AddCommand<UpdateTransportCommand>(CommandsConstants.updatetransport).WithDescription("Update a transport's name");
+            config.AddCommand<DeleteTransportCommand>(CommandsConstants.deletetransport).WithDescription("Delete a transport option");
+            config.AddCommand<LinkTransportCommand>(CommandsConstants.linktransport).WithDescription("Link an existing transport to a planet");
         });
 
         var knownCommands = GeneralUtils.GetKnownCommands();

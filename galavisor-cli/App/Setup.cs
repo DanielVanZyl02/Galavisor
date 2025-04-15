@@ -13,6 +13,8 @@ using GalavisorCli.Commands.Auth;
 using GalavisorCli.Commands.Planets;
 using GalavisorCli.Commands.Activities;
 using GalavisorCli.Commands.Help;
+using GalavisorCli.Commands.Transport;
+
 
 namespace GalavisorCli.App;
 
@@ -53,13 +55,20 @@ public static class Setup
         services.AddTransient<GetPlanetWeatherCommand>();
         services.AddTransient<AddPlanetCommand>();
         services.AddTransient<UpdatePlanetCommand>();
-        services.AddTransient<ActivityCommand>();
+        services.AddTransient<AddActivityCommand>();
         services.AddTransient<GetActivityCommand>();
         services.AddTransient<UpdateActivityCommand>();
         services.AddTransient<DeleteActivityCommand>();
         services.AddTransient<LinkActivityCommand>();
         services.AddTransient<DeletePlanetCommand>();
 
+        // Transport commands
+        services.AddTransient<AddTransportCommand>();
+        services.AddTransient<GetTransportCommand>();
+        services.AddTransient<UpdateTransportCommand>();
+        services.AddTransient<DeleteTransportCommand>();
+        services.AddTransient<LinkTransportCommand>();
+      
         var serviceProvider = services.BuildServiceProvider();
         var registrar = new DependencyInjectionRegistrar(services);
         var app = new CommandApp(registrar);
@@ -101,13 +110,20 @@ public static class Setup
             config.AddCommand<GetPlanetCommand>(CommandsConstants.getplanet);
             config.AddCommand<GetPlanetWeatherCommand>(CommandsConstants.getweather);
             config.AddCommand<AddPlanetCommand>(CommandsConstants.addplanet);
-            config.AddCommand<ActivityCommand>(CommandsConstants.addactivity).WithDescription("Add a new activity to the database");
-            config.AddCommand<GetActivityCommand>(CommandsConstants.getactivity).WithDescription("Get activities by planet");
+            config.AddCommand<AddActivityCommand>(CommandsConstants.addactivity).WithDescription("Add a new activity to the database");
+            config.AddCommand<GetActivityCommand>(CommandsConstants.getactivity).WithDescription("Get activities (use with --all or --planet)");
             config.AddCommand<UpdateActivityCommand>(CommandsConstants.updateactivity).WithDescription("Update an activity's name");
             config.AddCommand<DeleteActivityCommand>(CommandsConstants.deleteactivity).WithDescription("Delete an activity");
             config.AddCommand<LinkActivityCommand>(CommandsConstants.linkactivity).WithDescription("Link an existing activity to a planet");
             config.AddCommand<UpdatePlanetCommand>(CommandsConstants.updateplanet);
             config.AddCommand<DeletePlanetCommand>(CommandsConstants.deleteplanet);
+
+            // Transport commands
+            config.AddCommand<AddTransportCommand>(CommandsConstants.addtransport).WithDescription("Add a new transport option");
+            config.AddCommand<GetTransportCommand>(CommandsConstants.gettransport).WithDescription("Get transport options (use with --all or --planet)");
+            config.AddCommand<UpdateTransportCommand>(CommandsConstants.updatetransport).WithDescription("Update a transport's name");
+            config.AddCommand<DeleteTransportCommand>(CommandsConstants.deletetransport).WithDescription("Delete a transport option");
+            config.AddCommand<LinkTransportCommand>(CommandsConstants.linktransport).WithDescription("Link an existing transport to a planet");
         });
 
         var knownCommands = GeneralUtils.GetKnownCommands();

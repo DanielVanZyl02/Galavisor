@@ -36,4 +36,10 @@ public static class CommandsConstants
     public const string deleteactivity = "delete-activity";
     public const string linkactivity = "link-activity";
     public const string deleteplanet = "delete-planet";
+
+    public const string addtransport = "add-transport";
+    public const string gettransport = "get-transport";
+    public const string updatetransport = "update-transport";
+    public const string deletetransport = "delete-transport";
+    public const string linktransport = "link-transport";
 }

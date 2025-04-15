@@ -38,37 +38,36 @@ public class PlanetController(PlanetService planetService, AuthService authServi
     public async Task<ActionResult<PlanetModel>> addPlanet([FromBody] PlanetModel request)
     {
         var GoogleSubject = HttpContext.User.FindFirst("sub")!.Value ?? "";
-        if(await _authService.IsSubAdmin(GoogleSubject)){
+        if (await _authService.IsSubAdmin(GoogleSubject))
+        {
             return Ok(await _planetService.AddPlanet(request));
-        } else {
+        }
+        else
+        {
             return StatusCode(403, new { message = "Get failed", error = "You cannot access this command, only available to admins" });
         }
-        
-    }
 
-    [AllowAnonymous]
+    }
     [Authorize]
-    [HttpDelete("delete/{id}")]
-    public async Task<ActionResult<bool>> addPlanet(int id)
-    {
-        return Ok(await _planetService.DeletePlanet(id));
+    [HttpPost("delete/{id}")]
     public async Task<ActionResult<bool>> deletePlanet(int id)
     {
-                var GoogleSubject = HttpContext.User.FindFirst("sub")!.Value ?? "";
-        if(await _authService.IsSubAdmin(GoogleSubject)){
+        var GoogleSubject = HttpContext.User.FindFirst("sub")!.Value ?? "";
+        if (await _authService.IsSubAdmin(GoogleSubject))
+        {
             return Ok(await _planetService.DeletePlanet(id));
-        } else {
+        }
+        else
+        {
             return StatusCode(403, new { message = "Get failed", error = "You cannot access this command, only available to admins" });
         }
-        
+
     }
 
-    [AllowAnonymous]
     [Authorize]
     [HttpPatch("update/{id}")]
     public async Task<ActionResult<bool>> updatePlanet([FromBody] PlanetModel planet)
     {
         return Ok(await _planetService.UpdatePlanet(planet));
->>>>>>> dc98d123f74e91b865def82acd8f41135162b8d3
     }
 }

@@ -20,22 +20,53 @@ internal sealed class ReviewCommand : AsyncCommand<ReviewCommand.Settings>
         
 
         [CommandArgument(0, "<PLANET>")]
-        public int planetId { get; set; }
+        [Description("The name of the planet you want to review")]
+        public string planetName { get; set; }
 
         [CommandArgument(1, "<RATING>")]
+        [Description("The rating you want to give the planet (1 - 5)")]
         public int rating { get; set; }
 
         [CommandArgument(2, "[COMMENT]")]
+        [Description("The comment you have about the planet")]
         public string? comment { get; set; }
     }
 
     public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
-    {
+    {   
+        int planetIdFound = -1;
+        try
+        {
+            var response = await HttpUtils.Get($"{ConfigStore.Get(ConfigKeys.ServerUri)}/planets/name/{settings.planetName}");
+            if(response.TryGetProperty("planet", out var planet))
+            {
+                var mappedPlanet = planet.Deserialize<PlanetModel>();
+                if(mappedPlanet != null)
+                {
+                    planetIdFound = mappedPlanet.PlanetId;
+                }
+                else
+                {
+                    AnsiConsole.MarkupLine($"[red]Planet does not exist[/]");
+                }
+            }
+        }
+        catch (HttpRequestException ex)
+        {
+            AnsiConsole.MarkupLine($"[red]Request failed:[/] {ex.Message}");
+            return 1;
+        }
+        catch (JsonException ex)
+        {
+            AnsiConsole.MarkupLine($"[red]Failed to parse response:[/] {ex.Message}");
+            return 1;
+        }
+
         var requestBody = new
         {
             rating = settings.rating, 
             comment = settings.comment,
-            planetId = settings.planetId
+            planetId = planetIdFound
         };
 
         try
@@ -81,17 +112,20 @@ internal sealed class ReviewCommand : AsyncCommand<ReviewCommand.Settings>
 
 internal sealed class GetReviewCommand : AsyncCommand<GetReviewCommand.Settings>
 {
+    [Description("Get a reviews based on a specified criteria")]
     public sealed class Settings : CommandSettings
     {
         [CommandArgument(0, "[ID]")]
         [DefaultValue(-1)]
+        [Description("The id of a review you want to get")]
         public int id { get; set; }
         [CommandOption("--posted")]
+        [Description("Include this flag if you want to see only reviews posted by you")]
         public bool posted { get; set; }
 
-        [CommandOption("--planet-id <PLANET_ID>")]
-        [DefaultValue(-1)]
-        public int planetId { get; set; }
+        [CommandOption("--planet <PLANET_NAME>")]
+        [Description("Include this flag if you want to see reviews posted for a specific planet")]
+        public string planetName { get; set; } = string.Empty;
 
         [CommandOption("--rating-eq <RATING>")]
         [Description("Filter reviews with rating equal to this value")]
@@ -111,9 +145,38 @@ internal sealed class GetReviewCommand : AsyncCommand<GetReviewCommand.Settings>
 
     public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
     {
+        int planetIdFound = -1;
         try
         {
-            if (settings.id != -1 && settings.planetId != -1)
+            var response = await HttpUtils.Get($"{ConfigStore.Get(ConfigKeys.ServerUri)}/planets/name/{settings.planetName}");
+            if(response.TryGetProperty("planet", out var planet))
+            {
+                var mappedPlanet = planet.Deserialize<PlanetModel>();
+                if(mappedPlanet != null)
+                {
+                    planetIdFound = mappedPlanet.PlanetId;
+                }
+                else
+                {
+                    AnsiConsole.MarkupLine($"[red]Planet does not exist[/]");
+                }
+            }
+        }
+        catch (HttpRequestException ex)
+        {
+            AnsiConsole.MarkupLine($"[red]Request failed:[/] {ex.Message}");
+            return 1;
+        }
+        catch (JsonException ex)
+        {
+            AnsiConsole.MarkupLine($"[red]Failed to parse response:[/] {ex.Message}");
+            return 1;
+        }
+
+
+        try
+        {
+            if (settings.id != -1 && planetIdFound != -1)
             {
                 AnsiConsole.MarkupLine($"[red]Request failed:[/] Cannot search by planet and id");
                 return 1;
@@ -124,9 +187,9 @@ internal sealed class GetReviewCommand : AsyncCommand<GetReviewCommand.Settings>
             {
                 baseUrl += "/" + settings.id.ToString();
             }
-            else if (settings.planetId != -1)
+            else if (planetIdFound != -1)
             {
-                baseUrl += "/planets/" + settings.planetId.ToString();
+                baseUrl += "/planets/" + planetIdFound.ToString();
             }
 
             var queryParams = new List<string>();
@@ -155,7 +218,7 @@ internal sealed class GetReviewCommand : AsyncCommand<GetReviewCommand.Settings>
             {
                 requestUrl += "?" + string.Join("&", queryParams);
             }
-
+            
             var response = await HttpUtils.Get(requestUrl);
 
             var table = new Table
@@ -232,14 +295,18 @@ internal sealed class GetReviewCommand : AsyncCommand<GetReviewCommand.Settings>
 
 internal sealed class UpdateReviewCommand : AsyncCommand<UpdateReviewCommand.Settings>
 {
+    [Description("Edit a review you posted")]
     public sealed class Settings : CommandSettings
     {
         [CommandArgument(0, "<REVIEW>")]
+        [Description("The id of the review you want to update")]
         public int reviewId { get; set; }
         [CommandOption("-r | --rating <rating>")]
+        [Description("The new rating")]
         [DefaultValue(-1)]
         public int rating { get; set; }
         [CommandOption("-c | --comment <comment>")]
+        [Description("The new comment")]
         public string comment { get; set; } = string.Empty;
     }
 
@@ -296,9 +363,11 @@ internal sealed class UpdateReviewCommand : AsyncCommand<UpdateReviewCommand.Set
 
 internal sealed class DeleteReviewCommand : AsyncCommand<DeleteReviewCommand.Settings>
 {
+    [Description("Delete a review you posted")]
     public sealed class Settings : CommandSettings
     {
         [CommandArgument(0, "<REVIEW>")]
+        [Description("The id of the review you want to delete")]
         public int reviewId { get; set; }
     }
 

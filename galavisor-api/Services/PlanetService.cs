@@ -29,6 +29,10 @@ public class PlanetService
     {
         return await _planetRepository.GetById(id);
     }
+    public async Task<PlanetModel> GetPlanetByName(string name)
+    {
+        return await _planetRepository.GetByName(name);
+    }
 
     public async Task<string> GetPlanetWeatherById(int id)
     {

@@ -26,15 +26,33 @@ public class AuthService(HttpClient httpClient, UserRepository userRepository)
     {
         var sub = DecodeJWT("sub", jwt);
         var User = await _userRepository.GetBySub(sub);
-        if(User != null){
+        if (User != null)
+        {
             return User;
-        } else{
+        }
+        else
+        {
             var name = DecodeJWT("name", jwt);
             return await _userRepository.CreateUser(sub, name);
         }
     }
-  
-    public async Task<bool> IsSubAdmin(string sub){
+
+    public async Task<int> GetLoggedInUser(string jwt)
+    {
+        var sub = DecodeJWT("sub", jwt);
+        var User = await _userRepository.GetBySub(sub);
+        if (User != null)
+        {
+            return User.UserId;
+        }
+        else
+        {
+            return -1;
+        }
+    }
+
+    public async Task<bool> IsSubAdmin(string sub)
+    {
         var User = await _userRepository.GetBySub(sub);
         return User != null && User.RoleName == "Admin";
     }
@@ -87,7 +105,21 @@ public class AuthService(HttpClient httpClient, UserRepository userRepository)
 
     private static string DecodeBase64(string base64String)
     {
-        byte[] decodedBytes = Convert.FromBase64String(base64String);
+        string base64 = base64String
+            .Replace('-', '+')
+            .Replace('_', '/');
+
+        // Add padding if missing
+        switch (base64.Length % 4)
+        {
+            case 2: base64 += "=="; break;
+            case 3: base64 += "="; break;
+            case 0: break;
+            default:
+                throw new FormatException("Invalid Base64URL string");
+        }
+
+        byte[] decodedBytes = Convert.FromBase64String(base64);
         return Encoding.UTF8.GetString(decodedBytes);
     }
 }

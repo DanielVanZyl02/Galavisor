@@ -40,7 +40,11 @@ public static class GeneralUtils{
             CommandsConstants.updateactivity,
             CommandsConstants.deleteactivity,
             CommandsConstants.linkactivity
-
+            CommandsConstants.addtransport,
+            CommandsConstants.gettransport,
+            CommandsConstants.updatetransport,
+            CommandsConstants.deletetransport,
+            CommandsConstants.linktransport
         ];
     }
 }

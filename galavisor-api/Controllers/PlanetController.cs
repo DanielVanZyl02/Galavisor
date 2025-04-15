@@ -1,6 +1,7 @@
 using GalavisorApi.Services;
 using Microsoft.AspNetCore.Mvc;
 using GalavisorApi.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GalavisorApi.Controllers;
 
@@ -28,7 +29,7 @@ public class PlanetController(PlanetService planetService, AuthService authServi
     [Authorize]
     [HttpPost("weather/{id}")]
     public async Task<ActionResult<string>> getPlanetWeatherById(int id)
-    {   
+    {
         return Ok(await _planetService.GetPlanetWeatherById(id));
     }
 
@@ -45,8 +46,12 @@ public class PlanetController(PlanetService planetService, AuthService authServi
         
     }
 
+    [AllowAnonymous]
     [Authorize]
     [HttpDelete("delete/{id}")]
+    public async Task<ActionResult<bool>> addPlanet(int id)
+    {
+        return Ok(await _planetService.DeletePlanet(id));
     public async Task<ActionResult<bool>> deletePlanet(int id)
     {
                 var GoogleSubject = HttpContext.User.FindFirst("sub")!.Value ?? "";
@@ -58,16 +63,12 @@ public class PlanetController(PlanetService planetService, AuthService authServi
         
     }
 
+    [AllowAnonymous]
     [Authorize]
     [HttpPatch("update/{id}")]
-    public async Task<ActionResult<bool>> updatePlanet([FromBody] PlanetModel request)
+    public async Task<ActionResult<bool>> updatePlanet([FromBody] PlanetModel planet)
     {
-        var GoogleSubject = HttpContext.User.FindFirst("sub")!.Value ?? "";
-        if(await _authService.IsSubAdmin(GoogleSubject)){
-            return Ok(await _planetService.UpdatePlanet(request));
-        } else {
-            return StatusCode(403, new { message = "Get failed", error = "You cannot access this command, only available to admins" });
-        }
-        
+        return Ok(await _planetService.UpdatePlanet(planet));
+>>>>>>> dc98d123f74e91b865def82acd8f41135162b8d3
     }
 }

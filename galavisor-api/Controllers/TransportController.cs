@@ -46,23 +46,33 @@ public class TransportController : ControllerBase
     }
 
     [Authorize]
-    [HttpPut("{currentName}")]
-    public async Task<IActionResult> UpdateTransport(string currentName, [FromBody] string newName)
+    [HttpPut]
+    public async Task<IActionResult> UpdateTransport([FromBody] TransportUpdateModel model)
     {
-        var success = await _transportService.UpdateTransport(currentName, newName);
-        if (!success)
-            return NotFound();
+        if (string.IsNullOrEmpty(model.CurrentName) || string.IsNullOrEmpty(model.NewName))
+        {
+            return BadRequest("Both current name and new name are required");
+        }
         
-        return Ok(new { message = $"Transport '{currentName}' updated to '{newName}' successfully" });
+        var success = await _transportService.UpdateTransport(model.CurrentName, model.NewName);
+        if (!success)
+            return NotFound($"Transport '{model.CurrentName}' not found");
+        
+        return Ok(new { message = $"Transport '{model.CurrentName}' updated to '{model.NewName}' successfully" });
     }
 
     [Authorize]
-    [HttpDelete("{transportName}")]
-    public async Task<IActionResult> DeleteTransport(string transportName)
+    [HttpDelete]
+    public async Task<IActionResult> DeleteTransport([FromBody] string transportName)
     {
+        if (string.IsNullOrEmpty(transportName))
+        {
+            return BadRequest("Transport name is required");
+        }
+        
         var success = await _transportService.DeleteTransport(transportName);
         if (!success)
-            return NotFound();
+            return NotFound($"Transport '{transportName}' not found");
         
         return Ok(new { message = $"Transport '{transportName}' deleted successfully" });
     }

@@ -170,8 +170,13 @@ internal sealed class UpdateActivityCommand : AsyncCommand<UpdateActivityCommand
     {
         try
         {
-            var url = $"{ConfigStore.Get(ConfigKeys.ServerUri)}/api/activity/{HttpUtility.UrlEncode(settings.CurrentName)}";
-            var response = await HttpUtils.Put(url, settings.NewName);
+            var url = $"{ConfigStore.Get(ConfigKeys.ServerUri)}/api/activity";
+            var requestBody = new
+            {
+                CurrentName = settings.CurrentName,
+                NewName = settings.NewName
+            };
+            var response = await HttpUtils.Put(url, requestBody);
             
             var message = response.GetProperty("message").GetString();
             AnsiConsole.MarkupLine($"[green]{message}[/]");
@@ -198,8 +203,8 @@ internal sealed class DeleteActivityCommand : AsyncCommand<DeleteActivityCommand
     {
         try
         {
-            var url = $"{ConfigStore.Get(ConfigKeys.ServerUri)}/api/activity/{HttpUtility.UrlEncode(settings.Name)}";
-            var response = await HttpUtils.Delete(url);
+            var url = $"{ConfigStore.Get(ConfigKeys.ServerUri)}/api/activity";
+            var response = await HttpUtils.DeleteWithBody(url, settings.Name);
             
             var message = response.GetProperty("message").GetString();
             AnsiConsole.MarkupLine($"[green]{message}[/]");

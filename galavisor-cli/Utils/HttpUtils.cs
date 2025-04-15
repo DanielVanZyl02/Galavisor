@@ -101,4 +101,11 @@ public static class HttpUtils
             throw new Exception($"Could not parse JSON response body {ex.Message}");
         }
     }
+
+    public static async Task<JsonElement> DeleteWithBody(string url, object requestBody)
+    {
+        var request = CreateJsonRequest(HttpMethod.Delete, url, requestBody);
+        return await SendRequestAsync(request);
+    }
+
 }

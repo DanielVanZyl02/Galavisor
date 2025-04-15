@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using GalavisorApi.Services;
 using GalavisorApi.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace GalavisorApi.Controllers;
 
@@ -17,6 +18,7 @@ public class ActivityController : ControllerBase
         _activityService = activityService;
     }
 
+    [Authorize]
     [HttpGet("planet/{planetName}")]
     public async Task<ActionResult<List<ActivityModel>>> GetActivitiesByPlanet(string planetName)
     {
@@ -24,6 +26,7 @@ public class ActivityController : ControllerBase
         return Ok(activities);
     }
 
+    [Authorize]
     [HttpPost]
     public async Task<ActionResult<object>> AddActivity([FromBody] ActivityModel activity)
     {
@@ -42,24 +45,29 @@ public class ActivityController : ControllerBase
         return StatusCode(201, response);
     }
 
+    [Authorize]
     [HttpPut("{currentName}")]
     public async Task<IActionResult> UpdateActivity(string currentName, [FromBody] string newName)
     {
         var success = await _activityService.UpdateActivity(currentName, newName);
         if (!success)
             return NotFound();
-        return NoContent();
+        
+        return Ok(new { message = $"Activity '{currentName}' updated to '{newName}' successfully" });
     }
 
+    [Authorize]
     [HttpDelete("{activityName}")]
     public async Task<IActionResult> DeleteActivity(string activityName)
     {
         var success = await _activityService.DeleteActivity(activityName);
         if (!success)
             return NotFound();
-        return NoContent();
+        
+        return Ok(new { message = $"Activity '{activityName}' deleted successfully" });
     }
 
+    [Authorize]
     [HttpPost("link")]
     public async Task<ActionResult<object>> LinkActivityToPlanet([FromBody] ActivityModel activity)
     {
@@ -92,5 +100,13 @@ public class ActivityController : ControllerBase
         {
             return NotFound(ex.Message);
         }
+    }
+
+    [Authorize]
+    [HttpGet]
+    public async Task<ActionResult<List<ActivityModel>>> GetAllActivities()
+    {
+        var activity = await _activityService.GetAllActivities();
+        return Ok(activity);
     }
 } 

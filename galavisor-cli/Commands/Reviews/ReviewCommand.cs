@@ -38,7 +38,7 @@ internal sealed class ReviewCommand : AsyncCommand<ReviewCommand.Settings>
         try
         {
             using var httpClient = new HttpClient();
-            var response = await httpClient.PostAsJsonAsync("http://localhost:5228/reviews", requestBody);
+            var response = await httpClient.PostAsJsonAsync($"{ConfigStore.Get(ConfigKeys.ServerUri)}/reviews", requestBody);
 
             response.EnsureSuccessStatusCode();
             var responseJson = await response.Content.ReadAsStringAsync();
@@ -114,7 +114,7 @@ internal sealed class GetReviewCommand : AsyncCommand<GetReviewCommand.Settings>
                 return 1;
             }
 
-            var baseUrl = "http://localhost:5228/reviews";
+            var baseUrl = $"{ConfigStore.Get(ConfigKeys.ServerUri)}/reviews";
             if (settings.id != -1)
             {
                 baseUrl += "/" + settings.id.ToString();
@@ -245,7 +245,7 @@ internal sealed class UpdateReviewCommand : AsyncCommand<UpdateReviewCommand.Set
             };
 
             using var httpClient = new HttpClient();
-            var response = await httpClient.PutAsJsonAsync($"http://localhost:5228/reviews/{settings.reviewId}", requestBody);
+            var response = await httpClient.PutAsJsonAsync($"{ConfigStore.Get(ConfigKeys.ServerUri)}/reviews/{settings.reviewId}", requestBody);
 
             response.EnsureSuccessStatusCode();
             var responseJson = await response.Content.ReadAsStringAsync();
@@ -294,7 +294,7 @@ internal sealed class DeleteReviewCommand : AsyncCommand<DeleteReviewCommand.Set
         try
         {
             using var httpClient = new HttpClient();
-            var response = await httpClient.DeleteAsync($"http://localhost:5228/reviews/{settings.reviewId}");
+            var response = await httpClient.DeleteAsync($"{ConfigStore.Get(ConfigKeys.ServerUri)}/reviews/{settings.reviewId}");
 
             var responseJson = await response.Content.ReadAsStringAsync();
             if(response.StatusCode  == HttpStatusCode.NotFound){

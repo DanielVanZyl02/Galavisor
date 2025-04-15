@@ -32,7 +32,7 @@ internal sealed class ActivityCommand : AsyncCommand<ActivityCommand.Settings>
         try
         {
             using var httpClient = new HttpClient();
-            var response = await httpClient.PostAsJsonAsync("http://localhost:5228/api/activity", requestBody);
+            var response = await httpClient.PostAsJsonAsync($"{ConfigStore.Get(ConfigKeys.ServerUri)}/api/activity", requestBody);
 
             response.EnsureSuccessStatusCode();
             var responseJson = await response.Content.ReadAsStringAsync();
@@ -98,7 +98,7 @@ internal sealed class GetActivityCommand : AsyncCommand<GetActivityCommand.Setti
         try
         {
             using var httpClient = new HttpClient();
-            var response = await httpClient.GetAsync($"http://localhost:5228/api/activity/planet/{settings.PlanetName}");
+            var response = await httpClient.GetAsync($"{ConfigStore.Get(ConfigKeys.ServerUri)}/api/activity/planet/{settings.PlanetName}");
 
             response.EnsureSuccessStatusCode();
             var responseJson = await response.Content.ReadAsStringAsync();
@@ -157,7 +157,7 @@ internal sealed class UpdateActivityCommand : AsyncCommand<UpdateActivityCommand
         try
         {
             using var httpClient = new HttpClient();
-            var response = await httpClient.PutAsJsonAsync($"http://localhost:5228/api/activity/{settings.CurrentName}", settings.NewName);
+            var response = await httpClient.PutAsJsonAsync($"{ConfigStore.Get(ConfigKeys.ServerUri)}/api/activity/{settings.CurrentName}", settings.NewName);
 
             response.EnsureSuccessStatusCode();
             AnsiConsole.MarkupLine($"[green]Activity '{settings.CurrentName}' updated to '{settings.NewName}' successfully[/]");
@@ -185,7 +185,7 @@ internal sealed class DeleteActivityCommand : AsyncCommand<DeleteActivityCommand
         try
         {
             using var httpClient = new HttpClient();
-            var response = await httpClient.DeleteAsync($"http://localhost:5228/api/activity/{settings.Name}");
+            var response = await httpClient.DeleteAsync($"{ConfigStore.Get(ConfigKeys.ServerUri)}/api/activity/{settings.Name}");
 
             response.EnsureSuccessStatusCode();
             AnsiConsole.MarkupLine($"[green]Activity '{settings.Name}' deleted successfully[/]");
@@ -223,7 +223,7 @@ internal sealed class LinkActivityCommand : AsyncCommand<LinkActivityCommand.Set
         try
         {
             using var httpClient = new HttpClient();
-            var response = await httpClient.PostAsJsonAsync("http://localhost:5228/api/activity/link", requestBody);
+            var response = await httpClient.PostAsJsonAsync($"{ConfigStore.Get(ConfigKeys.ServerUri)}/api/activity/link", requestBody);
 
             response.EnsureSuccessStatusCode();
             var responseJson = await response.Content.ReadAsStringAsync();

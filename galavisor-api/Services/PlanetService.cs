@@ -36,14 +36,9 @@ public class PlanetService
         string atmosphere = planet.Atmosphere;
         int temperature = planet.Temperature;
         string colour = planet.Colour;
-
-        string initialPrompt = $"generate me a planet report based on the following information " +
-        $"It's name is {name}, it has an atmosphere of {atmosphere}, it has an average temperature of ${temperature}c " +
-        $"and its colour is {colour}. " +
-        "This is for a sci fi system so i don't want to see any response bu the weather report " +
-        "Make do with the information you have and do not ask for further information" +
-        "Do not include any Mark up language and it must all be plain text and it must be a simple daily weather report " +
-        "The date is actually today's date, do not simply put the words today";
+        string initialPrompt = "Generate a daily weather report for a fictional planet with the following details: " +
+            $"Planet name: {name}, Atmosphere: {atmosphere}, Average temperature: {temperature}°C, Surface colour: {colour}. "+
+            "It must be 100 words max, and your response must contain solely the weather report, nothing else.";
 
         var payload = new
         {
@@ -51,20 +46,26 @@ public class PlanetService
             {
                 new {role = "user", content = initialPrompt}
             },
-            model = "meta-llama/llama-3.2-1b-instruct:free"
+            model = "meta-llama/llama-3.1-8b-instruct:free"
         };
         var jsonPayload = JsonSerializer.Serialize(payload);
         var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
         using var httpClient = new HttpClient();
         httpClient.DefaultRequestHeaders.Clear();
-        httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer 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");
+        httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + ConfigStore.Get(ConfigKeys.AIKEY));
 
         var response = await httpClient.PostAsync("https://openrouter.ai/api/v1/chat/completions", content);
 
-        var message = await response.Content.ReadAsStringAsync();
-        return message;
-
+        var jsonString = await response.Content.ReadAsStringAsync();
+        using JsonDocument doc = JsonDocument.Parse(jsonString); 
+        var message = doc.RootElement
+            .GetProperty("choices")[0]
+            .GetProperty("message")
+            .GetProperty("content")
+            .GetString();
+        var responseString = $"Date: {DateTime.Today.ToString("d")}\nPlanet: {name}\n\nWeather Report:\n"+message;
+        return responseString;
     }
 
     public async Task<PlanetModel> AddPlanet(PlanetModel planet)

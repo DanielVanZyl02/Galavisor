@@ -37,6 +37,20 @@ public class AuthService(HttpClient httpClient, UserRepository userRepository)
         }
     }
 
+    public async Task<int> GetLoggedInUser(string jwt)
+    {
+        var sub = DecodeJWT("sub", jwt);
+        var User = await _userRepository.GetBySub(sub);
+        if (User != null)
+        {
+            return User.UserId;
+        }
+        else
+        {
+            return -1;
+        }
+    }
+
     public async Task<bool> IsSubAdmin(string sub)
     {
         var User = await _userRepository.GetBySub(sub);

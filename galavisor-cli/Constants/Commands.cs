@@ -22,7 +22,7 @@ public static class CommandsConstants
     public const string review = "review";
     public const string getreview = "get-review";
 
-    public const string updatereview = "update-review";
+    public const string updatereview = "edit-review";
     public const string deletereview = "delete-review";
 
     public const string planets = "planets";

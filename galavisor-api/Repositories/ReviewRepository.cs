@@ -21,8 +21,6 @@ public class ReviewRepository
 
     public async Task<ReviewModel> Add(ReviewModel review)
     {
-        
-        review.UserId = 1; //Logic need to be added to get id of logged in user
         using var connection = _db.CreateConnection();
         var sql = @"
             INSERT INTO review (planetid, userid, rating, comment)
@@ -56,7 +54,7 @@ public class ReviewRepository
             new { Id = id });
     }
     
-    public async Task<List<ReviewModel>> GetByPlanetId(int planetId, int? ratingEq = null, int? ratingGte = null, int? ratingLte = null)
+    public async Task<List<ReviewModel>> GetByPlanetId(int planetId, int? ratingEq = null, int? ratingGte = null, int? ratingLte = null, int? userId = null)
     {
         using var connection = _db.CreateConnection();
         
@@ -72,14 +70,14 @@ public class ReviewRepository
         var parameters = new DynamicParameters();
         parameters.Add("PlanetId", planetId);
         
-        AddRatingFilters(queryBuilder, parameters, ratingEq, ratingGte, ratingLte);
+        AddRatingFilters(queryBuilder, parameters, ratingEq, ratingGte, ratingLte, userId);
         
         var reviews = await connection.QueryAsync<ReviewModel>(queryBuilder.ToString(), parameters);
         return reviews.ToList();
     }
 
 
-    public async Task<List<ReviewModel>> GetAll(int? ratingEq = null, int? ratingGte = null, int? ratingLte = null)
+    public async Task<List<ReviewModel>> GetAll(int? ratingEq = null, int? ratingGte = null, int? ratingLte = null, int? userId = null)
     {
         using var connection = _db.CreateConnection();
         
@@ -93,10 +91,10 @@ public class ReviewRepository
         
         var parameters = new DynamicParameters();
 
-        if (ratingEq.HasValue || ratingGte.HasValue || ratingLte.HasValue)
+        if (ratingEq.HasValue || ratingGte.HasValue || ratingLte.HasValue || userId.HasValue)
         {
             queryBuilder.Append(" WHERE 1=1");
-            AddRatingFilters(queryBuilder, parameters, ratingEq, ratingGte, ratingLte);
+            AddRatingFilters(queryBuilder, parameters, ratingEq, ratingGte, ratingLte, userId);
         }
         
         var reviews = await connection.QueryAsync<ReviewModel>(queryBuilder.ToString(), parameters);
@@ -152,7 +150,7 @@ public class ReviewRepository
         return result > 0;
     }
 
-    private void AddRatingFilters(StringBuilder queryBuilder, DynamicParameters parameters, int? ratingEq, int? ratingGte, int? ratingLte)
+    private void AddRatingFilters(StringBuilder queryBuilder, DynamicParameters parameters, int? ratingEq, int? ratingGte, int? ratingLte, int? userId)
     {
         if (ratingEq.HasValue)
         {
@@ -170,6 +168,12 @@ public class ReviewRepository
         {
             queryBuilder.Append(" AND rating <= @RatingLte");
             parameters.Add("RatingLte", ratingLte.Value);
+        }
+
+        if (userId.HasValue)
+        {
+            queryBuilder.Append(" AND userid = @UserId");
+            parameters.Add("UserId", userId.Value);
         }
     }
 }

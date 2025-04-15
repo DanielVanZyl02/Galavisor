@@ -12,12 +12,16 @@ using GalavisorCli.Commands.Reviews;
 using GalavisorCli.Commands.Auth;
 using GalavisorCli.Commands.Planets;
 using GalavisorCli.Commands.Activities;
+using GalavisorCli.Commands.Help;
 using GalavisorCli.Commands.Transport;
+
 
 namespace GalavisorCli.App;
 
-public static class Setup{
-    public static CommandApp SetupCli(){
+public static class Setup
+{
+    public static CommandApp SetupCli()
+    {
         var services = new ServiceCollection();
         services.AddSingleton<AuthService>();
 
@@ -38,6 +42,7 @@ public static class Setup{
         services.AddTransient<DeleteCommand>();
         services.AddTransient<ExitCommand>();
         services.AddTransient<HelpCommand>();
+
         services.AddTransient<ConfigCommand>();
         services.AddTransient<ReviewCommand>();
         services.AddTransient<GetReviewCommand>();
@@ -63,10 +68,14 @@ public static class Setup{
         services.AddTransient<UpdateTransportCommand>();
         services.AddTransient<DeleteTransportCommand>();
         services.AddTransient<LinkTransportCommand>();
-
+      
         var serviceProvider = services.BuildServiceProvider();
         var registrar = new DependencyInjectionRegistrar(services);
         var app = new CommandApp(registrar);
+
+        var helpCommand = new HelpCommand("Galavisor CLI", "A command-line interface for the Galavisor service");
+        
+        RegisterCommandsWithHelp(helpCommand);
 
         app.Configure(config =>
         {
@@ -78,7 +87,7 @@ public static class Setup{
             config.AddCommand<ConfigCommand>(CommandsConstants.config).WithDescription("See your config information");
             config.AddCommand<DisableAccountCommand>(CommandsConstants.disable).WithDescription("Disable your or other peoples accounts");
             config.AddCommand<EnableAccountCommand>(CommandsConstants.enable).WithDescription("Enable other peoples accounts");
-            config.AddCommand<ToggleRoleCommand>(CommandsConstants.role).WithDescription("Change the tole of a user");
+            config.AddCommand<ToggleRoleCommand>(CommandsConstants.role).WithDescription("Change the role of a user");
             config.AddCommand<UsersCommand>(CommandsConstants.users).WithDescription("See all users in the system");
 
             config.AddCommand<AddCommand>(CommandsConstants.add);
@@ -86,7 +95,11 @@ public static class Setup{
             config.AddCommand<UpdateCommand>(CommandsConstants.update);
             config.AddCommand<DeleteCommand>(CommandsConstants.delete);
             config.AddCommand<ExitCommand>(CommandsConstants.exit).WithDescription("Exit the cli");
-            config.AddCommand<HelpCommand>(CommandsConstants.help).WithDescription("See all commands available in the cli");
+            
+            config.AddCommand<HelpCommand>("help")
+                .WithDescription("Shows help information for available commands")
+                .WithData(helpCommand);
+
             config.AddCommand<ReviewCommand>(CommandsConstants.review);
             config.AddCommand<GetReviewCommand>(CommandsConstants.getreview);
 
@@ -118,8 +131,37 @@ public static class Setup{
         AnsiConsole.Write(
             new FigletText("Galavisor")
             .Color(Color.Teal));
-        AnsiConsole.MarkupLine("[green]Welcome to Galavisor CLI![/] Type 'exit' to quit.\n"); // please change this message
+        AnsiConsole.MarkupLine("[green]Welcome to Galavisor CLI![/] Type 'help' to see available commands.\n");
 
         return app;
+    }
+
+    private static void RegisterCommandsWithHelp(HelpCommand helpCommand)
+    {
+        // System commands
+        helpCommand.RegisterCommand<AddCommand.Settings>("add");
+        helpCommand.RegisterCommand<UpdateCommand.Settings>("update");
+        helpCommand.RegisterCommand<DeleteCommand.Settings>("delete");
+
+        // Review commands
+        helpCommand.RegisterCommand<ReviewCommand.Settings>("review");
+        helpCommand.RegisterCommand<GetReviewCommand.Settings>("reviews");
+        helpCommand.RegisterCommand<UpdateReviewCommand.Settings>("review update");
+        helpCommand.RegisterCommand<DeleteReviewCommand.Settings>("review delete");
+
+        // Planet commands
+        helpCommand.RegisterCommand<GetPlanetsCommand.Settings>("planets");
+        helpCommand.RegisterCommand<GetPlanetCommand.Settings>("planet");
+        helpCommand.RegisterCommand<GetPlanetWeatherCommand.Settings>("planet weather");
+        helpCommand.RegisterCommand<AddPlanetCommand.Settings>("planet add");
+        helpCommand.RegisterCommand<UpdatePlanetCommand.Settings>("planet update");
+        helpCommand.RegisterCommand<DeletePlanetCommand.Settings>("planet delete");
+
+        // Activity commands
+        helpCommand.RegisterCommand<ActivityCommand.Settings>("activity add");
+        helpCommand.RegisterCommand<GetActivityCommand.Settings>("activities");
+        helpCommand.RegisterCommand<UpdateActivityCommand.Settings>("activity update");
+        helpCommand.RegisterCommand<DeleteActivityCommand.Settings>("activity delete");
+        helpCommand.RegisterCommand<LinkActivityCommand.Settings>("activity link");
     }
 }

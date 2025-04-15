@@ -12,7 +12,7 @@ using GalavisorCli.Models;
 
 namespace GalavisorCli.Commands.Transport;
 
-internal sealed class TransportCommand : AsyncCommand<TransportCommand.Settings>
+internal sealed class AddTransportCommand : AsyncCommand<AddTransportCommand.Settings>
 {
     public sealed class Settings : CommandSettings
     {
@@ -33,22 +33,40 @@ internal sealed class TransportCommand : AsyncCommand<TransportCommand.Settings>
             var url = $"{ConfigStore.Get(ConfigKeys.ServerUri)}/api/transport";
             var response = await HttpUtils.Post(url, requestBody);
             
-            var transportModel = JsonSerializer.Deserialize<TransportModel>(response.GetRawText(), new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-
-            if (transportModel != null)
+            // Parse the response JSON structure to match the API
+            var transport = response.GetProperty("transport");
+            var transportName = transport.GetProperty("name").GetString();
+            
+            var isNewlyCreated = response.GetProperty("status").GetProperty("isNewlyCreated").GetBoolean();
+            
+            var table = new Table
             {
-                var table = new Table
-                {
-                    Border = TableBorder.Rounded,
-                    BorderStyle = Style.Parse("green")
-                };
+                Border = TableBorder.Rounded,
+                BorderStyle = Style.Parse("green")
+            };
 
-                table.AddColumn("Name");
-                table.AddRow(transportModel.Name);
+            table.AddColumn("Name");
+            table.AddRow(transportName);
 
-                AnsiConsole.MarkupLine("[green]Transport added successfully[/]");
-                AnsiConsole.Write(table);
-            }
+            var title = isNewlyCreated ? 
+                "Transport Added Successfully" : 
+                "Transport Already Exists";
+                
+            var messageColor = isNewlyCreated ? "green" : "yellow";
+            var panelStyle = isNewlyCreated ? 
+                Style.Parse("green") : 
+                Style.Parse("yellow");
+            
+            // Output the message above the panel with direct color
+            AnsiConsole.MarkupLine($"[{messageColor}]{title}[/]");
+
+            // Create a panel with a simpler header
+            var panel = new Panel(table)
+                .Header("Transport Details", Justify.Center)
+                .Border(BoxBorder.Rounded)
+                .BorderStyle(panelStyle);
+
+            AnsiConsole.Write(panel);
 
             return 0;
         }
@@ -233,24 +251,33 @@ internal sealed class LinkTransportCommand : AsyncCommand<LinkTransportCommand.S
                 table.AddRow("Planet", transport.PlanetName);
                 
                 string title;
+                string messageColor;
                 Style panelStyle;
                 
                 if (isNewlyLinked)
                 {
                     title = "Transport Linked to Planet";
+                    messageColor = "green";
                     panelStyle = Style.Parse("green");
                 }
                 else 
                 {
                     title = "Transport Already Linked";
-                    table.AddRow("Status", "Transport was already linked to this planet");
+                    messageColor = "yellow";
                     panelStyle = Style.Parse("yellow");
+                    table.AddRow("Status", "Transport was already linked to this planet");
                 }
 
-                AnsiConsole.Write(new Panel(table)
-                    .Header(title, Justify.Center)
+                // Output the message above the panel with direct color
+                AnsiConsole.MarkupLine($"[{messageColor}]{title}[/]");
+
+                // Create a panel with a simpler header
+                var panel = new Panel(table)
+                    .Header("Link Details", Justify.Center)
                     .Border(BoxBorder.Rounded)
-                    .BorderStyle(panelStyle));
+                    .BorderStyle(panelStyle);
+
+                AnsiConsole.Write(panel);
             }
 
             return 0;

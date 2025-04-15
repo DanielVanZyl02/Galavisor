@@ -58,7 +58,7 @@ public static class Setup{
         services.AddTransient<DeletePlanetCommand>();
 
         // Transport commands
-        services.AddTransient<TransportCommand>();
+        services.AddTransient<AddTransportCommand>();
         services.AddTransient<GetTransportCommand>();
         services.AddTransient<UpdateTransportCommand>();
         services.AddTransient<DeleteTransportCommand>();
@@ -106,7 +106,7 @@ public static class Setup{
             config.AddCommand<DeletePlanetCommand>(CommandsConstants.deleteplanet);
 
             // Transport commands
-            config.AddCommand<TransportCommand>(CommandsConstants.addtransport).WithDescription("Add a new transport option");
+            config.AddCommand<AddTransportCommand>(CommandsConstants.addtransport).WithDescription("Add a new transport option");
             config.AddCommand<GetTransportCommand>(CommandsConstants.gettransport).WithDescription("Get transport options (use with --all or --planet)");
             config.AddCommand<UpdateTransportCommand>(CommandsConstants.updatetransport).WithDescription("Update a transport's name");
             config.AddCommand<DeleteTransportCommand>(CommandsConstants.deletetransport).WithDescription("Delete a transport option");

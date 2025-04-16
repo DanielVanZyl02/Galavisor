@@ -8,20 +8,12 @@ public static class ConfigStore
 
     private static Dictionary<string, string> Load()
     {
-        try
-        {
-            if (!File.Exists(ConfigFile))
-                return [];
-
-            var json = File.ReadAllText(ConfigFile);
-            return JsonSerializer.Deserialize<Dictionary<string, string>>(json)
-                   ?? [];
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Failed to load config: {ex.Message}");
+        if (!File.Exists(ConfigFile))
             return [];
-        }
+
+        var json = File.ReadAllText(ConfigFile);
+        return JsonSerializer.Deserialize<Dictionary<string, string>>(json)
+                ?? [];
     }
 
     private static void Save()

@@ -57,6 +57,7 @@ galivisor-api/.vs
 
 **/local_config.json
 **/server_config.json
+**/.vs
 
 #Terraform
 .terraform/

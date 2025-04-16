@@ -224,6 +224,10 @@ public class ReviewController : ControllerBase
         if(loggedInUser != -1)
         {
             var review = await _reviewService.GetReviewById(id);
+            
+            return  Ok(new {status = "Fail", message = $"Review {id} not found" });
+
+
             if(review.UserId == loggedInUser)
             {
                 isLoggedInUser = true;

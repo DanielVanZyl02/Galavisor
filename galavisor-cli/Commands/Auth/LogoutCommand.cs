@@ -2,12 +2,18 @@ using Spectre.Console;
 using Spectre.Console.Cli;
 using GalavisorCli.Constants;
 using  GalavisorCli.Utils;
+using System.ComponentModel;
 
 namespace GalavisorCli.Commands.Auth;
 
-public class LogoutCommand : Command
+public class LogoutCommand : Command<LogoutCommand.Settings>
 {
-    public override int Execute(CommandContext context)
+    [Description("Attempt to login to the system")]
+    public class Settings : CommandSettings
+    {
+    }
+    
+    public override int Execute(CommandContext context, Settings settings)
     {
         if(ConfigStore.Exists(ConfigKeys.JwtToken)){
             ConfigStore.Remove(ConfigKeys.JwtToken);

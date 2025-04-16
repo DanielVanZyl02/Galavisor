@@ -2,14 +2,13 @@ using Dapper;
 using GalavisorApi.Models;
 using GalavisorApi.Data;
 
-
 namespace GalavisorApi.Repositories;
 
 public class UserRepository(DatabaseConnection db)
 {
     private readonly DatabaseConnection _db = db;
 
-    public async Task<UserModel?> GetBySub(string GoogleSubject)
+    public virtual async Task<UserModel?> GetBySub(string GoogleSubject)
     {
         using var connection = _db.CreateConnection();
         return await connection.QueryFirstOrDefaultAsync<UserModel>(
@@ -69,7 +68,7 @@ public class UserRepository(DatabaseConnection db)
         });
     }
 
-    public async Task<UserModel?> GetById(int UserId)
+    public virtual async Task<UserModel?> GetById(int UserId)
     {
         using var connection = _db.CreateConnection();
         return await connection.QueryFirstOrDefaultAsync<UserModel>(
@@ -87,7 +86,7 @@ public class UserRepository(DatabaseConnection db)
             new { UserId });
     }
 
-    public async Task<List<UserModel>> GetAll()
+    public virtual async Task<List<UserModel>> GetAll()
     {
         using var connection = _db.CreateConnection();
         var users = await connection.QueryAsync<UserModel>(

@@ -1,11 +1,7 @@
 using Spectre.Console;
 using Spectre.Console.Cli;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace GalavisorCli.Commands.Help;
 
@@ -22,31 +18,31 @@ public class HelpCommand : Command<HelpCommand.HelpSettings>
         public bool Verbose { get; set; }
         [CommandArgument(0, "[command]")]
         [Description("Specific command to show help for")]
-        public string Command { get; set; }
+        public required string Command { get; set; }
     }
 
     public class CommandInfo
     {
-        public string Name { get; set; }
-        public string Description { get; set; }
+        public required string Name { get; set; }
+        public required string Description { get; set; }
         public List<ArgumentInfo> Arguments { get; set; } = new();
         public List<OptionInfo> Options { get; set; } = new();
     }
 
     public class ArgumentInfo
     {
-        public string Name { get; set; }
-        public string Description { get; set; }
+        public required string Name { get; set; }
+        public required string Description { get; set; }
         public bool Required { get; set; }
-        public string DefaultValue { get; set; }
+        public required string DefaultValue { get; set; }
     }
 
     public class OptionInfo
     {
-        public string Name { get; set; }
-        public string Description { get; set; }
+        public required string Name { get; set; }
+        public required string Description { get; set; }
         public bool Required { get; set; }
-        public string DefaultValue { get; set; }
+        public required string DefaultValue { get; set; }
     }
 
     public HelpCommand() : this("Galavisor CLI", "A command-line interface for the Galavisor service")
@@ -148,7 +144,7 @@ public class HelpCommand : Command<HelpCommand.HelpSettings>
         if (defaultAttr != null)
         {
             if (defaultAttr.Value == null) return "null";
-            return defaultAttr.Value.ToString();
+            return defaultAttr.Value.ToString() ?? "";
         }
 
         if (property.PropertyType.IsValueType)

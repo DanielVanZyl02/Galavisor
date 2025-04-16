@@ -8,15 +8,16 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace GalavisorCli.Commands.Users;
 
-public class DisableAccountSettings : CommandSettings
+public class DisableAccountCommand : AsyncCommand<DisableAccountCommand.DisableAccountSettings>
 {
-    [CommandOption("--id <ID>")]
-    [Description("ID of the account to disable (optional)")]
-    public int? Id { get; set; }
-}
+    [Description("Disable your or other peoples accounts")]
+    public class DisableAccountSettings : CommandSettings
+    {
+        [CommandOption("--id <ID>")]
+        [Description("ID of the account to disable (optional)")]
+        public int? Id { get; set; }
+    }
 
-public class DisableAccountCommand : AsyncCommand<DisableAccountSettings>
-{
     public override async Task<int> ExecuteAsync([NotNull] CommandContext context, [NotNull] DisableAccountSettings settings)
     {
         if (!ConfigStore.Exists(ConfigKeys.JwtToken))
@@ -82,15 +83,13 @@ public class DisableAccountCommand : AsyncCommand<DisableAccountSettings>
                     table.AddColumn("[bold]Planet Name[/]");
                     table.AddColumn("[bold]Role[/]");
                     table.AddColumn("[bold]Active[/]");
-                    table.AddColumn("[bold]Google Subject[/]");
 
                     table.AddRow(
                         user.UserId.ToString(),
                         user.Name,
                         user.PlanetName,
                         user.RoleName,
-                        user.IsActive ? "[green]Active[/]" : "[red]Inactive[/]",
-                        user.GoogleSubject
+                        user.IsActive ? "[green]Active[/]" : "[red]Inactive[/]"
                     );
 
                     AnsiConsole.Write(table);
@@ -106,15 +105,13 @@ public class DisableAccountCommand : AsyncCommand<DisableAccountSettings>
                     table.AddColumn("[bold]Planet Name[/]");
                     table.AddColumn("[bold]Role[/]");
                     table.AddColumn("[bold]Active[/]");
-                    table.AddColumn("[bold]Google Subject[/]");
 
                     table.AddRow(
                         user.UserId.ToString(),
                         user.Name,
                         user.PlanetName,
                         user.RoleName,
-                        user.IsActive ? "[green]Active[/]" : "[red]Inactive[/]",
-                        user.GoogleSubject
+                        user.IsActive ? "[green]Active[/]" : "[red]Inactive[/]"
                     );
 
                     AnsiConsole.Write(table);

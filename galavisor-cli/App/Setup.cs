@@ -75,8 +75,8 @@ public static class Setup
         app.Configure(config =>
         {
             // Auth
-            config.AddCommand<LoginCommand>(CommandsConstants.login).WithDescription("login to the system");
-            config.AddCommand<LogoutCommand>(CommandsConstants.logout).WithDescription("logout of the system");
+            config.AddCommand<LoginCommand>(CommandsConstants.login).WithDescription("Attempt to login to the system");
+            config.AddCommand<LogoutCommand>(CommandsConstants.logout).WithDescription("Attempt to login to the system");
 
             // Users
             config.AddCommand<ConfigCommand>(CommandsConstants.config).WithDescription("See your config information");
@@ -129,6 +129,10 @@ public static class Setup
 
     private static void RegisterCommandsWithHelp(HelpCommand helpCommand)
     {
+        // Auth
+        helpCommand.RegisterCommand<LoginCommand.Settings>(CommandsConstants.login);
+        helpCommand.RegisterCommand<LogoutCommand.Settings>(CommandsConstants.logout);
+
         // Review commands
         helpCommand.RegisterCommand<ReviewCommand.Settings>("review");
         helpCommand.RegisterCommand<GetReviewCommand.Settings>("get-review");
@@ -149,5 +153,12 @@ public static class Setup
         // helpCommand.RegisterCommand<UpdateActivityCommand.Settings>("activity update");
         // helpCommand.RegisterCommand<DeleteActivityCommand.Settings>("activity delete");
         // helpCommand.RegisterCommand<LinkActivityCommand.Settings>("activity link");
+
+        // Users
+        helpCommand.RegisterCommand<ConfigCommand.ConfigSettings>(CommandsConstants.config);
+        helpCommand.RegisterCommand<DisableAccountCommand.DisableAccountSettings>(CommandsConstants.disable);
+        helpCommand.RegisterCommand<EnableAccountCommand.EnableAccountSettings>(CommandsConstants.enable);
+        helpCommand.RegisterCommand<ToggleRoleCommand.ToggleRoleSettings>(CommandsConstants.role);
+        helpCommand.RegisterCommand<UsersCommand.Settings>(CommandsConstants.users);
     }
 }

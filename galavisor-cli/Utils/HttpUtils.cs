@@ -77,18 +77,24 @@ public static class HttpUtils
 
         if (statusCode == 401)
         {
-            
-            // Handle session expiration
             ConfigStore.Remove(ConfigKeys.JwtToken);
             throw new Exception("Your session has expired. Please log in again.");
         }
+        else if (statusCode == 403)
+        {
+            throw new Exception("You are not authorized to access this command");
+        }
         else if (statusCode == 404)
         {
-            throw new Exception("Resource not found.");
+            throw new Exception("No result returned from server.");
+        }
+        else if (statusCode == 500)
+        {
+            throw new Exception("Internal Server Error");
         }
         else if (statusCode >= 400)
         {
-            throw new Exception($"{statusCode} - {await response.Content.ReadAsStringAsync()}");
+            throw new Exception($"{statusCode} - Some error occured");
         }
 
         string responseBody = await response.Content.ReadAsStringAsync();

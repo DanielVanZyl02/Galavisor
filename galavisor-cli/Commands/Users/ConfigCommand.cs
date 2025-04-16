@@ -8,23 +8,24 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace GalavisorCli.Commands.Users;
 
-public class ConfigSettings : CommandSettings
+public class ConfigCommand : AsyncCommand<ConfigCommand.ConfigSettings>
 {
-    [CommandOption("--list")]
-    [Description("List current config values")]
-    public bool List { get; set; }
+    [Description("See your config information")]
+    public class ConfigSettings : CommandSettings
+    {
+        [CommandOption("--list")]
+        [Description("List current config values")]
+        public bool List { get; set; }
 
-    [CommandOption("--username <USERNAME>")]
-    [Description("Set your username")]
-    public string? Username { get; set; }
+        [CommandOption("--username <USERNAME>")]
+        [Description("Set your username")]
+        public string? Username { get; set; }
 
-    [CommandOption("--homeplanet <PLANET>")]
-    [Description("Set your home planet")]
-    public string? HomePlanet { get; set; }
-}
+        [CommandOption("--homeplanet <PLANET>")]
+        [Description("Set your home planet")]
+        public string? HomePlanet { get; set; }
+    }
 
-public class ConfigCommand : AsyncCommand<ConfigSettings>
-{
     public override async Task<int> ExecuteAsync([NotNull] CommandContext context, [NotNull] ConfigSettings settings)
     {
         if(!ConfigStore.Exists(ConfigKeys.JwtToken)){
@@ -91,15 +92,13 @@ public class ConfigCommand : AsyncCommand<ConfigSettings>
                 table.AddColumn("[bold]Planet Name[/]");
                 table.AddColumn("[bold]Role[/]");
                 table.AddColumn("[bold]Active[/]");
-                table.AddColumn("[bold]Google Subject[/]");
 
                 table.AddRow(
                     User.UserId.ToString(),
                     User.Name,
                     User.PlanetName,
                     User.RoleName,
-                    User.IsActive ? "[green]Active[/]" : "[red]Inactive[/]",
-                    User.GoogleSubject
+                    User.IsActive ? "[green]Active[/]" : "[red]Inactive[/]"
                 );
 
                 AnsiConsole.Write(table);

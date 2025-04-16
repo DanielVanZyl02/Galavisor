@@ -8,15 +8,16 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace GalavisorCli.Commands.Users;
 
-public class EnableAccountSettings : CommandSettings
+public class EnableAccountCommand : AsyncCommand<EnableAccountCommand.EnableAccountSettings>
 {
-    [CommandOption("--id <ID>")]
-    [Description("ID of the account to enable")]
-    public int? Id { get; set; }
-}
+    [Description("Enable other peoples accounts")]
+    public class EnableAccountSettings : CommandSettings
+    {
+        [CommandOption("--id <ID>")]
+        [Description("ID of the account to enable")]
+        public int? Id { get; set; }
+    }
 
-public class EnableAccountCommand : AsyncCommand<EnableAccountSettings>
-{
     public override async Task<int> ExecuteAsync([NotNull] CommandContext context, [NotNull] EnableAccountSettings settings)
     {
         if (!ConfigStore.Exists(ConfigKeys.JwtToken))
@@ -63,15 +64,13 @@ public class EnableAccountCommand : AsyncCommand<EnableAccountSettings>
                 table.AddColumn("[bold]Planet Name[/]");
                 table.AddColumn("[bold]Role[/]");
                 table.AddColumn("[bold]Active[/]");
-                table.AddColumn("[bold]Google Subject[/]");
 
                 table.AddRow(
                     user.UserId.ToString(),
                     user.Name,
                     user.PlanetName,
                     user.RoleName,
-                    user.IsActive ? "[green]Active[/]" : "[red]Inactive[/]",
-                    user.GoogleSubject
+                    user.IsActive ? "[green]Active[/]" : "[red]Inactive[/]"
                 );
 
                 AnsiConsole.Write(table);

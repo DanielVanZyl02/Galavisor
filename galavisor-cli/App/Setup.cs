@@ -101,20 +101,20 @@ public static class Setup
             config.AddCommand<GetPlanetCommand>(CommandsConstants.getplanet);
             config.AddCommand<GetPlanetWeatherCommand>(CommandsConstants.getweather);
             config.AddCommand<AddPlanetCommand>(CommandsConstants.addplanet);
-            config.AddCommand<AddActivityCommand>(CommandsConstants.addactivity).WithDescription("Add a new activity to the database");
-            config.AddCommand<GetActivityCommand>(CommandsConstants.getactivity).WithDescription("Get activities (use with --all or --planet)");
-            config.AddCommand<UpdateActivityCommand>(CommandsConstants.updateactivity).WithDescription("Update an activity's name");
-            config.AddCommand<DeleteActivityCommand>(CommandsConstants.deleteactivity).WithDescription("Delete an activity");
-            config.AddCommand<LinkActivityCommand>(CommandsConstants.linkactivity).WithDescription("Link an existing activity to a planet");
+            config.AddCommand<AddActivityCommand>(CommandsConstants.AddActivity).WithDescription("Add a new activity to the database");
+            config.AddCommand<GetActivityCommand>(CommandsConstants.GetActivity).WithDescription("Get activities (use with --all or --planet)");
+            config.AddCommand<UpdateActivityCommand>(CommandsConstants.UpdateActivity).WithDescription("Update an activity's name");
+            config.AddCommand<DeleteActivityCommand>(CommandsConstants.DeleteActivity).WithDescription("Delete an activity");
+            config.AddCommand<LinkActivityCommand>(CommandsConstants.LinkActivity).WithDescription("Link an existing activity to a planet");
             config.AddCommand<UpdatePlanetCommand>(CommandsConstants.updateplanet);
             config.AddCommand<DeletePlanetCommand>(CommandsConstants.deleteplanet);
 
             // Transport commands
-            config.AddCommand<AddTransportCommand>(CommandsConstants.addtransport).WithDescription("Add a new transport option");
-            config.AddCommand<GetTransportCommand>(CommandsConstants.gettransport).WithDescription("Get transport options (use with --all or --planet)");
-            config.AddCommand<UpdateTransportCommand>(CommandsConstants.updatetransport).WithDescription("Update a transport's name");
-            config.AddCommand<DeleteTransportCommand>(CommandsConstants.deletetransport).WithDescription("Delete a transport option");
-            config.AddCommand<LinkTransportCommand>(CommandsConstants.linktransport).WithDescription("Link an existing transport to a planet");
+            config.AddCommand<AddTransportCommand>(CommandsConstants.AddTransport).WithDescription("Add a new transport option");
+            config.AddCommand<GetTransportCommand>(CommandsConstants.GetTransport).WithDescription("Get transport options (use with --all or --planet)");
+            config.AddCommand<UpdateTransportCommand>(CommandsConstants.UpdateTransport).WithDescription("Update a transport's name");
+            config.AddCommand<DeleteTransportCommand>(CommandsConstants.DeleteTransport).WithDescription("Delete a transport option");
+            config.AddCommand<LinkTransportCommand>(CommandsConstants.LinkTransport).WithDescription("Link an existing transport to a planet");
         });
 
         var knownCommands = GeneralUtils.GetKnownCommands();
@@ -148,11 +148,11 @@ public static class Setup
         helpCommand.RegisterCommand<DeletePlanetCommand.Settings>(CommandsConstants.deleteplanet);
 
         // Activity commands
-        // helpCommand.RegisterCommand<AddActivityCommand.Settings>("activity add");
-        // helpCommand.RegisterCommand<GetActivityCommand.Settings>("activities");
-        // helpCommand.RegisterCommand<UpdateActivityCommand.Settings>("activity update");
-        // helpCommand.RegisterCommand<DeleteActivityCommand.Settings>("activity delete");
-        // helpCommand.RegisterCommand<LinkActivityCommand.Settings>("activity link");
+        helpCommand.RegisterCommand<AddActivityCommand.Settings>(CommandsConstants.AddActivity);
+        helpCommand.RegisterCommand<GetActivityCommand.Settings>(CommandsConstants.GetActivity);
+        helpCommand.RegisterCommand<UpdateActivityCommand.Settings>(CommandsConstants.UpdateActivity);
+        helpCommand.RegisterCommand<DeleteActivityCommand.Settings>(CommandsConstants.DeleteActivity);
+        helpCommand.RegisterCommand<LinkActivityCommand.Settings>(CommandsConstants.LinkActivity);
 
         // Users
         helpCommand.RegisterCommand<ConfigCommand.ConfigSettings>(CommandsConstants.config);
@@ -160,5 +160,12 @@ public static class Setup
         helpCommand.RegisterCommand<EnableAccountCommand.EnableAccountSettings>(CommandsConstants.enable);
         helpCommand.RegisterCommand<ToggleRoleCommand.ToggleRoleSettings>(CommandsConstants.role);
         helpCommand.RegisterCommand<UsersCommand.Settings>(CommandsConstants.users);
+
+        // Transport commands
+        helpCommand.RegisterCommand<AddTransportCommand.Settings>(CommandsConstants.AddTransport);
+        helpCommand.RegisterCommand<GetTransportCommand.Settings>(CommandsConstants.GetTransport);
+        helpCommand.RegisterCommand<UpdateTransportCommand.Settings>(CommandsConstants.UpdateTransport);
+        helpCommand.RegisterCommand<DeleteTransportCommand.Settings>(CommandsConstants.DeleteTransport);
+        helpCommand.RegisterCommand<LinkTransportCommand.Settings>(CommandsConstants.LinkTransport);
     }
 }

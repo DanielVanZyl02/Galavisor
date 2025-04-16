@@ -35,16 +35,16 @@ public static class GeneralUtils{
             CommandsConstants.updateplanet,
             CommandsConstants.deleteplanet,
             CommandsConstants.updateplanet,
-            CommandsConstants.addactivity,
-            CommandsConstants.getactivity,
-            CommandsConstants.updateactivity,
-            CommandsConstants.deleteactivity,
-            CommandsConstants.linkactivity,
-            CommandsConstants.addtransport,
-            CommandsConstants.gettransport,
-            CommandsConstants.updatetransport,
-            CommandsConstants.deletetransport,
-            CommandsConstants.linktransport
+            CommandsConstants.AddActivity,
+            CommandsConstants.GetActivity,
+            CommandsConstants.UpdateActivity,
+            CommandsConstants.DeleteActivity,
+            CommandsConstants.LinkActivity,
+            CommandsConstants.AddTransport,
+            CommandsConstants.GetTransport,
+            CommandsConstants.UpdateTransport,
+            CommandsConstants.DeleteTransport,
+            CommandsConstants.LinkTransport
         ];
     }
 }

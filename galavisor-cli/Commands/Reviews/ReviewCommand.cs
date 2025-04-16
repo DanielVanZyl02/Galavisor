@@ -258,7 +258,14 @@ internal sealed class UpdateReviewCommand : AsyncCommand<UpdateReviewCommand.Set
 
             var response = await HttpUtils.Put($"{ConfigStore.Get(ConfigKeys.ServerUri)}/reviews/{settings.reviewId}", requestBody);
 
-            if(response.TryGetProperty("review", out var updatedReview))
+            if(response.TryGetProperty("status", out var status) && response.TryGetProperty("message", out var message))
+            {
+                var responseStatus = status.Deserialize<string>();
+                var responseMessage = message.Deserialize<string>();
+                var color = responseStatus == "Success" ? "green" : "red";
+                AnsiConsole.MarkupLine($"[{color}] {responseMessage} [/]");
+            }
+            else if(response.TryGetProperty("review", out var updatedReview))
             {
                 var review = updatedReview.Deserialize<ReviewModel>();
                 if (review != null)

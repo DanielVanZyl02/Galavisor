@@ -12,7 +12,7 @@ namespace GalavisorApi.Tests
         [Fact]
         public async Task GetById_ExistingId_ReturnsUserModel()
         {
-            var expectedUser = new UserModel
+            var ExpectedUser = new UserModel
             {
                 UserId = 1,
                 Name = "Test",
@@ -21,45 +21,45 @@ namespace GalavisorApi.Tests
                 GoogleSubject = "1234567890"
             };
 
-            var connectionMock = new Mock<IDbConnection>();
+            var ConnectionMock = new Mock<IDbConnection>();
 
-            var dbConnection = new TestDatabaseConnection(connectionMock.Object);
+            var DbConnection = new TestDatabaseConnection(ConnectionMock.Object);
 
-            var repositoryMock = new Mock<UserRepository>(dbConnection);
+            var RepositoryMock = new Mock<UserRepository>(DbConnection);
 
-            repositoryMock.Setup(r => r.GetById(1))
-                .ReturnsAsync(expectedUser);
+            RepositoryMock.Setup(r => r.GetById(1))
+                .ReturnsAsync(ExpectedUser);
 
 
-            var result = await repositoryMock.Object.GetById(1);
+            var Result = await RepositoryMock.Object.GetById(1);
 
-            Assert.NotNull(result);
-            Assert.Equal(expectedUser.UserId, result.UserId);
-            Assert.Equal(expectedUser.Name, result.Name);
-            Assert.Equal(expectedUser.RoleName, result.RoleName);
-            Assert.Equal(expectedUser.IsActive, result.IsActive);
-            Assert.Equal(expectedUser.GoogleSubject, result.GoogleSubject);
+            Assert.NotNull(Result);
+            Assert.Equal(ExpectedUser.UserId, Result.UserId);
+            Assert.Equal(ExpectedUser.Name, Result.Name);
+            Assert.Equal(ExpectedUser.RoleName, Result.RoleName);
+            Assert.Equal(ExpectedUser.IsActive, Result.IsActive);
+            Assert.Equal(ExpectedUser.GoogleSubject, Result.GoogleSubject);
         }
 
         [Fact]
         public async Task GetById_NonExistingId_ReturnsNull()
         {
-            var connectionMock = new Mock<IDbConnection>();
+            var ConnectionMock = new Mock<IDbConnection>();
 
-            var dbConnection = new TestDatabaseConnection(connectionMock.Object);
-            var repositoryMock = new Mock<UserRepository>(dbConnection);
+            var DbConnection = new TestDatabaseConnection(ConnectionMock.Object);
+            var RepositoryMock = new Mock<UserRepository>(DbConnection);
 
-            _ = repositoryMock.Setup(r => r.GetById(999))
+            _ = RepositoryMock.Setup(r => r.GetById(999))
                 .ReturnsAsync((UserModel)null);
 
-            var result = await repositoryMock.Object.GetById(999);
-            Assert.Null(result);
+            var Result = await RepositoryMock.Object.GetById(999);
+            Assert.Null(Result);
         }
 
         [Fact]
         public async Task GetBySub_ExistingId_ReturnsUserModel()
         {
-            var expectedUser = new UserModel
+            var ExpectedUser = new UserModel
             {
                 UserId = 1,
                 Name = "Test",
@@ -68,45 +68,45 @@ namespace GalavisorApi.Tests
                 GoogleSubject = "1234567890"
             };
 
-            var connectionMock = new Mock<IDbConnection>();
+            var ConnectionMock = new Mock<IDbConnection>();
 
-            var dbConnection = new TestDatabaseConnection(connectionMock.Object);
+            var DbConnection = new TestDatabaseConnection(ConnectionMock.Object);
 
-            var repositoryMock = new Mock<UserRepository>(dbConnection);
+            var RepositoryMock = new Mock<UserRepository>(DbConnection);
 
-            repositoryMock.Setup(r => r.GetBySub("1234567890"))
-                .ReturnsAsync(expectedUser);
+            RepositoryMock.Setup(r => r.GetBySub("1234567890"))
+                .ReturnsAsync(ExpectedUser);
 
 
-            var result = await repositoryMock.Object.GetBySub("1234567890");
+            var Result = await RepositoryMock.Object.GetBySub("1234567890");
 
-            Assert.NotNull(result);
-            Assert.Equal(expectedUser.UserId, result.UserId);
-            Assert.Equal(expectedUser.Name, result.Name);
-            Assert.Equal(expectedUser.RoleName, result.RoleName);
-            Assert.Equal(expectedUser.IsActive, result.IsActive);
-            Assert.Equal(expectedUser.GoogleSubject, result.GoogleSubject);
+            Assert.NotNull(Result);
+            Assert.Equal(ExpectedUser.UserId, Result.UserId);
+            Assert.Equal(ExpectedUser.Name, Result.Name);
+            Assert.Equal(ExpectedUser.RoleName, Result.RoleName);
+            Assert.Equal(ExpectedUser.IsActive, Result.IsActive);
+            Assert.Equal(ExpectedUser.GoogleSubject, Result.GoogleSubject);
         }
 
         [Fact]
         public async Task GetBySub_NonExistingId_ReturnsNull()
         {
-            var connectionMock = new Mock<IDbConnection>();
+            var ConnectionMock = new Mock<IDbConnection>();
 
-            var dbConnection = new TestDatabaseConnection(connectionMock.Object);
-            var repositoryMock = new Mock<UserRepository>(dbConnection);
+            var DbConnection = new TestDatabaseConnection(ConnectionMock.Object);
+            var RepositoryMock = new Mock<UserRepository>(DbConnection);
 
-            _ = repositoryMock.Setup(r => r.GetById(999))
+            _ = RepositoryMock.Setup(r => r.GetById(999))
                 .ReturnsAsync((UserModel)null);
 
-            var result = await repositoryMock.Object.GetById(999);
-            Assert.Null(result);
+            var Result = await RepositoryMock.Object.GetById(999);
+            Assert.Null(Result);
         }
 
         [Fact]
         public async Task Get_ReturnsUserModels()
         {
-            var expectedUser = new UserModel
+            var ExpectedUser = new UserModel
             {
                 UserId = 1,
                 Name = "Test",
@@ -115,36 +115,36 @@ namespace GalavisorApi.Tests
                 GoogleSubject = "1234567890"
             };
 
-            var connectionMock = new Mock<IDbConnection>();
+            var ConnectionMock = new Mock<IDbConnection>();
 
-            var dbConnection = new TestDatabaseConnection(connectionMock.Object);
+            var DbConnection = new TestDatabaseConnection(ConnectionMock.Object);
 
-            var repositoryMock = new Mock<UserRepository>(dbConnection);
+            var RepositoryMock = new Mock<UserRepository>(DbConnection);
 
-            repositoryMock.Setup(r => r.GetAll())
-                .ReturnsAsync([expectedUser, expectedUser]);
+            RepositoryMock.Setup(r => r.GetAll())
+                .ReturnsAsync([ExpectedUser, ExpectedUser]);
 
 
-            var result = await repositoryMock.Object.GetAll();
+            var Result = await RepositoryMock.Object.GetAll();
 
-            Assert.NotNull(result);
-            Assert.Equal(2, result.Count);
+            Assert.NotNull(Result);
+            Assert.Equal(2, Result.Count);
         }
 
         [Fact]
         public async Task Get_ReturnsEmpty()
         {
-            var connectionMock = new Mock<IDbConnection>();
+            var ConnectionMock = new Mock<IDbConnection>();
 
-            var dbConnection = new TestDatabaseConnection(connectionMock.Object);
-            var repositoryMock = new Mock<UserRepository>(dbConnection);
+            var DbConnection = new TestDatabaseConnection(ConnectionMock.Object);
+            var RepositoryMock = new Mock<UserRepository>(DbConnection);
 
-            _ = repositoryMock.Setup(r => r.GetAll())
+            _ = RepositoryMock.Setup(r => r.GetAll())
                 .ReturnsAsync([]);
 
-            var result = await repositoryMock.Object.GetAll();
-            Assert.NotNull(result);
-            Assert.Empty(result);
+            var Result = await RepositoryMock.Object.GetAll();
+            Assert.NotNull(Result);
+            Assert.Empty(Result);
         }
     }
 }

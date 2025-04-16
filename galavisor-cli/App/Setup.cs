@@ -75,17 +75,17 @@ public static class Setup
         App.Configure(config =>
         {
             // Auth
-            config.AddCommand<LoginCommand>(CommandsConstants.login).WithDescription("Attempt to login to the system");
-            config.AddCommand<LogoutCommand>(CommandsConstants.logout).WithDescription("Attempt to login to the system");
+            config.AddCommand<LoginCommand>(CommandsConstants.Login).WithDescription("Attempt to login to the system");
+            config.AddCommand<LogoutCommand>(CommandsConstants.Logout).WithDescription("Attempt to login to the system");
 
             // Users
-            config.AddCommand<ConfigCommand>(CommandsConstants.config).WithDescription("See your config information");
-            config.AddCommand<DisableAccountCommand>(CommandsConstants.disable).WithDescription("Disable your or other peoples accounts");
-            config.AddCommand<EnableAccountCommand>(CommandsConstants.enable).WithDescription("Enable other peoples accounts");
-            config.AddCommand<ToggleRoleCommand>(CommandsConstants.role).WithDescription("Change the role of a user");
-            config.AddCommand<UsersCommand>(CommandsConstants.users).WithDescription("See all users in the system");
+            config.AddCommand<ConfigCommand>(CommandsConstants.Config).WithDescription("See your config information");
+            config.AddCommand<DisableAccountCommand>(CommandsConstants.Disable).WithDescription("Disable your or other peoples accounts");
+            config.AddCommand<EnableAccountCommand>(CommandsConstants.Enable).WithDescription("Enable other peoples accounts");
+            config.AddCommand<ToggleRoleCommand>(CommandsConstants.Role).WithDescription("Change the role of a user");
+            config.AddCommand<UsersCommand>(CommandsConstants.Users).WithDescription("See all users in the system");
 
-            config.AddCommand<ExitCommand>(CommandsConstants.exit).WithDescription("Exit the cli");
+            config.AddCommand<ExitCommand>(CommandsConstants.Exit).WithDescription("Exit the cli");
             
             config.AddCommand<HelpCommand>("help")
                 .WithDescription("Shows help information for available commands")
@@ -129,8 +129,8 @@ public static class Setup
     private static void RegisterCommandsWithHelp(HelpCommand HelpCommand)
     {
         // Auth
-        HelpCommand.RegisterCommand<LoginCommand.Settings>(CommandsConstants.login);
-        HelpCommand.RegisterCommand<LogoutCommand.Settings>(CommandsConstants.logout);
+        HelpCommand.RegisterCommand<LoginCommand.Settings>(CommandsConstants.Login);
+        HelpCommand.RegisterCommand<LogoutCommand.Settings>(CommandsConstants.Logout);
 
         // Review commands
         HelpCommand.RegisterCommand<ReviewCommand.Settings>(CommandsConstants.review);
@@ -154,11 +154,11 @@ public static class Setup
         HelpCommand.RegisterCommand<LinkActivityCommand.Settings>(CommandsConstants.LinkActivity);
 
         // Users
-        HelpCommand.RegisterCommand<ConfigCommand.ConfigSettings>(CommandsConstants.config);
-        HelpCommand.RegisterCommand<DisableAccountCommand.DisableAccountSettings>(CommandsConstants.disable);
-        HelpCommand.RegisterCommand<EnableAccountCommand.EnableAccountSettings>(CommandsConstants.enable);
-        HelpCommand.RegisterCommand<ToggleRoleCommand.ToggleRoleSettings>(CommandsConstants.role);
-        HelpCommand.RegisterCommand<UsersCommand.Settings>(CommandsConstants.users);
+        HelpCommand.RegisterCommand<ConfigCommand.ConfigSettings>(CommandsConstants.Config);
+        HelpCommand.RegisterCommand<DisableAccountCommand.DisableAccountSettings>(CommandsConstants.Disable);
+        HelpCommand.RegisterCommand<EnableAccountCommand.EnableAccountSettings>(CommandsConstants.Enable);
+        HelpCommand.RegisterCommand<ToggleRoleCommand.ToggleRoleSettings>(CommandsConstants.Role);
+        HelpCommand.RegisterCommand<UsersCommand.Settings>(CommandsConstants.Users);
 
         // Transport commands
         HelpCommand.RegisterCommand<AddTransportCommand.Settings>(CommandsConstants.AddTransport);

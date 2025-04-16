@@ -6,6 +6,8 @@ using GalavisorApi.Constants;
 using GalavisorApi.Models;
 using GalavisorApi.Repositories;
 using GalavisorApi.Utils;
+using System;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace GalavisorApi.Services;
 
@@ -87,39 +89,11 @@ public class AuthService(HttpClient HttpClient, UserRepository UserRepository)
     }
     private static string DecodeJWT(string Key, string Jwt)
     {
-        var Parts = Jwt.Split('.');
-        if (Parts.Length != 3)
-        {
-            throw new ArgumentException("Invalid JWT token");
-        }
+        var handler = new JwtSecurityTokenHandler();
+        var token = handler.ReadJwtToken(Jwt);
 
-        string PayloadJson = DecodeBase64(Parts[1]);
-        var PayloadMap = JsonSerializer.Deserialize<Dictionary<string, object>>(PayloadJson, JsonOptions);
+        var claims = token.Claims;
 
-        if (PayloadMap != null && PayloadMap.TryGetValue(Key, out object? Value))
-        {
-            return Value?.ToString() ?? throw new Exception("Key not found in JWT payload");
-        }
-
-        throw new Exception("Key not found in JWT payload");
-    }
-
-    private static string DecodeBase64(string base64String)
-    {
-        string base64 = base64String
-            .Replace('-', '+')
-            .Replace('_', '/');
-
-        switch (base64.Length % 4)
-        {
-            case 2: base64 += "=="; break;
-            case 3: base64 += "="; break;
-            case 0: break;
-            default:
-                throw new FormatException("Invalid Base64URL string");
-        }
-
-        byte[] decodedBytes = Convert.FromBase64String(base64);
-        return Encoding.UTF8.GetString(decodedBytes);
+        return token.Claims.FirstOrDefault(c => c.Type == Key)?.Value ?? "";
     }
 }

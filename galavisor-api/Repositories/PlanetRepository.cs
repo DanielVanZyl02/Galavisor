@@ -46,7 +46,6 @@ public class PlanetRepository
             where name = @name;",
             new { name = name });
 
-        Console.WriteLine(planet);
         return planet.ToList()[0];
     }
 

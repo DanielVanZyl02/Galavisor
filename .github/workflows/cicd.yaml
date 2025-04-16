@@ -37,6 +37,7 @@ jobs:
 
       - name: Deploy
         run: |
+          ssh -o StrictHostKeyChecking=no -i "~/.ssh/id_rsa" ec2-user@ec2-54-75-118-89.eu-west-1.compute.amazonaws.com "sudo pkill -f Galavisor"
           scp -r -o StrictHostKeyChecking=no -i "~/.ssh/id_rsa" galavisor-api/bin/Release/net9.0/linux-x64/publish ec2-user@ec2-54-75-118-89.eu-west-1.compute.amazonaws.com:~/
           scp -o StrictHostKeyChecking=no -i "~/.ssh/id_rsa" run.sh ec2-user@ec2-54-75-118-89.eu-west-1.compute.amazonaws.com:~/
           ssh -o StrictHostKeyChecking=no -i "~/.ssh/id_rsa" ec2-user@ec2-54-75-118-89.eu-west-1.compute.amazonaws.com "sudo ./run.sh"

@@ -15,7 +15,7 @@ public static class CommandsConstants
 
     public const string Exit = "exit";
     public const string Help = "help";
-    public const string review = "review";
+    public const string Review = "review";
     public const string GetReview = "get-review";
 
     public const string UpdateReview = "edit-review";

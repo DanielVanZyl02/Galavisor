@@ -4,7 +4,7 @@ namespace GalavisorApi.Utils;
 
 public static class ConfigStore
 {
-    private static readonly string ConfigFile = "server_config.Json";
+    private static readonly string ConfigFile = "server_config.json";
     private static readonly JsonSerializerOptions JsonSerializerOpt = new() { WriteIndented = true };
     private static Dictionary<string, string> _config = Load();
 

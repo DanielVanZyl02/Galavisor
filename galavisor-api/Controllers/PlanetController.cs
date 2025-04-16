@@ -23,6 +23,10 @@ public class PlanetController(PlanetService planetService, AuthService authServi
     [HttpGet("{id}")]
     public async Task<ActionResult<PlanetModel>> getPlanetById(int id)
     {
+        if (id < 0)
+        {
+            return StatusCode(500, new { message = "Get Failed", error = "Planet ID cannot be negative" });
+        }
         return Ok(await _planetService.GetPlanetById(id));
     }
 
@@ -37,6 +41,10 @@ public class PlanetController(PlanetService planetService, AuthService authServi
     [HttpPost("weather/{id}")]
     public async Task<ActionResult<string>> getPlanetWeatherById(int id)
     {
+        if (id < 0)
+        {
+            return StatusCode(500, new { message = "Get Failed", error = "Planet ID cannot be negative" });
+        }
         return Ok(await _planetService.GetPlanetWeatherById(id));
     }
 
@@ -59,9 +67,14 @@ public class PlanetController(PlanetService planetService, AuthService authServi
     [HttpDelete("delete/{id}")]
     public async Task<ActionResult<bool>> deletePlanet(int id)
     {
+
         var GoogleSubject = HttpContext.User.FindFirst("sub")!.Value ?? "";
         if (await _authService.IsSubAdmin(GoogleSubject))
         {
+            if (id < 0)
+            {
+                return StatusCode(500, new { message = "Get Failed", error = "Planet ID cannot be negative" });
+            }
             return Ok(await _planetService.DeletePlanet(id));
         }
         else
@@ -73,11 +86,16 @@ public class PlanetController(PlanetService planetService, AuthService authServi
 
     [Authorize]
     [HttpPatch("update/{id}")]
-    public async Task<ActionResult<bool>> updatePlanet([FromBody] PlanetModel planet)
+    public async Task<ActionResult<bool>> updatePlanet([FromBody] PlanetModel planet, int id)
     {
+
         var GoogleSubject = HttpContext.User.FindFirst("sub")!.Value ?? "";
         if (await _authService.IsSubAdmin(GoogleSubject))
         {
+            if (id < 0)
+            {
+                return StatusCode(500, new { message = "Get Failed", error = "Planet ID cannot be negative" });
+            }
             return Ok(await _planetService.UpdatePlanet(planet));
         }
         else

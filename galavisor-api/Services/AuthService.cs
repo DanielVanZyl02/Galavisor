@@ -8,10 +8,10 @@ using GalavisorApi.Repositories;
 
 namespace GalavisorApi.Services;
 
-public class AuthService(HttpClient httpClient, UserRepository userRepository)
+public class AuthService(HttpClient HttpClient, UserRepository UserRepository)
 {
-    private readonly HttpClient _httpClient = httpClient;
-    private readonly UserRepository _userRepository = userRepository;
+    private readonly HttpClient _httpClient = HttpClient;
+    private readonly UserRepository _userRepository = UserRepository;
     private static readonly JsonSerializerOptions jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
@@ -22,25 +22,25 @@ public class AuthService(HttpClient httpClient, UserRepository userRepository)
         return await GetJwtAsync(authCode);
     }
 
-    public async Task<UserModel> GetOrCreateUser(string jwt)
+    public async Task<UserModel> GetOrCreateUser(string Jwt)
     {
-        var sub = DecodeJWT("sub", jwt);
-        var User = await _userRepository.GetBySub(sub);
+        var Sub = DecodeJWT("sub", Jwt);
+        var User = await _userRepository.GetBySub(Sub);
         if (User != null)
         {
             return User;
         }
         else
         {
-            var name = DecodeJWT("name", jwt);
-            return await _userRepository.CreateUser(sub, name);
+            var Name = DecodeJWT("name", Jwt);
+            return await _userRepository.CreateUser(Sub, Name);
         }
     }
 
-    public async Task<int> GetLoggedInUser(string jwt)
+    public async Task<int> GetLoggedInUser(string Jwt)
     {
-        var sub = DecodeJWT("sub", jwt);
-        var User = await _userRepository.GetBySub(sub);
+        var Sub = DecodeJWT("sub", Jwt);
+        var User = await _userRepository.GetBySub(Sub);
         if (User != null)
         {
             return User.UserId;
@@ -51,9 +51,9 @@ public class AuthService(HttpClient httpClient, UserRepository userRepository)
         }
     }
 
-    public async Task<bool> IsSubAdmin(string sub)
+    public async Task<bool> IsSubAdmin(string Sub)
     {
-        var User = await _userRepository.GetBySub(sub);
+        var User = await _userRepository.GetBySub(Sub);
         return User != null && User.RoleName == "Admin";
     }
 
@@ -84,9 +84,9 @@ public class AuthService(HttpClient httpClient, UserRepository userRepository)
 
         return tokenMap?["id_token"].GetString() ?? "";
     }
-    private static string DecodeJWT(string key, string jwt)
+    private static string DecodeJWT(string key, string Jwt)
     {
-        var parts = jwt.Split('.');
+        var parts = Jwt.Split('.');
         if (parts.Length != 3)
         {
             throw new ArgumentException("Invalid JWT token");
@@ -109,7 +109,6 @@ public class AuthService(HttpClient httpClient, UserRepository userRepository)
             .Replace('-', '+')
             .Replace('_', '/');
 
-        // Add padding if missing
         switch (base64.Length % 4)
         {
             case 2: base64 += "=="; break;

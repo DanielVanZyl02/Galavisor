@@ -10,7 +10,7 @@ namespace GalavisorCli.Commands.Users;
 
 public class ToggleRoleCommand : AsyncCommand<ToggleRoleCommand.ToggleRoleSettings>
 {
-    [Description("Change the role of a user")]
+    [Description("Change the role of a User")]
     public class ToggleRoleSettings : CommandSettings
     {
         [CommandOption("--id <ID>")]
@@ -24,53 +24,44 @@ public class ToggleRoleCommand : AsyncCommand<ToggleRoleCommand.ToggleRoleSettin
         {
             AnsiConsole.MarkupLine("[red]Please login to use this command.[/]");
             return 0;
-        }
+        } else{
+            var UserId = settings.Id ?? -1;
+            if(settings.Id == null || UserId == -1){
+                UserId = AnsiConsole.Ask<int>("Enter the [green]User ID[/] of the account you want to update:");
+            } else{
+                // User id is a lready a valid value
+            }
+            
+            var NewRole = AnsiConsole.Prompt(
+                new SelectionPrompt<string>()
+                    .Title("What role do you want to assign?")
+                    .AddChoices("Admin", "Traveler")
+            );
 
-        var userId = settings.Id ?? -1;
-        if(settings.Id == null || userId == -1){
-            userId = AnsiConsole.Ask<int>("Enter the [green]User ID[/] of the account you want to update:");
-        }
-        
-        var newRole = AnsiConsole.Prompt(
-            new SelectionPrompt<string>()
-                .Title("What role do you want to assign?")
-                .AddChoices("Admin", "Traveler")
-        );
+            if (!AnsiConsole.Confirm($"Are you sure you want to change the role of [cyan]{UserId}[/] to [yellow]{NewRole}[/]?"))
+            {
+                AnsiConsole.MarkupLine("[grey]Operation cancelled.[/]");
+                return 0;
+            } else{
+                // User does want to change the role of another User
+            }
 
-        if (!AnsiConsole.Confirm($"Are you sure you want to change the role of [cyan]{userId}[/] to [yellow]{newRole}[/]?"))
-        {
-            AnsiConsole.MarkupLine("[grey]Operation cancelled.[/]");
+            var Result = await UserService.UpdateUserRole(UserId, NewRole);
+
+            Result.Switch(
+                Message =>
+                {
+                    AnsiConsole.MarkupLine($"[red]Encountered an error: {Message}[/]");
+                },
+                User =>
+                {
+                    AnsiConsole.MarkupLine($"[green]Success:[/] User [cyan]{User.UserId}[/] is now a(n) [yellow]{User.RoleName}[/].");
+                    AnsiConsole.Write(TableBuilderUtils.MakeUsersTable([User]));
+                }
+            );
+
             return 0;
         }
 
-        var result = await UserService.UpdateUserRole(userId, newRole);
-
-        result.Switch(
-            message =>
-            {
-                AnsiConsole.MarkupLine($"[red]Encountered an error: {message}[/]");
-            },
-            user =>
-            {
-                AnsiConsole.MarkupLine($"[green]Success:[/] User [cyan]{user.UserId}[/] is now a(n) [yellow]{user.RoleName}[/].");
-
-                var table = new Table();
-                table.AddColumn("[bold]User ID[/]");
-                table.AddColumn("[bold]Name[/]");
-                table.AddColumn("[bold]Role[/]");
-                table.AddColumn("[bold]Active[/]");
-
-                table.AddRow(
-                    user.UserId.ToString(),
-                    user.Name,
-                    user.RoleName,
-                    user.IsActive ? "[green]Active[/]" : "[red]Inactive[/]"
-                );
-
-                AnsiConsole.Write(table);
-            }
-        );
-
-        return 0;
     }
 }

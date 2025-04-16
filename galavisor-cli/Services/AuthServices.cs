@@ -11,24 +11,24 @@ public class AuthService
     {
         try
         {
-            string authCode = await BrowserAuthServices.GetUsersGoogleAuthCodeAsync();
-            if (string.IsNullOrEmpty(authCode))
+            string AuthCode = await BrowserAuthServices.GetUsersGoogleAuthCodeAsync();
+            if (string.IsNullOrEmpty(AuthCode))
             {
                 return "Browser authentication took too long or failed, releasing resources";
             }
             else
             {
-                var jsonResponse = await HttpUtils.Post(
+                var JsonResponse = await HttpUtils.Post(
                     $"{ConfigStore.Get(ConfigKeys.ServerUri)}/auth/login",
-                    new Dictionary<string, string> { { "AuthCode", authCode } });
+                    new Dictionary<string, string> { { "AuthCode", AuthCode } });
 
-                if (jsonResponse.TryGetProperty("message", out var message) && jsonResponse.TryGetProperty("error", out var error)){
-                    return $"{message}, ${error}";
-                } else if(jsonResponse.TryGetProperty("message", out message) && jsonResponse.TryGetProperty("jwt", out var jwt)){
-                    if(jsonResponse.TryGetProperty("user", out var User)){
+                if (JsonResponse.TryGetProperty("message", out var Message) && JsonResponse.TryGetProperty("error", out var Error)){
+                    return $"{Message}, ${Error}";
+                } else if(JsonResponse.TryGetProperty("message", out Message) && JsonResponse.TryGetProperty("jwt", out var Jwt)){
+                    if(JsonResponse.TryGetProperty("user", out var User)){
                         var DeserializedUser = User.Deserialize<UserModel>();
                         if(DeserializedUser != null){
-                            ConfigStore.Set(ConfigKeys.JwtToken, jwt.GetString() ?? "");
+                            ConfigStore.Set(ConfigKeys.JwtToken, Jwt.GetString() ?? "");
                             ConfigStore.Set(ConfigKeys.GoogleName, DeserializedUser.Name);
                             return $"Authentication successful! Hi {DeserializedUser.Name}, welcome to the Galavisor App!";
                         } else{
@@ -42,9 +42,9 @@ public class AuthService
                 }
             }
         }
-        catch (Exception error)
+        catch (Exception Error)
         {
-            return $"Error encountered in attempting Google login: {error.Message}";
+            return $"Error encountered in attempting Google login: {Error.Message}";
         }
     }
 }

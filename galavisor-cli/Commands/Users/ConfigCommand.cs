@@ -27,65 +27,55 @@ public class ConfigCommand : AsyncCommand<ConfigCommand.ConfigSettings>
         if(!ConfigStore.Exists(ConfigKeys.JwtToken)){
             AnsiConsole.MarkupLine("[red]Please login to use this command.[/]");
             return 0;
-        }
-        
-        var Username = ConfigStore.Exists(ConfigKeys.GoogleName) ? ConfigStore.Get(ConfigKeys.GoogleName) : "not-set";
+        } else{
+            var Username = ConfigStore.Exists(ConfigKeys.GoogleName) ? ConfigStore.Get(ConfigKeys.GoogleName) : "not-set";
 
-        if (settings.List)
-        {
-            AnsiConsole.MarkupLine($"[green]Username:[/] {Username ?? "[not set]"}");
-            return 0;
-        }
-
-        var updated = false;
-
-        if (!string.IsNullOrEmpty(settings.Username))
-        {
-            Username = settings.Username;
-            updated = true;
-        }
-
-        if (!updated)
-        {
-            updated = false;
-
-            if (AnsiConsole.Confirm("Do you want to update your username?"))
+            if (settings.List)
             {
-                Username = AnsiConsole.Ask<string>("What is your new username?");
-                updated = true;
+                AnsiConsole.MarkupLine($"[green]Username:[/] {Username ?? "[not set]"}");
+                return 0;
+            } else{
+                // Different flag was entered
             }
+
+            var Updated = false;
+
+            if (!string.IsNullOrEmpty(settings.Username))
+            {
+                Username = settings.Username;
+                Updated = true;
+            } else{
+                // the username is not being Updated as the user did not specify the flag
+            }
+
+            if (!Updated)
+            {
+                if (AnsiConsole.Confirm("Do you want to update your username?"))
+                {
+                    Username = AnsiConsole.Ask<string>("What is your new username?");
+                    Updated = true;
+                } else{
+                    AnsiConsole.MarkupLine($"[green]Username was not Updated, remains:[/] {Username ?? "[not set]"}");
+                    return 0;
+                }
+            }
+
+            var User = await UserService.UpdateUserConfig(Username);
+
+            User.Switch(
+                Message => {
+                    AnsiConsole.MarkupLine($"[red]Encountered some error, please try again later: {Message}.[/]");
+                },
+                User => {
+                    ConfigStore.Set(ConfigKeys.GoogleName, User.Name);
+                    AnsiConsole.MarkupLine($"[green]Config Updated for Username to {User.Name}.[/]");
+                    AnsiConsole.Write(TableBuilderUtils.MakeUsersTable([User]));
+                }
+            );
+
+            return 0;
+
         }
-
-        if (!updated)return 0;
-
-        var User = await UserService.UpdateUserConfig(Username);
-
-        User.Switch(
-            Message => {
-                AnsiConsole.MarkupLine($"[red]Encountered some error, please try again later: {Message}.[/]");
-            },
-            User => {
-                ConfigStore.Set(ConfigKeys.GoogleName, User.Name);
-                AnsiConsole.MarkupLine($"[green]Config updated for Username to {User.Name}.[/]");
-
-                var table = new Table();
-                table.AddColumn("[bold]User ID[/]");
-                table.AddColumn("[bold]Name[/]");
-                table.AddColumn("[bold]Role[/]");
-                table.AddColumn("[bold]Active[/]");
-
-                table.AddRow(
-                    User.UserId.ToString(),
-                    User.Name,
-                    User.RoleName,
-                    User.IsActive ? "[green]Active[/]" : "[red]Inactive[/]"
-                );
-
-                AnsiConsole.Write(table);
-            }
-        );
-
         
-        return 0;
     }
 }

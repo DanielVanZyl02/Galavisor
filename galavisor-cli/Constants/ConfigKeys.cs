@@ -6,7 +6,7 @@ public static class ConfigKeys
     public const string ClientId = "ClientId";
     public const string RedirectUri = "RedirectUri";
     public const string AuthUrl = "AuthUrl";
-    public const string localAuthTimeout = "localAuthTimeout";
+    public const string LocalAuthTimeout = "LocalAuthTimeout";
     public const string ServerUri = "ServerUri";
     public const string JwtToken = "JwtToken";
     public const string GoogleSub = "GoogleSub";

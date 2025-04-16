@@ -5,8 +5,8 @@
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": false,
-      "applicationUrl": "http://ec2-54-75-118-89.eu-west-1.compute.amazonaws.com",
-      "applicationUrla": "http://localhost:5228",
+      "applicationUrla": "http://ec2-54-75-118-89.eu-west-1.compute.amazonaws.com",
+      "applicationUrl": "http://localhost:5228",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

@@ -38,6 +38,13 @@ jobs:
       - name: Deploy
         run: |
           scp -r -o StrictHostKeyChecking=no -i "~/.ssh/id_rsa" galavisor-api/bin/Release/net9.0/linux-x64/publish ec2-user@ec2-54-75-118-89.eu-west-1.compute.amazonaws.com:~/
+          ssh -o StrictHostKeyChecking=no -i "~/.ssh/id_rsa" ec2-user@ec2-54-75-118-89.eu-west-1.compute.amazonaws.com "sudo pkill -f Galavisor || true & exit"
+          ssh -o StrictHostKeyChecking=no -i "~/.ssh/id_rsa" ec2-user@ec2-54-75-118-89.eu-west-1.compute.amazonaws.com "export DOTNET_ROOT=$HOME/.dotnet || true & exit"
+          ssh -o StrictHostKeyChecking=no -i "~/.ssh/id_rsa" ec2-user@ec2-54-75-118-89.eu-west-1.compute.amazonaws.com "export PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools || true & exit"
+          ssh -o StrictHostKeyChecking=no -i "~/.ssh/id_rsa" ec2-user@ec2-54-75-118-89.eu-west-1.compute.amazonaws.com "export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 || true & exit"
+          ssh -o StrictHostKeyChecking=no -i "~/.ssh/id_rsa" ec2-user@ec2-54-75-118-89.eu-west-1.compute.amazonaws.com "export ASPNETCORE_HTTP_PORTS=80 || true & exit"
+          ssh -o StrictHostKeyChecking=no -i "~/.ssh/id_rsa" ec2-user@ec2-54-75-118-89.eu-west-1.compute.amazonaws.com "chmod +X publish/GalavisorApi || true & exit"
+          ssh -o StrictHostKeyChecking=no -i "~/.ssh/id_rsa" ec2-user@ec2-54-75-118-89.eu-west-1.compute.amazonaws.com "cd publish || sudo -E nohup ./GalavisorApi > /dev/null 2>&1 || true & exit"
     env:
       SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}}
       SERVER_CONFIG: ${{secrets.SERVER_CONFIG}}

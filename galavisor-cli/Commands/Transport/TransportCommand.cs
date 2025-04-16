@@ -14,6 +14,7 @@ namespace GalavisorCli.Commands.Transport;
 
 internal sealed class AddTransportCommand : AsyncCommand<AddTransportCommand.Settings>
 {
+    [Description("Add a transport option to the database")]
     public sealed class Settings : CommandSettings
     {
         [CommandArgument(0, "<name>")]
@@ -80,6 +81,7 @@ internal sealed class AddTransportCommand : AsyncCommand<AddTransportCommand.Set
 
 internal sealed class GetTransportCommand : AsyncCommand<GetTransportCommand.Settings>
 {
+    [Description("Get all transport options or get the transport for a specific planet")]
     public sealed class Settings : CommandSettings
     {
         [CommandOption("-p|--planet <PLANET>")]
@@ -152,6 +154,7 @@ internal sealed class GetTransportCommand : AsyncCommand<GetTransportCommand.Set
 
 internal sealed class UpdateTransportCommand : AsyncCommand<UpdateTransportCommand.Settings>
 {
+    [Description("Update the name of an existing transport option")]
     public sealed class Settings : CommandSettings
     {
         [CommandArgument(0, "<name>")]
@@ -167,8 +170,13 @@ internal sealed class UpdateTransportCommand : AsyncCommand<UpdateTransportComma
     {
         try
         {
-            var url = $"{ConfigStore.Get(ConfigKeys.ServerUri)}/api/transport/{HttpUtility.UrlEncode(settings.CurrentName)}";
-            var response = await HttpUtils.Put(url, settings.NewName);
+            var url = $"{ConfigStore.Get(ConfigKeys.ServerUri)}/api/transport";
+            var requestBody = new
+            {
+                CurrentName = settings.CurrentName,
+                NewName = settings.NewName
+            };
+            var response = await HttpUtils.Put(url, requestBody);
             
             var message = response.GetProperty("message").GetString();
             AnsiConsole.MarkupLine($"[green]{message}[/]");
@@ -184,6 +192,7 @@ internal sealed class UpdateTransportCommand : AsyncCommand<UpdateTransportComma
 
 internal sealed class DeleteTransportCommand : AsyncCommand<DeleteTransportCommand.Settings>
 {
+    [Description("Delete a transport option from the database")]
     public sealed class Settings : CommandSettings
     {
         [CommandArgument(0, "<name>")]
@@ -195,8 +204,8 @@ internal sealed class DeleteTransportCommand : AsyncCommand<DeleteTransportComma
     {
         try
         {
-            var url = $"{ConfigStore.Get(ConfigKeys.ServerUri)}/api/transport/{HttpUtility.UrlEncode(settings.Name)}";
-            var response = await HttpUtils.Delete(url);
+            var url = $"{ConfigStore.Get(ConfigKeys.ServerUri)}/api/transport";
+            var response = await HttpUtils.DeleteWithBody(url, settings.Name);
             
             var message = response.GetProperty("message").GetString();
             AnsiConsole.MarkupLine($"[green]{message}[/]");
@@ -212,6 +221,7 @@ internal sealed class DeleteTransportCommand : AsyncCommand<DeleteTransportComma
 
 internal sealed class LinkTransportCommand : AsyncCommand<LinkTransportCommand.Settings>
 {
+    [Description("Link a transport option to a planet")]
     public sealed class Settings : CommandSettings
     {
         [CommandArgument(0, "<transport-name>")]

@@ -27,6 +27,13 @@ public class PlanetController(PlanetService planetService, AuthService authServi
     }
 
     [Authorize]
+    [HttpGet("name/{planetName}")]
+    public async Task<ActionResult<string>> getPlanetByName(string planetName)
+    {
+        return Ok(new { planet = await _planetService.GetPlanetByName(planetName) });
+    }
+
+    [Authorize]
     [HttpPost("weather/{id}")]
     public async Task<ActionResult<string>> getPlanetWeatherById(int id)
     {

@@ -15,6 +15,7 @@ namespace GalavisorCli.Commands.Activities;
 
 internal sealed class AddActivityCommand : AsyncCommand<AddActivityCommand.Settings>
 {
+    [Description("Add an activity to the database")]
     public sealed class Settings : CommandSettings
     {
         [CommandArgument(0, "<NAME>")]
@@ -85,6 +86,7 @@ internal sealed class AddActivityCommand : AsyncCommand<AddActivityCommand.Setti
 
 internal sealed class GetActivityCommand : AsyncCommand<GetActivityCommand.Settings>
 {
+    [Description("Get all activities or get activities for a planet")]
     public sealed class Settings : CommandSettings
     {
         [CommandOption("-p|--planet <PLANET>")]
@@ -157,6 +159,7 @@ internal sealed class GetActivityCommand : AsyncCommand<GetActivityCommand.Setti
 
 internal sealed class UpdateActivityCommand : AsyncCommand<UpdateActivityCommand.Settings>
 {
+    [Description("Update the name of an existing activity")]
     public sealed class Settings : CommandSettings
     {
         [CommandArgument(0, "<CURRENT_NAME>")]
@@ -170,8 +173,13 @@ internal sealed class UpdateActivityCommand : AsyncCommand<UpdateActivityCommand
     {
         try
         {
-            var url = $"{ConfigStore.Get(ConfigKeys.ServerUri)}/api/activity/{HttpUtility.UrlEncode(settings.CurrentName)}";
-            var response = await HttpUtils.Put(url, settings.NewName);
+            var url = $"{ConfigStore.Get(ConfigKeys.ServerUri)}/api/activity";
+            var requestBody = new
+            {
+                CurrentName = settings.CurrentName,
+                NewName = settings.NewName
+            };
+            var response = await HttpUtils.Put(url, requestBody);
             
             var message = response.GetProperty("message").GetString();
             AnsiConsole.MarkupLine($"[green]{message}[/]");
@@ -187,6 +195,7 @@ internal sealed class UpdateActivityCommand : AsyncCommand<UpdateActivityCommand
 
 internal sealed class DeleteActivityCommand : AsyncCommand<DeleteActivityCommand.Settings>
 {
+    [Description("Delete an activity from the database")]
     public sealed class Settings : CommandSettings
     {
         [CommandArgument(0, "<NAME>")]
@@ -198,8 +207,8 @@ internal sealed class DeleteActivityCommand : AsyncCommand<DeleteActivityCommand
     {
         try
         {
-            var url = $"{ConfigStore.Get(ConfigKeys.ServerUri)}/api/activity/{HttpUtility.UrlEncode(settings.Name)}";
-            var response = await HttpUtils.Delete(url);
+            var url = $"{ConfigStore.Get(ConfigKeys.ServerUri)}/api/activity";
+            var response = await HttpUtils.DeleteWithBody(url, settings.Name);
             
             var message = response.GetProperty("message").GetString();
             AnsiConsole.MarkupLine($"[green]{message}[/]");
@@ -215,6 +224,7 @@ internal sealed class DeleteActivityCommand : AsyncCommand<DeleteActivityCommand
 
 internal sealed class LinkActivityCommand : AsyncCommand<LinkActivityCommand.Settings>
 {
+    [Description("Link an activity to a planet")]
     public sealed class Settings : CommandSettings
     {
         [CommandArgument(0, "<ACTIVITY>")]

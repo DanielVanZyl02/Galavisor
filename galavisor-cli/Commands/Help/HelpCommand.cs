@@ -20,6 +20,9 @@ public class HelpCommand : Command<HelpCommand.HelpSettings>
         [CommandOption("-v|--verbose")]
         [Description("Show detailed help information")]
         public bool Verbose { get; set; }
+        [CommandArgument(0, "[command]")]
+        [Description("Specific command to show help for")]
+        public string Command { get; set; }
     }
 
     public class CommandInfo
@@ -80,19 +83,13 @@ public class HelpCommand : Command<HelpCommand.HelpSettings>
             var argAttr = prop.GetCustomAttribute<CommandArgumentAttribute>();
             if (argAttr != null)
             {
-                string argumentTemplate = "";
-                
-                var valueField = argAttr.GetType().GetField("_value", BindingFlags.NonPublic | BindingFlags.Instance);
-                if (valueField != null)
-                {
-                    argumentTemplate = valueField.GetValue(argAttr)?.ToString() ?? "";
-                }
+                string argumentTemplate = prop.Name;
                 
                 info.Arguments.Add(new ArgumentInfo
                 {
                     Name = argumentTemplate,
                     Description = GetPropertyDescription(prop),
-                    Required = argumentTemplate.StartsWith("<") && argumentTemplate.EndsWith(">"),
+                    Required = !HasDefaultValue(prop),
                     DefaultValue = GetDefaultValue(prop)
                 });
             }
@@ -101,18 +98,17 @@ public class HelpCommand : Command<HelpCommand.HelpSettings>
             if (optAttr != null)
             {
                 string optionTemplate = "";
+                var constructorInfo = optAttr.GetType().GetConstructors()
+                    .FirstOrDefault(c => c.GetParameters().Length > 0);
                 
-                var templateField = optAttr.GetType().GetField("_template", BindingFlags.NonPublic | BindingFlags.Instance);
-                if (templateField != null)
+                if (constructorInfo != null)
                 {
-                    optionTemplate = templateField.GetValue(optAttr)?.ToString() ?? "";
-                }
-                else 
-                {
-                    var templateProperty = optAttr.GetType().GetProperty("Template", BindingFlags.Public | BindingFlags.Instance);
-                    if (templateProperty != null)
+                    var usageAttr = prop.GetCustomAttributesData()
+                        .FirstOrDefault(d => d.AttributeType == typeof(CommandOptionAttribute));
+                    
+                    if (usageAttr != null && usageAttr.ConstructorArguments.Count > 0)
                     {
-                        optionTemplate = templateProperty.GetValue(optAttr)?.ToString() ?? "";
+                        optionTemplate = usageAttr.ConstructorArguments[0].Value?.ToString() ?? "";
                     }
                 }
                 
@@ -167,13 +163,20 @@ public class HelpCommand : Command<HelpCommand.HelpSettings>
     public override int Execute(CommandContext context, HelpSettings settings)
     {
         var customHelpCommand = context.Data as HelpCommand;
-        
         if (customHelpCommand != null && customHelpCommand._commandInfoProviders.Any())
         {
             try
             {
-                customHelpCommand.RenderCommandHelp(settings.Verbose);
-                return 0;
+                if (!string.IsNullOrEmpty(settings.Command))
+                {
+                    customHelpCommand.RenderSpecificCommandHelp(settings.Command);
+                    return 0;
+                }
+                else
+                {
+                    customHelpCommand.RenderCommandHelp(settings.Verbose);
+                    return 0;
+                }
             }
             catch (Exception ex)
             {
@@ -213,52 +216,54 @@ public class HelpCommand : Command<HelpCommand.HelpSettings>
         }
 
         AnsiConsole.WriteLine();
-        AnsiConsole.WriteLine("Available Commands:");
+        AnsiConsole.MarkupLine("[bold]Available Commands:[/]");
         AnsiConsole.WriteLine();
-
-        var table = new Table();
-        table.Border = TableBorder.Rounded;
-        table.BorderStyle = Style.Parse("green");
-        table.AddColumn("Command");
-        table.AddColumn("Description");
-        
-        if (verbose)
-        {
-            table.AddColumn("Arguments");
-            table.AddColumn("Options");
-        }
 
         foreach (var provider in _commandInfoProviders)
         {
             var commandInfo = provider.Value();
+
+            AnsiConsole.MarkupLine($"[bold cyan]{provider.Key}[/]");
+            
+            AnsiConsole.MarkupLine($"  {EscapeMarkup(commandInfo.Description ?? "")}");
             
             if (verbose)
             {
-                var args = FormatArgumentsList(commandInfo.Arguments);
-                var opts = FormatOptionsList(commandInfo.Options);
-                
-                table.AddRow(
-                    provider.Key,
-                    EscapeMarkup(commandInfo.Description ?? ""),
-                    args,
-                    opts
-                );
+                if (commandInfo.Arguments.Count > 0)
+                {
+                    AnsiConsole.WriteLine();
+                    AnsiConsole.MarkupLine("  [bold underline]Arguments:[/]");
+                    foreach (var arg in commandInfo.Arguments)
+                    {
+                        AnsiConsole.MarkupLine($"    [bold]{arg.Name}[/]");
+                        AnsiConsole.MarkupLine($"      {EscapeMarkup(arg.Description)}");
+                        
+                        if (arg.Required)
+                            AnsiConsole.MarkupLine("      [italic]This is a required argument[/]\n");
+                    }
+                }
+            
+                if (commandInfo.Options.Count > 0)
+                {
+                    AnsiConsole.WriteLine();
+                    AnsiConsole.MarkupLine("  [bold underline]Options:[/]");
+                    foreach (var opt in commandInfo.Options)
+                    {
+                        AnsiConsole.MarkupLine($"    [bold]{opt.Name}[/]");
+                        AnsiConsole.MarkupLine($"      {EscapeMarkup(opt.Description)}\n");
+                    
+                    }
+                }
             }
-            else
-            {
-                table.AddRow(
-                    provider.Key,
-                    EscapeMarkup(commandInfo.Description ?? "")
-                );
-            }
+            AnsiConsole.WriteLine();
+            AnsiConsole.Write(new Rule().RuleStyle("grey"));
+            AnsiConsole.WriteLine();
         }
-
-        AnsiConsole.Write(table);
         
         if (!verbose)
         {
             AnsiConsole.WriteLine();
-            AnsiConsole.WriteLine("Use --verbose for detailed command information");
+            AnsiConsole.MarkupLine("[dim]Use --verbose for detailed command information[/]");
         }
     }
 
@@ -285,46 +290,52 @@ public class HelpCommand : Command<HelpCommand.HelpSettings>
         AnsiConsole.WriteLine("Use 'help --verbose' for more details.");
     }
 
-    private string FormatArgumentsList(List<ArgumentInfo> arguments)
+    private int RenderSpecificCommandHelp(string commandName)
     {
-        if (arguments.Count == 0) return "";
-        
-        var sb = new StringBuilder();
-        foreach (var arg in arguments)
+        if (!_commandInfoProviders.TryGetValue(commandName, out var infoProvider))
         {
-            sb.AppendLine($"{arg.Name}:");
-            sb.AppendLine($"  {EscapeMarkup(arg.Description)}");
-            
-            if (arg.Required)
-                sb.AppendLine("  Required");
-                
-            if (!string.IsNullOrEmpty(arg.DefaultValue))
-                sb.AppendLine($"  Default: {EscapeMarkup(arg.DefaultValue)}");
-                
-            sb.AppendLine();
+            AnsiConsole.MarkupLine($"[red]Command '[bold]{commandName}[/]' not found.[/]");
+            AnsiConsole.WriteLine("Available commands:");
+            foreach (var cmd in _commandInfoProviders.Keys)
+            {
+                AnsiConsole.WriteLine($"  {cmd}");
+            }
+            return 1;
         }
-        return sb.ToString().TrimEnd();
-    }
+        var commandInfo = infoProvider();
+        
+        AnsiConsole.Write(new Rule($"[bold green]{EscapeMarkup(commandName)} Help[/]").RuleStyle("green").Centered());
+        AnsiConsole.WriteLine();
 
-    private string FormatOptionsList(List<OptionInfo> options)
-    {
-        if (options.Count == 0) return "";
+        AnsiConsole.MarkupLine($"[bold cyan]{commandName}[/]");
+        AnsiConsole.MarkupLine($"  {EscapeMarkup(commandInfo.Description ?? "")}");
         
-        var sb = new StringBuilder();
-        foreach (var opt in options)
+        if (commandInfo.Arguments.Count > 0)
         {
-            sb.AppendLine($"{opt.Name}:");
-            sb.AppendLine($"  {EscapeMarkup(opt.Description)}");
-            
-            if (opt.Required)
-                sb.AppendLine("  Required");
+            AnsiConsole.WriteLine();
+            AnsiConsole.MarkupLine("  [bold underline]Arguments:[/]");
+            foreach (var arg in commandInfo.Arguments)
+            {
+                AnsiConsole.MarkupLine($"    [bold]{arg.Name}[/]");
+                AnsiConsole.MarkupLine($"      {EscapeMarkup(arg.Description)}");
                 
-            if (!string.IsNullOrEmpty(opt.DefaultValue))
-                sb.AppendLine($"  Default: {EscapeMarkup(opt.DefaultValue)}");
-                
-            sb.AppendLine();
+                if (arg.Required)
+                    AnsiConsole.MarkupLine("      [italic]This is a required argument[/]\n");
+            }
         }
-        return sb.ToString().TrimEnd();
+        
+        if (commandInfo.Options.Count > 0)
+        {
+            AnsiConsole.WriteLine();
+            AnsiConsole.MarkupLine("  [bold underline]Options:[/]");
+            foreach (var opt in commandInfo.Options)
+            {
+                AnsiConsole.MarkupLine($"    [bold]{opt.Name}[/]");
+                AnsiConsole.MarkupLine($"      {EscapeMarkup(opt.Description)}\n");
+            }
+        }
+        
+        return 0;
     }
 
     private string EscapeMarkup(string text)

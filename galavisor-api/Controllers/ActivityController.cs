@@ -46,23 +46,33 @@ public class ActivityController : ControllerBase
     }
 
     [Authorize]
-    [HttpPut("{currentName}")]
-    public async Task<IActionResult> UpdateActivity(string currentName, [FromBody] string newName)
+    [HttpPut]
+    public async Task<IActionResult> UpdateActivity([FromBody] ActivityUpdateModel model)
     {
-        var success = await _activityService.UpdateActivity(currentName, newName);
-        if (!success)
-            return NotFound();
+        if (string.IsNullOrEmpty(model.CurrentName) || string.IsNullOrEmpty(model.NewName))
+        {
+            return BadRequest("Both current name and new name are required");
+        }
         
-        return Ok(new { message = $"Activity '{currentName}' updated to '{newName}' successfully" });
+        var success = await _activityService.UpdateActivity(model.CurrentName, model.NewName);
+        if (!success)
+            return NotFound($"Activity '{model.CurrentName}' not found");
+        
+        return Ok(new { message = $"Activity '{model.CurrentName}' updated to '{model.NewName}' successfully" });
     }
 
     [Authorize]
-    [HttpDelete("{activityName}")]
-    public async Task<IActionResult> DeleteActivity(string activityName)
+    [HttpDelete]
+    public async Task<IActionResult> DeleteActivity([FromBody] string activityName)
     {
+        if (string.IsNullOrEmpty(activityName))
+        {
+            return BadRequest("Activity name is required");
+        }
+        
         var success = await _activityService.DeleteActivity(activityName);
         if (!success)
-            return NotFound();
+            return NotFound($"Activity '{activityName}' not found");
         
         return Ok(new { message = $"Activity '{activityName}' deleted successfully" });
     }

@@ -17,7 +17,7 @@ internal sealed class AddTransportCommand : AsyncCommand<AddTransportCommand.Set
     [Description("Add a transport option to the database")]
     public sealed class Settings : CommandSettings
     {
-        [CommandArgument(0, "<name>")]
+        [CommandArgument(0, "<NAME>")]
         [Description("The name of the transport")]
         public string Name { get; set; } = null!;
     }
@@ -58,10 +58,10 @@ internal sealed class AddTransportCommand : AsyncCommand<AddTransportCommand.Set
                 Style.Parse("green") : 
                 Style.Parse("yellow");
             
-            // Output the message above the panel with direct color
+            // Output the message above the panel
             AnsiConsole.MarkupLine($"[{messageColor}]{title}[/]");
 
-            // Create a panel with a simpler header
+    
             var panel = new Panel(table)
                 .Header("Transport Details", Justify.Center)
                 .Border(BoxBorder.Rounded)
@@ -157,11 +157,11 @@ internal sealed class UpdateTransportCommand : AsyncCommand<UpdateTransportComma
     [Description("Update the name of an existing transport option")]
     public sealed class Settings : CommandSettings
     {
-        [CommandArgument(0, "<name>")]
+        [CommandArgument(0, "<CURRENT_NAME>")]
         [Description("Current name of the transport")]
         public string CurrentName { get; set; } = string.Empty;
 
-        [CommandArgument(1, "<new-name>")]
+        [CommandArgument(1, "<NEW_NAME>")]
         [Description("New name for the transport")]
         public string NewName { get; set; } = string.Empty;
     }
@@ -195,7 +195,7 @@ internal sealed class DeleteTransportCommand : AsyncCommand<DeleteTransportComma
     [Description("Delete a transport option from the database")]
     public sealed class Settings : CommandSettings
     {
-        [CommandArgument(0, "<name>")]
+        [CommandArgument(0, "<NAME>")]
         [Description("Name of the transport to delete")]
         public string Name { get; set; } = string.Empty;
     }
@@ -224,11 +224,11 @@ internal sealed class LinkTransportCommand : AsyncCommand<LinkTransportCommand.S
     [Description("Link a transport option to a planet")]
     public sealed class Settings : CommandSettings
     {
-        [CommandArgument(0, "<transport-name>")]
+        [CommandArgument(0, "<TRANSPORT_NAME>")]
         [Description("Name of the existing transport to link")]
         public string TransportName { get; set; } = string.Empty;
 
-        [CommandArgument(1, "<planet-name>")]
+        [CommandArgument(1, "<PLANET_NAME>")]
         [Description("Name of the planet to link the transport to")]
         public string PlanetName { get; set; } = string.Empty;
     }
@@ -278,10 +278,10 @@ internal sealed class LinkTransportCommand : AsyncCommand<LinkTransportCommand.S
                     table.AddRow("Status", "Transport was already linked to this planet");
                 }
 
-                // Output the message above the panel with direct color
+                // Output the message above the panel
                 AnsiConsole.MarkupLine($"[{messageColor}]{title}[/]");
 
-                // Create a panel with a simpler header
+                
                 var panel = new Panel(table)
                     .Header("Link Details", Justify.Center)
                     .Border(BoxBorder.Rounded)

@@ -95,7 +95,7 @@ public static class HttpUtils
                 var JsonResponse = JsonSerializer.Deserialize<JsonElement>(await Response.Content.ReadAsStringAsync());
                 if (JsonResponse.TryGetProperty("message", out var message) && JsonResponse.TryGetProperty("error", out var error))
                 {
-                    return JsonResponse;
+                    throw new Exception(message.GetString() ?? "");
                 } else {
                     throw new Exception("You are not authorized to access this command");
                 }

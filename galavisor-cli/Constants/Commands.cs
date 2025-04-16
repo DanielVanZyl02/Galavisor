@@ -30,16 +30,16 @@ public static class CommandsConstants
     public const string getweather = "get-weather";
     public const string addplanet = "add-planet";
     public const string updateplanet = "update-planet";
-    public const string addactivity = "add-activity";
-    public const string getactivity = "get-activity";
-    public const string updateactivity = "update-activity";
-    public const string deleteactivity = "delete-activity";
-    public const string linkactivity = "link-activity";
+    public const string AddActivity = "add-activity";
+    public const string GetActivity = "get-activity";
+    public const string UpdateActivity = "update-activity";
+    public const string DeleteActivity = "delete-activity";
+    public const string LinkActivity = "link-activity";
     public const string deleteplanet = "delete-planet";
 
-    public const string addtransport = "add-transport";
-    public const string gettransport = "get-transport";
-    public const string updatetransport = "update-transport";
-    public const string deletetransport = "delete-transport";
-    public const string linktransport = "link-transport";
+    public const string AddTransport = "add-transport";
+    public const string GetTransport = "get-transport";
+    public const string UpdateTransport = "update-transport";
+    public const string DeleteTransport = "delete-transport";
+    public const string LinkTransport = "link-transport";
 }

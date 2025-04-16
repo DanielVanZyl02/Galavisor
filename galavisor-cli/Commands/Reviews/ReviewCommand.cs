@@ -6,19 +6,19 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using System.Net;
+using System.Linq;
 
 using GalavisorCli.Constants;
-using  GalavisorCli.Utils;
+using GalavisorCli.Utils;
 using GalavisorCli.Models;
 
 namespace GalavisorCli.Commands.Reviews;
+
 internal sealed class ReviewCommand : AsyncCommand<ReviewCommand.Settings>
 {
     [Description("Post a review for a specified planet")]
     public sealed class Settings : CommandSettings
     {
-        
-
         [CommandArgument(0, "<PLANET>")]
         [Description("The name of the planet you want to review")]
         public string planetName { get; set; }
@@ -34,63 +34,35 @@ internal sealed class ReviewCommand : AsyncCommand<ReviewCommand.Settings>
 
     public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
     {   
-        int planetIdFound = -1;
         try
         {
             var response = await HttpUtils.Get($"{ConfigStore.Get(ConfigKeys.ServerUri)}/planets/name/{settings.planetName}");
-            if(response.TryGetProperty("planet", out var planet))
+
+            var planetId = response.TryGetProperty("planet", out var planet) 
+                ? planet.Deserialize<PlanetModel>()?.PlanetId ?? -1 
+                : -1;
+                
+            if (planetId == -1)
             {
-                var mappedPlanet = planet.Deserialize<PlanetModel>();
-                if(mappedPlanet != null)
-                {
-                    planetIdFound = mappedPlanet.PlanetId;
-                }
-                else
-                {
-                    AnsiConsole.MarkupLine($"[red]Planet does not exist[/]");
-                }
+                AnsiConsole.MarkupLine($"[red]Planet does not exist[/]");
+                return 1;
             }
-        }
-        catch (HttpRequestException ex)
-        {
-            AnsiConsole.MarkupLine($"[red]Request failed:[/] {ex.Message}");
-            return 1;
-        }
-        catch (JsonException ex)
-        {
-            AnsiConsole.MarkupLine($"[red]Failed to parse response:[/] {ex.Message}");
-            return 1;
-        }
 
-        var requestBody = new
-        {
-            rating = settings.rating, 
-            comment = settings.comment,
-            planetId = planetIdFound
-        };
+            var requestBody = new
+            {
+                rating = settings.rating, 
+                comment = settings.comment,
+                planetId = planetId
+            };
 
-        try
-        {
+            var postResponse = await HttpUtils.Post($"{ConfigStore.Get(ConfigKeys.ServerUri)}/reviews", requestBody);
 
-            var response = await HttpUtils.Post($"{ConfigStore.Get(ConfigKeys.ServerUri)}/reviews", requestBody);
-
-            if(response.TryGetProperty("review", out var createdReview)){
+            if(postResponse.TryGetProperty("review", out var createdReview))
+            {
                 var review = createdReview.Deserialize<ReviewModel>();
                 if (review != null)
                 {
-                    var table = new Table();
-                    table.AddColumn("Field");
-                    table.AddColumn("Value");
-
-                    table.AddRow("Review ID", review.ReviewId.ToString());
-                    table.AddRow("Planet", review.PlanetName);
-                    table.AddRow("Rating", review.Rating.ToString());
-                    table.AddRow("Comment", review.Comment ?? "(none)");
-
-                    AnsiConsole.Write(new Panel(table)
-                        .Header("Review Posted", Justify.Center)
-                        .Border(BoxBorder.Rounded)
-                        .BorderStyle(Style.Parse("green")));
+                    Display.DisplayReviewDetails(review, "Review Posted");
                 }                
             }
 
@@ -112,13 +84,14 @@ internal sealed class ReviewCommand : AsyncCommand<ReviewCommand.Settings>
 
 internal sealed class GetReviewCommand : AsyncCommand<GetReviewCommand.Settings>
 {
-    [Description("Get a reviews based on a specified criteria")]
+    [Description("Get reviews based on specified criteria")]
     public sealed class Settings : CommandSettings
     {
         [CommandArgument(0, "[ID]")]
         [DefaultValue(-1)]
         [Description("The id of a review you want to get")]
         public int id { get; set; }
+        
         [CommandOption("--posted")]
         [Description("Include this flag if you want to see only reviews posted by you")]
         public bool posted { get; set; }
@@ -145,131 +118,86 @@ internal sealed class GetReviewCommand : AsyncCommand<GetReviewCommand.Settings>
 
     public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
     {
-        int planetIdFound = -1;
-        try
+        int planetId = -1;
+        
+        if (!string.IsNullOrEmpty(settings.planetName))
         {
-            var response = await HttpUtils.Get($"{ConfigStore.Get(ConfigKeys.ServerUri)}/planets/name/{settings.planetName}");
-            if(response.TryGetProperty("planet", out var planet))
+            try
             {
-                var mappedPlanet = planet.Deserialize<PlanetModel>();
-                if(mappedPlanet != null)
-                {
-                    planetIdFound = mappedPlanet.PlanetId;
-                }
-                else
+                var response = await HttpUtils.Get($"{ConfigStore.Get(ConfigKeys.ServerUri)}/planets/name/{settings.planetName}");
+                planetId = response.TryGetProperty("planet", out var planet) 
+                    ? planet.Deserialize<PlanetModel>()?.PlanetId ?? -1 
+                    : -1;
+                    
+                if (planetId == -1)
                 {
                     AnsiConsole.MarkupLine($"[red]Planet does not exist[/]");
+                    return 1;
                 }
             }
+            catch (HttpRequestException ex)
+            {
+                AnsiConsole.MarkupLine($"[red]Request failed:[/] {ex.Message}");
+                return 1;
+            }
+            catch (JsonException ex)
+            {
+                AnsiConsole.MarkupLine($"[red]Failed to parse response:[/] {ex.Message}");
+                return 1;
+            }
         }
-        catch (HttpRequestException ex)
-        {
-            AnsiConsole.MarkupLine($"[red]Request failed:[/] {ex.Message}");
-            return 1;
-        }
-        catch (JsonException ex)
-        {
-            AnsiConsole.MarkupLine($"[red]Failed to parse response:[/] {ex.Message}");
-            return 1;
-        }
-
 
         try
         {
-            if (settings.id != -1 && planetIdFound != -1)
+            if (settings.id != -1 && planetId != -1)
             {
                 AnsiConsole.MarkupLine($"[red]Request failed:[/] Cannot search by planet and id");
                 return 1;
             }
+            string baseUrl = settings.id != -1 
+                ? $"{ConfigStore.Get(ConfigKeys.ServerUri)}/reviews/{settings.id}" 
+                : planetId != -1 
+                    ? $"{ConfigStore.Get(ConfigKeys.ServerUri)}/reviews/planets/{planetId}" 
+                    : $"{ConfigStore.Get(ConfigKeys.ServerUri)}/reviews";
 
-            var baseUrl = $"{ConfigStore.Get(ConfigKeys.ServerUri)}/reviews";
-            if (settings.id != -1)
+            var queryParams = new Dictionary<string, string>
             {
-                baseUrl += "/" + settings.id.ToString();
-            }
-            else if (planetIdFound != -1)
-            {
-                baseUrl += "/planets/" + planetIdFound.ToString();
-            }
-
-            var queryParams = new List<string>();
+                { "posted", settings.posted ? "true" : null },
+                { "ratingEq", settings.ratingEqual != -1 ? settings.ratingEqual.ToString() : null },
+                { "ratingGte", settings.ratingGreaterThanOrEqual != -1 ? settings.ratingGreaterThanOrEqual.ToString() : null },
+                { "ratingLte", settings.ratingLessThanOrEqual != -1 ? settings.ratingLessThanOrEqual.ToString() : null }
+            };
             
-            if(settings.posted){
-                queryParams.Add($"posted={settings.posted}");
-            }
-
-            if (settings.ratingEqual != -1)
-            {
-                queryParams.Add($"ratingEq={settings.ratingEqual}");
-            }
+            var queryString = string.Join("&", 
+                queryParams.Where(p => p.Value != null)
+                          .Select(p => $"{p.Key}={p.Value}"));
             
-            if (settings.ratingGreaterThanOrEqual != -1)
-            {
-                queryParams.Add($"ratingGte={settings.ratingGreaterThanOrEqual}");
-            }
-            
-            if (settings.ratingLessThanOrEqual != -1)
-            {
-                queryParams.Add($"ratingLte={settings.ratingLessThanOrEqual}");
-            }
-            
-            var requestUrl = baseUrl;
-            if (queryParams.Count > 0)
-            {
-                requestUrl += "?" + string.Join("&", queryParams);
-            }
+            var requestUrl = string.IsNullOrEmpty(queryString) 
+                ? baseUrl
+                : $"{baseUrl}?{queryString}";
             
             var response = await HttpUtils.Get(requestUrl);
 
-            var table = new Table
-            {
-                Border = TableBorder.Rounded,
-                BorderStyle = Style.Parse("green")
-            };
-
-            table.AddColumn("Review ID");
-            table.AddColumn("User");
-            table.AddColumn("Planet");
-            table.AddColumn("Rating");
-            table.AddColumn("Comment");
-
             if (settings.id != -1)
             {
-                if(response.TryGetProperty("reviews", out var reviews)){
+                if(response.TryGetProperty("reviews", out var reviews))
+                {
                     var review = reviews.Deserialize<ReviewModel>();
-
                     if (review != null)
                     {
-                        table.AddRow(
-                            review.ReviewId.ToString(),
-                            review.UserName ?? "(no user name)",
-                            review.PlanetName ?? "(no planet name)",
-                            review.Rating.ToString(), 
-                            review.Comment ?? "(no comment)"
-                        );
+                        Display.DisplaySingleReviewAsTable(review);
                     }
-                    AnsiConsole.Write(table);
                 }
             }
             else
             {
-                if(response.TryGetProperty("reviews", out var reviewList)){
+                if(response.TryGetProperty("reviews", out var reviewList))
+                {
                     var reviews = reviewList.Deserialize<List<ReviewModel>>();
 
-                    if (reviews != null && reviews.Count > 0)
+                    if (reviews != null && reviews.Any())
                     {
-                        foreach (var review in reviews)
-                        {
-                            table.AddRow(
-                                review.ReviewId.ToString(),
-                                review.UserName ?? "(no user name)",
-                                review.PlanetName ?? "(no planet name)",
-                                review.Rating.ToString(), 
-                                review.Comment ?? "(no comment)"
-                            );
-                        }
-                        AnsiConsole.Write(table);
-                        AnsiConsole.MarkupLine($"[green]Found {reviews.Count} review(s) matching your criteria.[/]");
+                        Display.DisplayReviewList(reviews);
                     }
                     else
                     {
@@ -301,10 +229,12 @@ internal sealed class UpdateReviewCommand : AsyncCommand<UpdateReviewCommand.Set
         [CommandArgument(0, "<REVIEW>")]
         [Description("The id of the review you want to update")]
         public int reviewId { get; set; }
+        
         [CommandOption("-r | --rating <rating>")]
         [Description("The new rating")]
         [DefaultValue(-1)]
         public int rating { get; set; }
+        
         [CommandOption("-c | --comment <comment>")]
         [Description("The new comment")]
         public string comment { get; set; } = string.Empty;
@@ -314,7 +244,8 @@ internal sealed class UpdateReviewCommand : AsyncCommand<UpdateReviewCommand.Set
     {
         try
         {
-            if(settings.rating == -1 && string.IsNullOrEmpty(settings.comment)){
+            if(settings.rating == -1 && string.IsNullOrEmpty(settings.comment))
+            {
                 AnsiConsole.MarkupLine($"[red]Request failed:[/] A new rating or comment is required");
                 return 1;                
             }
@@ -332,19 +263,7 @@ internal sealed class UpdateReviewCommand : AsyncCommand<UpdateReviewCommand.Set
                 var review = updatedReview.Deserialize<ReviewModel>();
                 if (review != null)
                 {
-                    var table = new Table();
-                    table.AddColumn("Field");
-                    table.AddColumn("Value");
-
-                    table.AddRow("Review ID", review.ReviewId.ToString());
-                    table.AddRow("Planet", review.PlanetName);
-                    table.AddRow("Rating", review.Rating.ToString());
-                    table.AddRow("Comment", review.Comment ?? "(none)");
-
-                    AnsiConsole.Write(new Panel(table)
-                        .Header("Review Updated", Justify.Center)
-                        .Border(BoxBorder.Rounded)
-                        .BorderStyle(Style.Parse("green")));
+                    Display.DisplayReviewDetails(review, "Review Updated");
                 }
             }
             return 0;
@@ -382,12 +301,8 @@ internal sealed class DeleteReviewCommand : AsyncCommand<DeleteReviewCommand.Set
             {
                 var responseStatus = status.Deserialize<string>();
                 var responseMessage = message.Deserialize<string>();
-                if(responseStatus == "Fail")
-                {
-                    AnsiConsole.MarkupLine($"[red] {responseMessage} [/]");
-                }else{
-                    AnsiConsole.MarkupLine($"[green] {responseMessage} [/]");
-                }
+                var color = responseStatus == "Success" ? "green" : "red";
+                AnsiConsole.MarkupLine($"[{color}] {responseMessage} [/]");
             }
             return 0;
         }
@@ -401,5 +316,83 @@ internal sealed class DeleteReviewCommand : AsyncCommand<DeleteReviewCommand.Set
             AnsiConsole.MarkupLine($"[red]Failed to parse response:[/] {ex.Message}");
             return 1;
         }
+    }
+}
+
+internal static class Display
+{
+    public static void DisplayReviewDetails(ReviewModel review, string headerText = "Review Details")
+    {
+        var tableData = new[] 
+        {
+            ("Review ID", review.ReviewId.ToString()),
+            ("Planet", review.PlanetName),
+            ("Rating", review.Rating.ToString()),
+            ("Comment", review.Comment ?? "(none)")
+        };
+        
+        var table = new Table();
+        table.AddColumn("Field");
+        table.AddColumn("Value");
+        
+        tableData.ToList().ForEach(row => table.AddRow(row.Item1, row.Item2));
+
+        AnsiConsole.Write(new Panel(table)
+            .Header(headerText, Justify.Center)
+            .Border(BoxBorder.Rounded)
+            .BorderStyle(Style.Parse("green")));
+    }
+
+    public static void DisplayReviewList(IEnumerable<ReviewModel> reviews)
+    {
+        var table = new Table
+        {
+            Border = TableBorder.Rounded,
+            BorderStyle = Style.Parse("green")
+        };
+
+        table.AddColumn("Review ID");
+        table.AddColumn("User");
+        table.AddColumn("Planet");
+        table.AddColumn("Rating");
+        table.AddColumn("Comment");
+
+        reviews.ToList().ForEach(review => 
+            table.AddRow(
+                review.ReviewId.ToString(),
+                review.UserName ?? "(no user name)",
+                review.PlanetName ?? "(no planet name)",
+                review.Rating.ToString(), 
+                review.Comment ?? "(no comment)"
+            )
+        );
+        
+        AnsiConsole.Write(table);
+        AnsiConsole.MarkupLine($"[green]Found {reviews.Count()} review(s) matching your criteria.[/]");
+    }
+
+    public static void DisplaySingleReviewAsTable(ReviewModel review)
+    {
+        var table = new Table
+        {
+            Border = TableBorder.Rounded,
+            BorderStyle = Style.Parse("green")
+        };
+
+        table.AddColumn("Review ID");
+        table.AddColumn("User");
+        table.AddColumn("Planet");
+        table.AddColumn("Rating");
+        table.AddColumn("Comment");
+
+        table.AddRow(
+            review.ReviewId.ToString(),
+            review.UserName ?? "(no user name)",
+            review.PlanetName ?? "(no planet name)",
+            review.Rating.ToString(), 
+            review.Comment ?? "(no comment)"
+        );
+        
+        AnsiConsole.Write(table);
     }
 }

@@ -7,7 +7,6 @@ using GalavisorCli.Utils;
 using GalavisorCli.Constants;
 using GalavisorCli.Commands.Users;
 using GalavisorCli.Commands.System;
-using GalavisorCli.Commands.TodoList;
 using GalavisorCli.Commands.Reviews;
 using GalavisorCli.Commands.Auth;
 using GalavisorCli.Commands.Planets;
@@ -36,10 +35,6 @@ public static class Setup
         services.AddTransient<ToggleRoleCommand>();
         services.AddTransient<UsersCommand>();
 
-        services.AddTransient<AddCommand>();
-        services.AddTransient<ListCommand>();
-        services.AddTransient<UpdateCommand>();
-        services.AddTransient<DeleteCommand>();
         services.AddTransient<ExitCommand>();
         services.AddTransient<HelpCommand>();
 
@@ -90,10 +85,6 @@ public static class Setup
             config.AddCommand<ToggleRoleCommand>(CommandsConstants.role).WithDescription("Change the role of a user");
             config.AddCommand<UsersCommand>(CommandsConstants.users).WithDescription("See all users in the system");
 
-            config.AddCommand<AddCommand>(CommandsConstants.add);
-            config.AddCommand<ListCommand>(CommandsConstants.list);
-            config.AddCommand<UpdateCommand>(CommandsConstants.update);
-            config.AddCommand<DeleteCommand>(CommandsConstants.delete);
             config.AddCommand<ExitCommand>(CommandsConstants.exit).WithDescription("Exit the cli");
             
             config.AddCommand<HelpCommand>("help")

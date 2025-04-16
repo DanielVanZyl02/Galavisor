@@ -2,7 +2,6 @@ using Dapper;
 using GalavisorApi.Models;
 using GalavisorApi.Data;
 
-
 namespace GalavisorApi.Repositories;
 
 public class UserRepository(DatabaseConnection db)

@@ -15,6 +15,7 @@ namespace GalavisorCli.Commands.Activities;
 
 internal sealed class AddActivityCommand : AsyncCommand<AddActivityCommand.Settings>
 {
+    [Description("Add an activity to the database")]
     public sealed class Settings : CommandSettings
     {
         [CommandArgument(0, "<NAME>")]
@@ -85,6 +86,7 @@ internal sealed class AddActivityCommand : AsyncCommand<AddActivityCommand.Setti
 
 internal sealed class GetActivityCommand : AsyncCommand<GetActivityCommand.Settings>
 {
+    [Description("Get all activities or get activities for a planet")]
     public sealed class Settings : CommandSettings
     {
         [CommandOption("-p|--planet <PLANET>")]
@@ -157,6 +159,7 @@ internal sealed class GetActivityCommand : AsyncCommand<GetActivityCommand.Setti
 
 internal sealed class UpdateActivityCommand : AsyncCommand<UpdateActivityCommand.Settings>
 {
+    [Description("Update the name of an existing activity")]
     public sealed class Settings : CommandSettings
     {
         [CommandArgument(0, "<CURRENT_NAME>")]
@@ -192,6 +195,7 @@ internal sealed class UpdateActivityCommand : AsyncCommand<UpdateActivityCommand
 
 internal sealed class DeleteActivityCommand : AsyncCommand<DeleteActivityCommand.Settings>
 {
+    [Description("Delete an activity from the database")]
     public sealed class Settings : CommandSettings
     {
         [CommandArgument(0, "<NAME>")]
@@ -220,6 +224,7 @@ internal sealed class DeleteActivityCommand : AsyncCommand<DeleteActivityCommand
 
 internal sealed class LinkActivityCommand : AsyncCommand<LinkActivityCommand.Settings>
 {
+    [Description("Link an activity to a planet")]
     public sealed class Settings : CommandSettings
     {
         [CommandArgument(0, "<ACTIVITY>")]

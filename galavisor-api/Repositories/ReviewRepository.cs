@@ -40,7 +40,7 @@ public class ReviewRepository
         return review;
     }
 
-    public async Task<ReviewModel?> GetById(int id)
+    public virtual async Task<ReviewModel?> GetById(int id)
     {
         using var connection = _db.CreateConnection();
         return await connection.QueryFirstOrDefaultAsync<ReviewModel>(

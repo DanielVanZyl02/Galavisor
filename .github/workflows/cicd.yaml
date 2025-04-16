@@ -20,8 +20,6 @@ jobs:
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          echo "$START_UP" > run.sh
-          chmod 600 run.sh
           cd galavisor-api
           echo "$SERVER_CONFIG" > server_config.json
           ls

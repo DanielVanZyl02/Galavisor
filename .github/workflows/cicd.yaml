@@ -20,6 +20,8 @@ jobs:
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
+          echo "$START_UP" > run.sh
+          chmod 600 run.sh
           cd galavisor-api
           echo "$SERVER_CONFIG" > server_config.json
           ls
@@ -38,7 +40,9 @@ jobs:
       - name: Deploy
         run: |
           scp -r -o StrictHostKeyChecking=no -i "~/.ssh/id_rsa" galavisor-api/bin/Release/net9.0/linux-x64/publish ec2-user@ec2-54-75-118-89.eu-west-1.compute.amazonaws.com:~/
-          ssh -o StrictHostKeyChecking=no -i "~/.ssh/id_rsa" ec2-user@ec2-54-75-118-89.eu-west-1.compute.amazonaws.com "sudo pkill -f Galavisor || export DOTNET_ROOT=$HOME/.dotnet && export PATH=$PATH:$DOTNET_ROOT:$DOTNET_ROOT/tools && export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1 && export ASPNETCORE_HTTP_PORTS=80 && chmod +X GalavisorApi && sudo -E nohup ./GalavisorApi > /dev/null 2>&1 & exit"
+          scp -o StrictHostKeyChecking=no -i "~/.ssh/id_rsa" run.sh ec2-user@ec2-54-75-118-89.eu-west-1.compute.amazonaws.com:~/
+          ssh -o StrictHostKeyChecking=no -i "~/.ssh/id_rsa" ec2-user@ec2-54-75-118-89.eu-west-1.compute.amazonaws.com "run.sh"
     env:
       SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}}
       SERVER_CONFIG: ${{secrets.SERVER_CONFIG}}
+      START_UP: ${{variables.START_UP}}

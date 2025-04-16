@@ -20,7 +20,7 @@ public class UserController(UserService UserService, AuthService AuthService) : 
         if(await _authService.IsSubAdmin(GoogleSubject)){
             return Ok(new { message = "Success", users = await _userService.GetAllUsers()});
         } else {
-            return StatusCode(403, new { message = "Get failed", error = "You cannot access this command, only available to admins" });
+            return StatusCode(403, new { error = "Get failed", message = "You cannot access this command, only available to admins" });
         }
     }
 
@@ -33,9 +33,9 @@ public class UserController(UserService UserService, AuthService AuthService) : 
             var User = await _userService.GetUser(Id);
             return User != null ? Ok(new { message = "Success", user = User}) : NotFound();
         } else if(Id <= 0){
-                    return BadRequest(new { message = "Request failed", error = "You can not pass in a negative id" });
+                    return BadRequest(new { error = "Request failed", message = "You can not pass in a negative id" });
         } else {
-            return StatusCode(403, new { message = "Get failed", error = "You cannot access this command, only available to admins" });
+            return StatusCode(403, new { error = "Get failed", message = "You cannot access this command, only available to admins" });
         }    
     }
 
@@ -48,11 +48,11 @@ public class UserController(UserService UserService, AuthService AuthService) : 
                 var GoogleSubject = HttpContext.User.FindFirst("sub")!.Value ?? "";
                 return Ok(new { message = "Success", user = await _userService.UpdateUserConfig(GoogleSubject, Request.Username)});
             } else{
-                return BadRequest(new { message = "Update failed", error = "Request body is required to perform update" });
+                return BadRequest(new { error = "Update failed", message = "Request body is required to perform update" });
             }
         } catch (Exception Error)
         {
-            return StatusCode(500, new { message = "Something went wrong", error = Error.Message });
+            return StatusCode(500, new { error = "Something went wrong", message = Error.Message });
         }
     }
 
@@ -73,16 +73,16 @@ public class UserController(UserService UserService, AuthService AuthService) : 
                 if(await _authService.IsSubAdmin(GoogleSubject) && Id != -1){
                     return Ok(new { message = "Success", user = await _userService.UpdateRole(Request.Role ?? "", Id)});
                 } else if(Id <= 0){
-                    return BadRequest(new { message = "Request failed", error = "You can not pass in a negative id" });
+                    return BadRequest(new { error = "Request failed", message = "You can not pass in a negative id" });
                 } else{
-                    return StatusCode(403, new { message = "Update failed", error = "You cannot access this command, only available to admins" });
+                    return StatusCode(403, new { error = "Update failed", message = "You cannot access this command, only available to admins" });
                 }
             } else{
-                return BadRequest(new { message = "Update failed", error = "Request body is required to perform update" });
+                return BadRequest(new { error = "Update failed", message = "Request body is required to perform update" });
             }
         } catch (Exception Error)
         {
-            return StatusCode(500, new { message = "Something went wrong", error = Error.Message });
+            return StatusCode(500, new { error = "Something went wrong", message = Error.Message });
         }
     }
 }

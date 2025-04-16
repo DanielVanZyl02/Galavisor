@@ -17,7 +17,7 @@ public class AuthController(AuthService AuthService, UserService UserService) : 
     {
         if (string.IsNullOrWhiteSpace(Request.AuthCode))
         {
-            return BadRequest(new { message = "Authentication failed", error = "authCode is required" });
+            return BadRequest(new { error = "Authentication failed", message = "authCode is required" });
         } else{
             try
             {
@@ -27,12 +27,12 @@ public class AuthController(AuthService AuthService, UserService UserService) : 
                     User = await _userService.UpdateActiveStatusBySub(true, User.GoogleSubject);
                     return Ok(new { message = "Success", jwt = Jwt, user = User});
                 } else{
-                    return BadRequest(new { message = "Authentication failed", error = "Jwt returned from google was null"});
+                    return BadRequest(new { error = "Authentication failed", message = "Jwt returned from google was null"});
                 }
             }
             catch (Exception Error)
             {
-                return StatusCode(500, new { message = "Authentication failed", error = Error.Message });
+                return StatusCode(500, new { error = "Authentication failed", message = Error.Message });
             }
 
         }

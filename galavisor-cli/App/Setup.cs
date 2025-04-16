@@ -75,8 +75,8 @@ public static class Setup
         app.Configure(config =>
         {
             // Auth
-            config.AddCommand<LoginCommand>(CommandsConstants.login).WithDescription("login to the system");
-            config.AddCommand<LogoutCommand>(CommandsConstants.logout).WithDescription("logout of the system");
+            config.AddCommand<LoginCommand>(CommandsConstants.login).WithDescription("Attempt to login to the system");
+            config.AddCommand<LogoutCommand>(CommandsConstants.logout).WithDescription("Attempt to login to the system");
 
             // Users
             config.AddCommand<ConfigCommand>(CommandsConstants.config).WithDescription("See your config information");

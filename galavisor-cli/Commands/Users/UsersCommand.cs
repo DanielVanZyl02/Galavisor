@@ -9,7 +9,7 @@ namespace GalavisorCli.Commands.Users;
 
 public class UsersCommand : AsyncCommand<UsersCommand.Settings>
 {
-    [Description("Get all users in the system")]
+    [Description("See all users in the system")]
     public class Settings : CommandSettings
     {
     }

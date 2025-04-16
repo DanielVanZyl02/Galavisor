@@ -1,10 +1,16 @@
+using System.ComponentModel;
 using Spectre.Console.Cli;
 
 namespace GalavisorCli.Commands.System;
 
-public class ExitCommand : Command
+public class ExitCommand : Command<ExitCommand.Settings>
 {
-    public override int Execute(CommandContext context)
+    [Description("Exit the cli")]
+    public class Settings : CommandSettings
+    {
+    }
+
+    public override int Execute(CommandContext context, Settings settings)
     {
         Environment.Exit(0);
         return 0;

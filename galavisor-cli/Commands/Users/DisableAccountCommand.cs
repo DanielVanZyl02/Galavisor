@@ -10,12 +10,13 @@ namespace GalavisorCli.Commands.Users;
 
 public class DisableAccountCommand : AsyncCommand<DisableAccountCommand.DisableAccountSettings>
 {
+    [Description("Disable your or other peoples accounts")]
     public class DisableAccountSettings : CommandSettings
-{
-    [CommandOption("--id <ID>")]
-    [Description("ID of the account to disable (optional)")]
-    public int? Id { get; set; }
-}
+    {
+        [CommandOption("--id <ID>")]
+        [Description("ID of the account to disable (optional)")]
+        public int? Id { get; set; }
+    }
 
     public override async Task<int> ExecuteAsync([NotNull] CommandContext context, [NotNull] DisableAccountSettings settings)
     {

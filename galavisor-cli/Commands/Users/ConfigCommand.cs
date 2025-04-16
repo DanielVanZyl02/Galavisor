@@ -10,20 +10,21 @@ namespace GalavisorCli.Commands.Users;
 
 public class ConfigCommand : AsyncCommand<ConfigCommand.ConfigSettings>
 {
+    [Description("See your config information")]
     public class ConfigSettings : CommandSettings
-{
-    [CommandOption("--list")]
-    [Description("List current config values")]
-    public bool List { get; set; }
+    {
+        [CommandOption("--list")]
+        [Description("List current config values")]
+        public bool List { get; set; }
 
-    [CommandOption("--username <USERNAME>")]
-    [Description("Set your username")]
-    public string? Username { get; set; }
+        [CommandOption("--username <USERNAME>")]
+        [Description("Set your username")]
+        public string? Username { get; set; }
 
-    [CommandOption("--homeplanet <PLANET>")]
-    [Description("Set your home planet")]
-    public string? HomePlanet { get; set; }
-}
+        [CommandOption("--homeplanet <PLANET>")]
+        [Description("Set your home planet")]
+        public string? HomePlanet { get; set; }
+    }
 
     public override async Task<int> ExecuteAsync([NotNull] CommandContext context, [NotNull] ConfigSettings settings)
     {

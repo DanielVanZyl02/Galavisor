@@ -10,6 +10,7 @@ namespace GalavisorCli.Commands.Users;
 
 public class EnableAccountCommand : AsyncCommand<EnableAccountCommand.EnableAccountSettings>
 {
+    [Description("Enable other peoples accounts")]
     public class EnableAccountSettings : CommandSettings
     {
         [CommandOption("--id <ID>")]

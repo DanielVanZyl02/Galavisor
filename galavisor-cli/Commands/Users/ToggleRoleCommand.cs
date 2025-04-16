@@ -10,6 +10,7 @@ namespace GalavisorCli.Commands.Users;
 
 public class ToggleRoleCommand : AsyncCommand<ToggleRoleCommand.ToggleRoleSettings>
 {
+    [Description("Change the role of a user")]
     public class ToggleRoleSettings : CommandSettings
     {
         [CommandOption("--id <ID>")]

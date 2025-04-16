@@ -8,9 +8,9 @@ CREATE TABLE UserRole (
 CREATE TABLE Planet (
     PlanetID SERIAL PRIMARY KEY,
     Name VARCHAR(100) NOT NULL UNIQUE,
-    Atmosphere VARCHAR(100),
-    Temperature VARCHAR(50),
-    Colour VARCHAR(50)
+    Atmosphere VARCHAR(100) NOT NULL,
+    Temperature VARCHAR(50) NOT NULL,
+    Colour VARCHAR(50) NOT NULL
 );
  
 -- Create Activity table
@@ -29,8 +29,8 @@ CREATE TABLE Transport (
 CREATE TABLE "User" (
     UserID SERIAL PRIMARY KEY,
     Name VARCHAR(100) NOT NULL,
-    PlanetID INT,
-    UserRoleID INT,
+    PlanetID INT NOT NULL,
+    UserRoleID INT NOT NULL,
 	IsActive BOOLEAN DEFAULT True,
     FOREIGN KEY (PlanetID) REFERENCES Planet(PlanetID)
         ON DELETE SET NULL
@@ -42,8 +42,8 @@ CREATE TABLE "User" (
  
 -- Create junction table for Planet-Activity many-to-many relationship
 CREATE TABLE PlanetActivity (
-    PlanetID INT,
-    ActivityID INT,
+    PlanetID INT NOT NULL,
+    ActivityID INT NOT NULL,
     PRIMARY KEY (PlanetID, ActivityID),
     FOREIGN KEY (PlanetID) REFERENCES Planet(PlanetID)
         ON DELETE CASCADE
@@ -55,8 +55,8 @@ CREATE TABLE PlanetActivity (
  
 -- Create junction table for Planet-Transport many-to-many relationship
 CREATE TABLE PlanetTransport (
-    PlanetID INT,
-    TransportID INT,
+    PlanetID INT NOT NULL,
+    TransportID INT NOT NULL,
     PRIMARY KEY (PlanetID, TransportID),
     FOREIGN KEY (PlanetID) REFERENCES Planet(PlanetID)
         ON DELETE CASCADE
@@ -68,8 +68,8 @@ CREATE TABLE PlanetTransport (
 
 CREATE TABLE Review (
     ReviewID SERIAL PRIMARY KEY,
-	PlanetID INT,
-    UserID INT,
+	PlanetID INT NOT NULL,
+    UserID INT NOT NULL,
     Rating INT NOT NULL,
     Comment VARCHAR(255),
     FOREIGN KEY (PlanetID) REFERENCES Planet(PlanetID)

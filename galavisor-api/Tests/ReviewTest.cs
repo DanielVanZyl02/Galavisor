@@ -14,11 +14,13 @@ namespace GalavisorApi.Tests
         [Fact]
         public async Task GetById_ExistingId_ReturnsReviewModel()
         {
-            var expectedReview = new ReviewModel
+            var expectedReview = new ReviewReturnModel
             {
                 ReviewId = 1,
                 PlanetId = 2,
+                PlanetName = "Neonara",
                 UserId = 3,
+                UserName = "Daniel",
                 Rating = 4,
                 Comment = "Great planet!"
             };
@@ -52,7 +54,7 @@ namespace GalavisorApi.Tests
             var repositoryMock = new Mock<ReviewRepository>(dbConnection);
 
             repositoryMock.Setup(r => r.GetById(999))
-                .ReturnsAsync((ReviewModel)null);
+                .ReturnsAsync((ReviewReturnModel)null);
 
             var result = await repositoryMock.Object.GetById(999);
             Assert.Null(result);

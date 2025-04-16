@@ -20,7 +20,7 @@ public class ReviewService
         return addedReview;
     }
 
-    public async Task<List<ReviewModel>> GetAllReviews(int userId, int? ratingEq = null, int? ratingGte = null, int? ratingLte = null)
+    public async Task<List<ReviewReturnModel>> GetAllReviews(int userId, int? ratingEq = null, int? ratingGte = null, int? ratingLte = null)
     {
         if(userId == -1){
             return await _reviewRepository.GetAll(ratingEq, ratingGte, ratingLte);
@@ -30,11 +30,11 @@ public class ReviewService
         
     }
 
-    public async Task<ReviewModel?> GetReviewById(int id)
+    public async Task<ReviewReturnModel?> GetReviewById(int id)
     {
         return await _reviewRepository.GetById(id);
     }
-    public async Task<List<ReviewModel>> GetReviewByPlanetId(int planetId, int userId, int? ratingEq = null, int? ratingGte = null, int? ratingLte = null)
+    public async Task<List<ReviewReturnModel>> GetReviewByPlanetId(int planetId, int userId, int? ratingEq = null, int? ratingGte = null, int? ratingLte = null)
     {
         if(userId == -1){
             return await _reviewRepository.GetByPlanetId(planetId, ratingEq, ratingGte, ratingLte);
@@ -43,7 +43,7 @@ public class ReviewService
         }
         
     }
-    public async Task<ReviewModel> UpdateReview(ReviewModel review)
+    public async Task<ReviewReturnModel> UpdateReview(ReviewModel review)
     {
         return await _reviewRepository.Update(review);
     }

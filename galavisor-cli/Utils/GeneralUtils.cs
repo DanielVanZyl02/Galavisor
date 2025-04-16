@@ -7,27 +7,25 @@ public static class GeneralUtils{
     {
         return [ 
             // Auth
-            CommandsConstants.login, 
-            CommandsConstants.logout, 
+            CommandsConstants.Login, 
+            CommandsConstants.Logout, 
 
             // Users
-            CommandsConstants.config,
-            CommandsConstants.config,
-            CommandsConstants.disable,
-            CommandsConstants.enable,
-            CommandsConstants.role,
-            CommandsConstants.users,
 
-            CommandsConstants.add, 
-            CommandsConstants.list, 
-            CommandsConstants.update, 
-            CommandsConstants.delete, 
-            CommandsConstants.exit, 
-            CommandsConstants.help,
+            CommandsConstants.Config,
+            CommandsConstants.Config,
+            CommandsConstants.Disable,
+            CommandsConstants.Enable,
+            CommandsConstants.Role,
+            CommandsConstants.Users,
+            
+            CommandsConstants.Exit, 
+            CommandsConstants.Help,
             CommandsConstants.Review,
             CommandsConstants.GetReview,
             CommandsConstants.UpdateReview,
             CommandsConstants.DeleteReview,
+          
             CommandsConstants.planets,
             CommandsConstants.getplanet,
             CommandsConstants.getweather,

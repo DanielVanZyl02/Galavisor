@@ -5,6 +5,7 @@ using System.Web;
 using GalavisorApi.Constants;
 using GalavisorApi.Models;
 using GalavisorApi.Repositories;
+using GalavisorApi.Utils;
 
 namespace GalavisorApi.Services;
 
@@ -12,14 +13,14 @@ public class AuthService(HttpClient HttpClient, UserRepository UserRepository)
 {
     private readonly HttpClient _httpClient = HttpClient;
     private readonly UserRepository _userRepository = UserRepository;
-    private static readonly JsonSerializerOptions jsonOptions = new()
+    private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
     };
 
-    public async Task<string> AuthenticateUserAsync(string authCode)
+    public async Task<string> AuthenticateUserAsync(string AuthCode)
     {
-        return await GetJwtAsync(authCode);
+        return await GetJwtAsync(AuthCode);
     }
 
     public async Task<UserModel> GetOrCreateUser(string Jwt)
@@ -57,11 +58,11 @@ public class AuthService(HttpClient HttpClient, UserRepository UserRepository)
         return User != null && User.RoleName == "Admin";
     }
 
-    private async Task<string> GetJwtAsync(string authCode)
+    private async Task<string> GetJwtAsync(string AuthCode)
     {
-        var values = new Dictionary<string, string>
+        var Values = new Dictionary<string, string>
         {
-            ["code"] = HttpUtility.UrlDecode(authCode),
+            ["code"] = HttpUtility.UrlDecode(AuthCode),
             ["client_id"] = ConfigStore.Get(ConfigKeys.ClientId),
             ["client_secret"] = ConfigStore.Get(ConfigKeys.ClientSecret),
             ["redirect_uri"] = ConfigStore.Get(ConfigKeys.RedirectUri),
@@ -69,35 +70,35 @@ public class AuthService(HttpClient HttpClient, UserRepository UserRepository)
             ["scope"] = "openid email profile"
         };
 
-        var content = new FormUrlEncodedContent(values);
-        var request = new HttpRequestMessage(HttpMethod.Post, ConfigStore.Get(ConfigKeys.TokenUrl))
+        var Content = new FormUrlEncodedContent(Values);
+        var Request = new HttpRequestMessage(HttpMethod.Post, ConfigStore.Get(ConfigKeys.TokenUrl))
         {
-            Content = content
+            Content = Content
         };
-        request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        Request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-        var response = await _httpClient.SendAsync(request);
-        response.EnsureSuccessStatusCode();
+        var Response = await _httpClient.SendAsync(Request);
+        Response.EnsureSuccessStatusCode();
 
-        var json = await response.Content.ReadAsStringAsync();
-        var tokenMap = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(json);
+        var Json = await Response.Content.ReadAsStringAsync();
+        var tokenMap = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(Json);
 
         return tokenMap?["id_token"].GetString() ?? "";
     }
-    private static string DecodeJWT(string key, string Jwt)
+    private static string DecodeJWT(string Key, string Jwt)
     {
-        var parts = Jwt.Split('.');
-        if (parts.Length != 3)
+        var Parts = Jwt.Split('.');
+        if (Parts.Length != 3)
         {
             throw new ArgumentException("Invalid JWT token");
         }
 
-        string payloadJson = DecodeBase64(parts[1]);
-        var payloadMap = JsonSerializer.Deserialize<Dictionary<string, object>>(payloadJson, jsonOptions);
+        string PayloadJson = DecodeBase64(Parts[1]);
+        var PayloadMap = JsonSerializer.Deserialize<Dictionary<string, object>>(PayloadJson, JsonOptions);
 
-        if (payloadMap != null && payloadMap.TryGetValue(key, out object? value))
+        if (PayloadMap != null && PayloadMap.TryGetValue(Key, out object? Value))
         {
-            return value?.ToString() ?? throw new Exception("Key not found in JWT payload");
+            return Value?.ToString() ?? throw new Exception("Key not found in JWT payload");
         }
 
         throw new Exception("Key not found in JWT payload");

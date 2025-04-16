@@ -3,6 +3,7 @@ using GalavisorApi.Services;
 using GalavisorApi.Repositories;
 using GalavisorApi.Data;
 using GalavisorApi.Constants;
+using GalavisorApi.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -2,14 +2,14 @@ namespace GalavisorApi.Middleware;
 
 public static class AuthorizationExtensions
 {
-    public static IServiceCollection AddDefaultAuthorization(this IServiceCollection services)
+    public static IServiceCollection AddDefaultAuthorization(this IServiceCollection Services)
     {
-        services.AddAuthorization(options =>
+        Services.AddAuthorization(Options =>
         {
             // Require authenticated user by default
-            options.FallbackPolicy = options.DefaultPolicy;
+            Options.FallbackPolicy = Options.DefaultPolicy;
         });
 
-        return services;
+        return Services;
     }
 }

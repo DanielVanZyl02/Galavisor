@@ -48,9 +48,9 @@ public class UserController(UserService UserService, AuthService AuthService) : 
             } else{
                 return BadRequest(new { message = "Update failed", error = "Request body is required to perform update" });
             }
-        } catch (Exception ex)
+        } catch (Exception Error)
         {
-            return StatusCode(500, new { message = "Something went wrong", error = ex.Message });
+            return StatusCode(500, new { message = "Something went wrong", error = Error.Message });
         }
     }
 
@@ -76,9 +76,9 @@ public class UserController(UserService UserService, AuthService AuthService) : 
             } else{
                 return BadRequest(new { message = "Update failed", error = "Request body is required to perform update" });
             }
-        } catch (Exception ex)
+        } catch (Exception Error)
         {
-            return StatusCode(500, new { message = "Something went wrong", error = ex.Message });
+            return StatusCode(500, new { message = "Something went wrong", error = Error.Message });
         }
     }
 }

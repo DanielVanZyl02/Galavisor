@@ -10,8 +10,8 @@ public class UserRepository(DatabaseConnection db)
 
     public virtual async Task<UserModel?> GetBySub(string GoogleSubject)
     {
-        using var connection = _db.CreateConnection();
-        return await connection.QueryFirstOrDefaultAsync<UserModel>(
+        using var Connection = _db.CreateConnection();
+        return await Connection.QueryFirstOrDefaultAsync<UserModel>(
             @"SELECT
                 u.userid AS UserId,
                 u.name AS Name,
@@ -26,48 +26,48 @@ public class UserRepository(DatabaseConnection db)
     }
     
     public async Task<UserModel> CreateUser(string GoogleSubject, string Name)
-{
-    using var connection = _db.CreateConnection();
+    {
+        using var Connection = _db.CreateConnection();
 
-    return await connection.QuerySingleAsync<UserModel>(
-        @"
-            WITH inserted AS (
-                INSERT INTO ""User"" (userroleid, planetid, name, isactive, googlesubject)
-                VALUES (
-                    (SELECT userroleid FROM userrole WHERE rolename = 'Traveler'),
-                    1,
-                    @Name,
-                    true,
-                    @GoogleSubject
+        return await Connection.QuerySingleAsync<UserModel>(
+            @"
+                WITH inserted AS (
+                    INSERT INTO ""User"" (userroleid, planetid, name, isactive, googlesubject)
+                    VALUES (
+                        (SELECT userroleid FROM userrole WHERE rolename = 'Traveler'),
+                        1,
+                        @Name,
+                        true,
+                        @GoogleSubject
+                    )
+                    ON CONFLICT (googlesubject) DO NOTHING
+                    RETURNING userid, userroleid, name, isactive, googlesubject
+                ),
+                fetched AS (
+                    SELECT * FROM inserted
+                    UNION
+                    SELECT userid, userroleid, name, isactive, googlesubject
+                    FROM ""User""
+                    WHERE googlesubject = @GoogleSubject
                 )
-                ON CONFLICT (googlesubject) DO NOTHING
-                RETURNING userid, userroleid, name, isactive, googlesubject
-            ),
-            fetched AS (
-                SELECT * FROM inserted
-                UNION
-                SELECT userid, userroleid, name, isactive, googlesubject
-                FROM ""User""
-                WHERE googlesubject = @GoogleSubject
-            )
-            SELECT
-                u.userid AS UserId,
-                u.name AS Name,
-                u.isactive AS IsActive,
-                r.rolename AS RoleName,
-                u.googlesubject AS GoogleSubject
-            FROM fetched u
-            LEFT JOIN userrole r ON u.userroleid = r.userroleid
-        ", new {
-            GoogleSubject,
-            Name
-        });
+                SELECT
+                    u.userid AS UserId,
+                    u.name AS Name,
+                    u.isactive AS IsActive,
+                    r.rolename AS RoleName,
+                    u.googlesubject AS GoogleSubject
+                FROM fetched u
+                LEFT JOIN userrole r ON u.userroleid = r.userroleid
+            ", new {
+                GoogleSubject,
+                Name
+            });
     }
 
     public virtual async Task<UserModel?> GetById(int UserId)
     {
-        using var connection = _db.CreateConnection();
-        return await connection.QueryFirstOrDefaultAsync<UserModel>(
+        using var Connection = _db.CreateConnection();
+        return await Connection.QueryFirstOrDefaultAsync<UserModel>(
             @"SELECT
                 u.userid AS UserId,
                 u.name AS Name,
@@ -82,8 +82,8 @@ public class UserRepository(DatabaseConnection db)
 
     public virtual async Task<List<UserModel>> GetAll()
     {
-        using var connection = _db.CreateConnection();
-        var users = await connection.QueryAsync<UserModel>(
+        using var Connection = _db.CreateConnection();
+        var users = await Connection.QueryAsync<UserModel>(
             @"SELECT
                 u.userid AS UserId,
                 u.name AS Name,
@@ -96,9 +96,10 @@ public class UserRepository(DatabaseConnection db)
         return [.. users];
     }
 
-    public async Task<UserModel> UpdateUserConfig(string GoogleSubject, string NewUserName){
-        using var connection = _db.CreateConnection();
-        return await connection.QuerySingleAsync<UserModel>(
+    public async Task<UserModel> UpdateUserConfig(string GoogleSubject, string NewUserName)
+    {
+        using var Connection = _db.CreateConnection();
+        return await Connection.QuerySingleAsync<UserModel>(
             @"WITH Updated AS (
                 UPDATE ""User""
                 SET
@@ -121,9 +122,10 @@ public class UserRepository(DatabaseConnection db)
             });
     }
 
-    public async Task<UserModel> UpdateActiveStatusBySub(string GoogleSubject, bool IsActive){
-        using var connection = _db.CreateConnection();
-        return await connection.QuerySingleAsync<UserModel>(
+    public async Task<UserModel> UpdateActiveStatusBySub(string GoogleSubject, bool IsActive)
+    {
+        using var Connection = _db.CreateConnection();
+        return await Connection.QuerySingleAsync<UserModel>(
             @"WITH Updated AS (
                 UPDATE ""User""
                 SET isactive = @IsActive
@@ -146,9 +148,10 @@ public class UserRepository(DatabaseConnection db)
             });
     }
 
-    public async Task<UserModel> UpdateActiveStatusById(int UserId, bool IsActive){
-        using var connection = _db.CreateConnection();
-        return await connection.QuerySingleAsync<UserModel>(
+    public async Task<UserModel> UpdateActiveStatusById(int UserId, bool IsActive)
+    {
+        using var Connection = _db.CreateConnection();
+        return await Connection.QuerySingleAsync<UserModel>(
             @"WITH Updated AS (
                 UPDATE ""User""
                 SET isactive = @IsActive
@@ -171,9 +174,10 @@ public class UserRepository(DatabaseConnection db)
             });
     }
 
-    public async Task<UserModel> UpdateRole(int UserId, string Role){
-        using var connection = _db.CreateConnection();
-        return await connection.QuerySingleAsync<UserModel>(
+    public async Task<UserModel> UpdateRole(int UserId, string Role)
+    {
+        using var Connection = _db.CreateConnection();
+        return await Connection.QuerySingleAsync<UserModel>(
             @"WITH Updated AS (
                 UPDATE ""User""
                 SET

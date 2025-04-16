@@ -14,6 +14,7 @@ namespace GalavisorCli.Commands.Transport;
 
 internal sealed class AddTransportCommand : AsyncCommand<AddTransportCommand.Settings>
 {
+    [Description("Add a transport option to the database")]
     public sealed class Settings : CommandSettings
     {
         [CommandArgument(0, "<name>")]
@@ -80,6 +81,7 @@ internal sealed class AddTransportCommand : AsyncCommand<AddTransportCommand.Set
 
 internal sealed class GetTransportCommand : AsyncCommand<GetTransportCommand.Settings>
 {
+    [Description("Get all transport options or get the transport for a specific planet")]
     public sealed class Settings : CommandSettings
     {
         [CommandOption("-p|--planet <PLANET>")]
@@ -152,6 +154,7 @@ internal sealed class GetTransportCommand : AsyncCommand<GetTransportCommand.Set
 
 internal sealed class UpdateTransportCommand : AsyncCommand<UpdateTransportCommand.Settings>
 {
+    [Description("Update the name of an existing transport option")]
     public sealed class Settings : CommandSettings
     {
         [CommandArgument(0, "<name>")]
@@ -189,6 +192,7 @@ internal sealed class UpdateTransportCommand : AsyncCommand<UpdateTransportComma
 
 internal sealed class DeleteTransportCommand : AsyncCommand<DeleteTransportCommand.Settings>
 {
+    [Description("Delete a transport option from the database")]
     public sealed class Settings : CommandSettings
     {
         [CommandArgument(0, "<name>")]
@@ -217,6 +221,7 @@ internal sealed class DeleteTransportCommand : AsyncCommand<DeleteTransportComma
 
 internal sealed class LinkTransportCommand : AsyncCommand<LinkTransportCommand.Settings>
 {
+    [Description("Link a transport option to a planet")]
     public sealed class Settings : CommandSettings
     {
         [CommandArgument(0, "<transport-name>")]

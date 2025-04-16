@@ -103,17 +103,6 @@ public class ReviewController : ControllerBase
             {
                 return NotFound($"Review with ID {id} not found");
             }
-            // var planet = await _planetService.GetPlanetById(review.PlanetId.Value);
-            // var user = await _userService.GetUser(review.UserId.Value);
-
-            // ReviewReturnModel reviewResponse = new ReviewReturnModel
-            // {
-            //     ReviewId = review.ReviewId,
-            //     PlanetName = planet.Name,
-            //     UserName = user.Name,
-            //     Rating = review.Rating,
-            //     Comment = review.Comment
-            // };
             return Ok(new {status = "Success", reviews = review});
         }
         catch (Exception ex)

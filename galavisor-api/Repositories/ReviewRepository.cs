@@ -40,54 +40,70 @@ public class ReviewRepository
         return review;
     }
 
-    public virtual async Task<ReviewModel?> GetById(int id)
+    public virtual async Task<ReviewReturnModel?> GetById(int id)
     {
         using var connection = _db.CreateConnection();
-        return await connection.QueryFirstOrDefaultAsync<ReviewModel>(
-            @"SELECT reviewid AS ReviewId, 
-                    planetid AS PlanetId, 
-                    userid AS UserId, 
+        var review = await connection.QueryFirstOrDefaultAsync<ReviewReturnModel>(
+            @" SELECT r.reviewid AS ReviewId,
+                    p.planetid AS PlanetId, 
+                    r.userid AS UserId,
+                    p.name AS PlanetName, 
+                    u.name AS UserName, 
                     rating AS Rating, 
-                    comment AS Comment 
-              FROM review 
-              WHERE reviewid = @Id", 
+                    comment AS Comment
+                FROM review r
+                INNER JOIN planet p ON p.planetid = r.planetid
+                INNER JOIN ""User"" u ON u.userid = r.userid
+                WHERE reviewid = @Id", 
             new { Id = id });
+        return review;
     }
     
-    public async Task<List<ReviewModel>> GetByPlanetId(int planetId, int? ratingEq = null, int? ratingGte = null, int? ratingLte = null, int? userId = null)
+    public async Task<List<ReviewReturnModel>> GetByPlanetId(int planetId, int? ratingEq = null, int? ratingGte = null, int? ratingLte = null, int? userId = null)
     {
         using var connection = _db.CreateConnection();
         
         var queryBuilder = new StringBuilder(@"
-            SELECT reviewid AS ReviewId, 
-                   planetid AS PlanetId, 
-                   userid AS UserId, 
-                   rating AS Rating, 
-                   comment AS Comment 
-            FROM review 
-            WHERE planetId = @PlanetId");
+                SELECT r.reviewid AS ReviewId,
+                    p.planetid AS PlanetId, 
+                    r.userid AS UserId,
+                    p.name AS PlanetName, 
+                    u.name AS UserName, 
+                    rating AS Rating, 
+                    comment AS Comment
+                FROM review r
+                INNER JOIN planet p ON p.planetid = r.planetid
+                INNER JOIN ""User"" u ON u.userid = r.userid
+                WHERE r.planetId = @PlanetId
+            ");
         
         var parameters = new DynamicParameters();
         parameters.Add("PlanetId", planetId);
         
         AddRatingFilters(queryBuilder, parameters, ratingEq, ratingGte, ratingLte, userId);
         
-        var reviews = await connection.QueryAsync<ReviewModel>(queryBuilder.ToString(), parameters);
+        var reviews = await connection.QueryAsync<ReviewReturnModel>(queryBuilder.ToString(), parameters);
         return reviews.ToList();
     }
 
 
-    public async Task<List<ReviewModel>> GetAll(int? ratingEq = null, int? ratingGte = null, int? ratingLte = null, int? userId = null)
+    public async Task<List<ReviewReturnModel>> GetAll(int? ratingEq = null, int? ratingGte = null, int? ratingLte = null, int? userId = null)
     {
         using var connection = _db.CreateConnection();
         
         var queryBuilder = new StringBuilder(@"
-            SELECT reviewid AS ReviewId, 
-                   planetid AS PlanetId, 
-                   userid AS UserId, 
-                   rating AS Rating, 
-                   comment AS Comment 
-            FROM review");
+                SELECT r.reviewid AS ReviewId,
+                    p.planetid AS PlanetId, 
+                    r.userid AS UserId,
+                    p.name AS PlanetName, 
+                    u.name AS UserName, 
+                    rating AS Rating, 
+                    comment AS Comment
+                FROM review r
+                INNER JOIN planet p ON p.planetid = r.planetid
+                INNER JOIN ""User"" u ON u.userid = r.userid
+            ");
+        
         
         var parameters = new DynamicParameters();
 
@@ -97,11 +113,12 @@ public class ReviewRepository
             AddRatingFilters(queryBuilder, parameters, ratingEq, ratingGte, ratingLte, userId);
         }
         
-        var reviews = await connection.QueryAsync<ReviewModel>(queryBuilder.ToString(), parameters);
+        var reviews = await connection.QueryAsync<ReviewReturnModel>(queryBuilder.ToString(), parameters);
+
         return reviews.ToList();
     }
 
-    public async Task<ReviewModel> Update(ReviewModel review)
+    public async Task<ReviewReturnModel> Update(ReviewModel review)
     {
         using var connection = _db.CreateConnection();
         
@@ -130,15 +147,19 @@ public class ReviewRepository
             SET {string.Join(", ", updateFields)}
             WHERE reviewid = @ReviewId;
             
-            SELECT reviewid as ReviewId, 
-                planetid as PlanetId, 
-                userid as UserId, 
-                rating as Rating, 
-                comment as Comment
-            FROM review
+            SELECT r.reviewid AS ReviewId,
+                p.planetid AS PlanetId, 
+                r.userid AS UserId,
+                p.name AS PlanetName, 
+                u.name AS UserName, 
+                rating AS Rating, 
+                comment AS Comment
+            FROM review r
+            INNER JOIN planet p ON p.planetid = r.planetid
+            INNER JOIN ""User"" u ON u.userid = r.userid
             WHERE reviewid = @ReviewId;";
         
-        var updatedReview = await connection.QuerySingleOrDefaultAsync<ReviewModel>(sql, parameters);
+        var updatedReview = await connection.QuerySingleOrDefaultAsync<ReviewReturnModel>(sql, parameters);
         return updatedReview;
     }
 
@@ -172,7 +193,7 @@ public class ReviewRepository
 
         if (userId.HasValue)
         {
-            queryBuilder.Append(" AND userid = @UserId");
+            queryBuilder.Append(" AND r.userid = @UserId");
             parameters.Add("UserId", userId.Value);
         }
     }

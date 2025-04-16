@@ -39,7 +39,7 @@ public class ReviewController : ControllerBase
 
         if(request.Rating < 1 || request.Rating > 5)
         {
-            return StatusCode(403, new { message = "Get failed", error = "You can only post reviews with a rating between 1 and 5" });
+            return StatusCode(403, new { error = "Get failed", message = "You can only post reviews with a rating between 1 and 5" });
         }
 
         var review = await _reviewService.AddReview(request);
@@ -81,36 +81,13 @@ public class ReviewController : ControllerBase
                 userId = await _authService.GetLoggedInUser(token);                
             }
 
-            var reviews = await _reviewService.GetAllReviews(userId,ratingEq, ratingGte, ratingLte);
-
-            List<ReviewReturnModel> reviewResponse = new List<ReviewReturnModel>();
-            
-            foreach (var review in reviews)
-            {
-                if (review.PlanetId.HasValue && review.UserId.HasValue)
-                {
-                    var planet = await _planetService.GetPlanetById(review.PlanetId.Value);
-                    var user = await _userService.GetUser(review.UserId.Value);
-
-
-                    ReviewReturnModel mappedReview = new ReviewReturnModel
-                    {
-                        ReviewId = review.ReviewId,
-                        PlanetName = planet.Name,
-                        UserName = user.Name,
-                        Rating = review.Rating,
-                        Comment = review.Comment
-                    };
-
-                    reviewResponse.Add(mappedReview);
-                }
-            }
+            var reviewResponse = await _reviewService.GetAllReviews(userId,ratingEq, ratingGte, ratingLte);
 
             return Ok(new {status = "Success", reviews = reviewResponse});
         }
         catch (Exception ex)
         {
-            return StatusCode(500, $"Internal server error: {ex.Message}");
+            return StatusCode(500, $"Internal server error");
         }
     }
 
@@ -121,26 +98,16 @@ public class ReviewController : ControllerBase
         try
         {
             var review = await _reviewService.GetReviewById(id);
+            Console.WriteLine(review.PlanetName);
             if (review == null)
             {
                 return NotFound($"Review with ID {id} not found");
             }
-            var planet = await _planetService.GetPlanetById(review.PlanetId.Value);
-            var user = await _userService.GetUser(review.UserId.Value);
-
-            ReviewReturnModel reviewResponse = new ReviewReturnModel
-            {
-                ReviewId = review.ReviewId,
-                PlanetName = planet.Name,
-                UserName = user.Name,
-                Rating = review.Rating,
-                Comment = review.Comment
-            };
-            return Ok(new {status = "Success", reviews = reviewResponse});
+            return Ok(new {status = "Success", reviews = review});
         }
         catch (Exception ex)
         {
-            return StatusCode(500, $"Internal server error: {ex.Message}");
+            return StatusCode(500, $"Internal server error");
         }
     }
 
@@ -195,7 +162,7 @@ public class ReviewController : ControllerBase
         }
         catch (Exception ex)
         {
-            return StatusCode(500, $"Internal server error: {ex.Message}");
+            return StatusCode(500, $"Internal server error");
         }
     }
 
@@ -218,16 +185,18 @@ public class ReviewController : ControllerBase
 
         if(request.Rating < 1 || request.Rating > 5)
         {
-            return StatusCode(403, new { message = "Get failed", error = "You can only post reviews with a rating between 1 and 5" });
+            return StatusCode(403, new { error = "Get failed", message = "You can only post reviews with a rating between 1 and 5" });
         }
 
         if(loggedInUser != -1)
         {
             var review = await _reviewService.GetReviewById(id);
             
-            return  Ok(new {status = "Fail", message = $"Review {id} not found" });
-
-
+            if(review == null)
+            {
+                return  Ok(new {status = "Fail", message = $"Review {id} not found" });
+            }
+            
             if(review.UserId == loggedInUser)
             {
                 isLoggedInUser = true;
@@ -256,7 +225,7 @@ public class ReviewController : ControllerBase
         } 
         else
         {
-            return StatusCode(403, new { message = "Get failed", error = "You can only edit reviews you posted" });
+            return StatusCode(403, new { error = "Get failed", message = "You can only edit reviews you posted" });
         }
     }
 
@@ -297,8 +266,7 @@ public class ReviewController : ControllerBase
             return deleted ? Ok(new { status = "Success", message = $"Review {id} succesfully deleted" }): Ok(new {status = "Fail", message = $"Review {id} not found" });
         } else
         {
-            return StatusCode(403, new { message = "Get failed", error = "You can only delete reviews you posted" });
+            return StatusCode(403, new { error = "Get failed", message = "You can only delete reviews you posted" });
         }
-
     }
 }

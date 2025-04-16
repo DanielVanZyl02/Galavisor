@@ -22,8 +22,15 @@ internal sealed class GetPlanetsCommand : AsyncCommand<GetPlanetsCommand.Setting
             httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + ConfigStore.Get(ConfigKeys.JwtToken));
             var response = await httpClient.GetAsync($"{ConfigStore.Get(ConfigKeys.ServerUri)}/planets");
 
-            response.EnsureSuccessStatusCode();
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorBody = await response.Content.ReadAsStringAsync();
+                AnsiConsole.MarkupLine($"[red]API returned error {response.StatusCode}[/]");
+                AnsiConsole.MarkupLine($"[yellow]Error:[/] {errorBody}");
+                return 1;
+            }
             var responseJson = await response.Content.ReadAsStringAsync();
+            response.EnsureSuccessStatusCode();
             var planets = JsonSerializer.Deserialize<List<PlanetModel>>(responseJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
             if (planets != null)
@@ -74,8 +81,16 @@ internal sealed class GetPlanetCommand : AsyncCommand<GetPlanetCommand.Settings>
             httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + ConfigStore.Get(ConfigKeys.JwtToken));
             var response = await httpClient.GetAsync($"{ConfigStore.Get(ConfigKeys.ServerUri)}/planets/{settings.planetId}");
 
-            response.EnsureSuccessStatusCode();
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorBody = await response.Content.ReadAsStringAsync();
+                AnsiConsole.MarkupLine($"[red]API returned error {response.StatusCode}[/]");
+                AnsiConsole.MarkupLine($"[yellow]Error:[/] {errorBody}");
+                return 1;
+            }
+
             var responseJson = await response.Content.ReadAsStringAsync();
+            response.EnsureSuccessStatusCode();
             var planet = JsonSerializer.Deserialize<PlanetModel>(responseJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             if (planet != null)
             {
@@ -96,7 +111,7 @@ internal sealed class GetPlanetCommand : AsyncCommand<GetPlanetCommand.Settings>
         }
         catch (HttpRequestException ex)
         {
-            AnsiConsole.MarkupLine($"[red]Request failed:[/] {ex.Message}");
+            AnsiConsole.MarkupLine($"[red]Request failed:[/] {ex.Message} {ex.Data}");
             return 1;
         }
         catch (JsonException ex)
@@ -123,7 +138,15 @@ internal sealed class GetPlanetWeatherCommand : AsyncCommand<GetPlanetWeatherCom
             using var httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + ConfigStore.Get(ConfigKeys.JwtToken));
             var response = await httpClient.PostAsJsonAsync($"{ConfigStore.Get(ConfigKeys.ServerUri)}/planets/weather/{settings.planetId}", new { });
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorBody = await response.Content.ReadAsStringAsync();
+                AnsiConsole.MarkupLine($"[red]API returned error {response.StatusCode}[/]");
+                AnsiConsole.MarkupLine($"[yellow]Error:[/] {errorBody}");
+                return 1;
+            }
 
+            response.EnsureSuccessStatusCode();
             string content = await response.Content.ReadAsStringAsync();
 
             if (content != null && content != "")
@@ -184,9 +207,15 @@ internal sealed class AddPlanetCommand : AsyncCommand<AddPlanetCommand.Settings>
             using var httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + ConfigStore.Get(ConfigKeys.JwtToken));
             var response = await httpClient.PostAsJsonAsync($"{ConfigStore.Get(ConfigKeys.ServerUri)}/planets/add", requestBody);
-
-            response.EnsureSuccessStatusCode();
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorBody = await response.Content.ReadAsStringAsync();
+                AnsiConsole.MarkupLine($"[red]API returned error {response.StatusCode}[/]");
+                AnsiConsole.MarkupLine($"[yellow]Error:[/] {errorBody}");
+                return 1;
+            }
             var responseJson = await response.Content.ReadAsStringAsync();
+            response.EnsureSuccessStatusCode();
             var planet = JsonSerializer.Deserialize<PlanetModel>(responseJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
             if (planet != null)
@@ -240,8 +269,15 @@ internal sealed class UpdatePlanetCommand : AsyncCommand<UpdatePlanetCommand.Set
             //Getting the new planet to change
             httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + ConfigStore.Get(ConfigKeys.JwtToken));
             var response = await httpClient.GetAsync($"{ConfigStore.Get(ConfigKeys.ServerUri)}/planets/{settings.planetId}");
-            response.EnsureSuccessStatusCode();
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorBody = await response.Content.ReadAsStringAsync();
+                AnsiConsole.MarkupLine($"[red]API returned error {response.StatusCode}[/]");
+                AnsiConsole.MarkupLine($"[yellow]Error:[/] {errorBody}");
+                return 1;
+            }
             var responseJson = await response.Content.ReadAsStringAsync();
+            response.EnsureSuccessStatusCode();
             var planet = JsonSerializer.Deserialize<PlanetModel>(responseJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             response = await httpClient.PatchAsJsonAsync($"{ConfigStore.Get(ConfigKeys.ServerUri)}/planets/update/{settings.planetId}", planet);
 
@@ -263,8 +299,15 @@ internal sealed class UpdatePlanetCommand : AsyncCommand<UpdatePlanetCommand.Set
             }
 
             response = await httpClient.PatchAsJsonAsync($"{ConfigStore.Get(ConfigKeys.ServerUri)}/planets/update/{settings.planetId}", planet);
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorBody = await response.Content.ReadAsStringAsync();
+                AnsiConsole.MarkupLine($"[red]API returned error {response.StatusCode}[/]");
+                AnsiConsole.MarkupLine($"[yellow]Error:[/] {errorBody}");
+                return 1;
+            }
             response.EnsureSuccessStatusCode();
-            if(planet != null) 
+            if (planet != null)
             {
                 var table = new Table();
                 table.AddColumn("Id");
@@ -310,9 +353,23 @@ internal sealed class DeletePlanetCommand : AsyncCommand<DeletePlanetCommand.Set
             using var httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Add("Authorization", "Bearer " + ConfigStore.Get(ConfigKeys.JwtToken));
             var response = await httpClient.GetAsync($"{ConfigStore.Get(ConfigKeys.ServerUri)}/planets/{settings.planetId}");
-            (await httpClient.DeleteAsync($"{ConfigStore.Get(ConfigKeys.ServerUri)}/planets/delete/{settings.planetId}")).EnsureSuccessStatusCode();
-
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorBody = await response.Content.ReadAsStringAsync();
+                AnsiConsole.MarkupLine($"[red]API returned error {response.StatusCode}[/]");
+                AnsiConsole.MarkupLine($"[yellow]Error:[/] {errorBody}");
+                return 1;
+            }
+            response = await httpClient.DeleteAsync($"{ConfigStore.Get(ConfigKeys.ServerUri)}/planets/delete/{settings.planetId}");
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorBody = await response.Content.ReadAsStringAsync();
+                AnsiConsole.MarkupLine($"[red]API returned error {response.StatusCode}[/]");
+                AnsiConsole.MarkupLine($"[yellow]Error:[/] {errorBody}");
+                return 1;
+            }
             response.EnsureSuccessStatusCode();
+
             var responseJson = await response.Content.ReadAsStringAsync();
             var planet = JsonSerializer.Deserialize<PlanetModel>(responseJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             if (planet != null)

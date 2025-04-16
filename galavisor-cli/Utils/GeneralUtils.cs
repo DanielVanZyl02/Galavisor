@@ -11,6 +11,7 @@ public static class GeneralUtils{
             CommandsConstants.Logout, 
 
             // Users
+
             CommandsConstants.Config,
             CommandsConstants.Config,
             CommandsConstants.Disable,
@@ -20,10 +21,11 @@ public static class GeneralUtils{
             
             CommandsConstants.Exit, 
             CommandsConstants.Help,
-            CommandsConstants.review,
-            CommandsConstants.getreview,
-            CommandsConstants.updatereview,
-            CommandsConstants.deletereview,
+            CommandsConstants.Review,
+            CommandsConstants.GetReview,
+            CommandsConstants.UpdateReview,
+            CommandsConstants.DeleteReview,
+          
             CommandsConstants.planets,
             CommandsConstants.getplanet,
             CommandsConstants.getweather,

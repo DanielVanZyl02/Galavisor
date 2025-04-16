@@ -16,7 +16,6 @@ namespace GalavisorApi.Tests
             {
                 UserId = 1,
                 Name = "Test",
-                PlanetName = "Planet",
                 RoleName = "Traveller",
                 IsActive = true,
                 GoogleSubject = "1234567890"
@@ -37,7 +36,6 @@ namespace GalavisorApi.Tests
             Assert.NotNull(result);
             Assert.Equal(expectedUser.UserId, result.UserId);
             Assert.Equal(expectedUser.Name, result.Name);
-            Assert.Equal(expectedUser.PlanetName, result.PlanetName);
             Assert.Equal(expectedUser.RoleName, result.RoleName);
             Assert.Equal(expectedUser.IsActive, result.IsActive);
             Assert.Equal(expectedUser.GoogleSubject, result.GoogleSubject);
@@ -65,7 +63,6 @@ namespace GalavisorApi.Tests
             {
                 UserId = 1,
                 Name = "Test",
-                PlanetName = "Planet",
                 RoleName = "Traveller",
                 IsActive = true,
                 GoogleSubject = "1234567890"
@@ -86,7 +83,6 @@ namespace GalavisorApi.Tests
             Assert.NotNull(result);
             Assert.Equal(expectedUser.UserId, result.UserId);
             Assert.Equal(expectedUser.Name, result.Name);
-            Assert.Equal(expectedUser.PlanetName, result.PlanetName);
             Assert.Equal(expectedUser.RoleName, result.RoleName);
             Assert.Equal(expectedUser.IsActive, result.IsActive);
             Assert.Equal(expectedUser.GoogleSubject, result.GoogleSubject);
@@ -114,7 +110,6 @@ namespace GalavisorApi.Tests
             {
                 UserId = 1,
                 Name = "Test",
-                PlanetName = "Planet",
                 RoleName = "Traveller",
                 IsActive = true,
                 GoogleSubject = "1234567890"

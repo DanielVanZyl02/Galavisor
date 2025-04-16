@@ -20,10 +20,6 @@ public class ConfigCommand : AsyncCommand<ConfigCommand.ConfigSettings>
         [CommandOption("--username <USERNAME>")]
         [Description("Set your username")]
         public string? Username { get; set; }
-
-        [CommandOption("--homeplanet <PLANET>")]
-        [Description("Set your home planet")]
-        public string? HomePlanet { get; set; }
     }
 
     public override async Task<int> ExecuteAsync([NotNull] CommandContext context, [NotNull] ConfigSettings settings)
@@ -34,12 +30,10 @@ public class ConfigCommand : AsyncCommand<ConfigCommand.ConfigSettings>
         }
         
         var Username = ConfigStore.Exists(ConfigKeys.GoogleName) ? ConfigStore.Get(ConfigKeys.GoogleName) : "not-set";
-        var HomePlanet = ConfigStore.Exists(ConfigKeys.HomePlanet) ? ConfigStore.Get(ConfigKeys.HomePlanet) : "not-set";
 
         if (settings.List)
         {
             AnsiConsole.MarkupLine($"[green]Username:[/] {Username ?? "[not set]"}");
-            AnsiConsole.MarkupLine($"[green]Home Planet:[/] {HomePlanet ?? "[not set]"}");
             return 0;
         }
 
@@ -51,20 +45,9 @@ public class ConfigCommand : AsyncCommand<ConfigCommand.ConfigSettings>
             updated = true;
         }
 
-        if (!string.IsNullOrEmpty(settings.HomePlanet))
-        {
-            HomePlanet = settings.HomePlanet;
-            updated = true;
-        }
-
         if (!updated)
         {
             updated = false;
-            if (AnsiConsole.Confirm("Do you want to update your home planet?"))
-            {
-                HomePlanet = AnsiConsole.Ask<string>("What is your new home planet?");
-                updated = true;
-            }
 
             if (AnsiConsole.Confirm("Do you want to update your username?"))
             {
@@ -75,7 +58,7 @@ public class ConfigCommand : AsyncCommand<ConfigCommand.ConfigSettings>
 
         if (!updated)return 0;
 
-        var User = await UserService.UpdateUserConfig(Username, HomePlanet);
+        var User = await UserService.UpdateUserConfig(Username);
 
         User.Switch(
             Message => {
@@ -83,20 +66,17 @@ public class ConfigCommand : AsyncCommand<ConfigCommand.ConfigSettings>
             },
             User => {
                 ConfigStore.Set(ConfigKeys.GoogleName, User.Name);
-                ConfigStore.Set(ConfigKeys.HomePlanet, User.PlanetName);
-                AnsiConsole.MarkupLine($"[green]Config updated for HomePlanet to {User.PlanetName} and for Username to {User.Name}.[/]");
+                AnsiConsole.MarkupLine($"[green]Config updated for Username to {User.Name}.[/]");
 
                 var table = new Table();
                 table.AddColumn("[bold]User ID[/]");
                 table.AddColumn("[bold]Name[/]");
-                table.AddColumn("[bold]Planet Name[/]");
                 table.AddColumn("[bold]Role[/]");
                 table.AddColumn("[bold]Active[/]");
 
                 table.AddRow(
                     User.UserId.ToString(),
                     User.Name,
-                    User.PlanetName,
                     User.RoleName,
                     User.IsActive ? "[green]Active[/]" : "[red]Inactive[/]"
                 );

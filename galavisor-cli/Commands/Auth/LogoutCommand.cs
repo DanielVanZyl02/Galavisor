@@ -18,7 +18,6 @@ public class LogoutCommand : Command<LogoutCommand.Settings>
         if(ConfigStore.Exists(ConfigKeys.JwtToken)){
             ConfigStore.Remove(ConfigKeys.JwtToken);
             ConfigStore.Remove(ConfigKeys.GoogleName);
-            ConfigStore.Remove(ConfigKeys.HomePlanet);
             AnsiConsole.MarkupLine("[green]You have been logged out successfully.[/]");
             return 0;
         } else {

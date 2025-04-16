@@ -80,14 +80,12 @@ public class DisableAccountCommand : AsyncCommand<DisableAccountCommand.DisableA
                     var table = new Table();
                     table.AddColumn("[bold]User ID[/]");
                     table.AddColumn("[bold]Name[/]");
-                    table.AddColumn("[bold]Planet Name[/]");
                     table.AddColumn("[bold]Role[/]");
                     table.AddColumn("[bold]Active[/]");
 
                     table.AddRow(
                         user.UserId.ToString(),
                         user.Name,
-                        user.PlanetName,
                         user.RoleName,
                         user.IsActive ? "[green]Active[/]" : "[red]Inactive[/]"
                     );
@@ -97,19 +95,17 @@ public class DisableAccountCommand : AsyncCommand<DisableAccountCommand.DisableA
                 else
                 {
                     AnsiConsole.MarkupLine($"[bold red]{user.Name}'s account has been disabled.[/]");
-                    AnsiConsole.MarkupLine("[grey]They have 30 days to re-enable it again by logging in.[/]");
+                    AnsiConsole.MarkupLine("[grey]They can re-enable it again by logging in.[/]");
 
                     var table = new Table();
                     table.AddColumn("[bold]User ID[/]");
                     table.AddColumn("[bold]Name[/]");
-                    table.AddColumn("[bold]Planet Name[/]");
                     table.AddColumn("[bold]Role[/]");
                     table.AddColumn("[bold]Active[/]");
 
                     table.AddRow(
                         user.UserId.ToString(),
                         user.Name,
-                        user.PlanetName,
                         user.RoleName,
                         user.IsActive ? "[green]Active[/]" : "[red]Inactive[/]"
                     );

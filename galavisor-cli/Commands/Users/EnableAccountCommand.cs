@@ -61,14 +61,12 @@ public class EnableAccountCommand : AsyncCommand<EnableAccountCommand.EnableAcco
                 var table = new Table();
                 table.AddColumn("[bold]User ID[/]");
                 table.AddColumn("[bold]Name[/]");
-                table.AddColumn("[bold]Planet Name[/]");
                 table.AddColumn("[bold]Role[/]");
                 table.AddColumn("[bold]Active[/]");
 
                 table.AddRow(
                     user.UserId.ToString(),
                     user.Name,
-                    user.PlanetName,
                     user.RoleName,
                     user.IsActive ? "[green]Active[/]" : "[red]Inactive[/]"
                 );

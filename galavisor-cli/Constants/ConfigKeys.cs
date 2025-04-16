@@ -11,6 +11,5 @@ public static class ConfigKeys
     public const string JwtToken = "JwtToken";
     public const string GoogleSub = "GoogleSub";
     public const string GoogleName = "GoogleName";
-    public const string HomePlanet = "HomePlanet";
 
 }

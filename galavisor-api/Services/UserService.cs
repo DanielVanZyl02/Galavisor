@@ -23,8 +23,8 @@ public class UserService(UserRepository repo)
         return await _userRepository.GetBySub(sub);
     }
 
-    public async Task<UserModel> UpdateUserConfig(string GoogleSubject, string PlanetName, string NewUserName){
-        return await _userRepository.UpdateUserConfig(GoogleSubject, PlanetName, NewUserName);
+    public async Task<UserModel> UpdateUserConfig(string GoogleSubject, string NewUserName){
+        return await _userRepository.UpdateUserConfig(GoogleSubject, NewUserName);
     }
 
     public async Task<UserModel> UpdateActiveStatusBySub(bool IsActive, string GoogleSubject){

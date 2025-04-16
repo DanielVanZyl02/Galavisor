@@ -42,9 +42,9 @@ public class UserController(UserService userService, AuthService authService) : 
     public async Task<IActionResult> UpdateUserConfig([FromBody] UpdateRequest request)
     {
         try {
-            if(request.HomePlanet != null && request.Username != null){
+            if(request.Username != null){
                 var GoogleSubject = HttpContext.User.FindFirst("sub")!.Value ?? "";
-                return Ok(new { message = "Success", user = await _userService.UpdateUserConfig(GoogleSubject, request.HomePlanet, request.Username)});
+                return Ok(new { message = "Success", user = await _userService.UpdateUserConfig(GoogleSubject, request.Username)});
             } else{
                 return BadRequest(new { message = "Update failed", error = "request body is required to perform update" });
             }
@@ -86,7 +86,6 @@ public class UserController(UserService userService, AuthService authService) : 
 public class UpdateRequest
 {
     public string? Username { get; set; }
-    public string? HomePlanet { get; set; }
     public bool? Active { get; set; }
     public string? Role { get; set; }
 }

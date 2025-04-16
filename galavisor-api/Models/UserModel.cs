@@ -10,9 +10,6 @@ public class UserModel
     [JsonPropertyName("name")]
     public required string Name { get; set; }
 
-    [JsonPropertyName("planetName")]
-    public required string PlanetName { get; set; }
-
     [JsonPropertyName("roleName")]
     public required string RoleName { get; set; }
 

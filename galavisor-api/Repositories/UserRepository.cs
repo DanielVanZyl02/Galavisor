@@ -16,11 +16,9 @@ public class UserRepository(DatabaseConnection db)
                 u.userid AS UserId,
                 u.name AS Name,
                 u.isactive AS IsActive,
-                p.name AS PlanetName,
                 r.rolename AS RoleName,
                 u.googlesubject AS GoogleSubject
             FROM ""User"" u
-            LEFT JOIN planet p ON u.planetid = p.planetid
             LEFT JOIN userrole r ON u.userroleid = r.userroleid
             WHERE u.googlesubject = @GoogleSubject
             ", 
@@ -43,12 +41,12 @@ public class UserRepository(DatabaseConnection db)
                     @GoogleSubject
                 )
                 ON CONFLICT (googlesubject) DO NOTHING
-                RETURNING userid, userroleid, planetid, name, isactive, googlesubject
+                RETURNING userid, userroleid, name, isactive, googlesubject
             ),
             fetched AS (
                 SELECT * FROM inserted
                 UNION
-                SELECT userid, userroleid, planetid, name, isactive, googlesubject
+                SELECT userid, userroleid, name, isactive, googlesubject
                 FROM ""User""
                 WHERE googlesubject = @GoogleSubject
             )
@@ -56,11 +54,9 @@ public class UserRepository(DatabaseConnection db)
                 u.userid AS UserId,
                 u.name AS Name,
                 u.isactive AS IsActive,
-                p.name AS PlanetName,
                 r.rolename AS RoleName,
                 u.googlesubject AS GoogleSubject
             FROM fetched u
-            LEFT JOIN planet p ON u.planetid = p.planetid
             LEFT JOIN userrole r ON u.userroleid = r.userroleid
         ", new {
             GoogleSubject,
@@ -76,11 +72,9 @@ public class UserRepository(DatabaseConnection db)
                 u.userid AS UserId,
                 u.name AS Name,
                 u.isactive AS IsActive,
-                p.name AS PlanetName,
                 r.rolename AS RoleName,
                 u.googlesubject AS GoogleSubject
             FROM ""User"" u
-            LEFT JOIN planet p ON u.planetid = p.planetid
             LEFT JOIN userrole r ON u.userroleid = r.userroleid
             WHERE u.userid = @UserId", 
             new { UserId });
@@ -94,40 +88,34 @@ public class UserRepository(DatabaseConnection db)
                 u.userid AS UserId,
                 u.name AS Name,
                 u.isactive AS IsActive,
-                p.name AS PlanetName,
                 r.rolename AS RoleName,
                 u.googlesubject AS GoogleSubject
             FROM ""User"" u
-            LEFT JOIN planet p ON u.planetid = p.planetid
             LEFT JOIN userrole r ON u.userroleid = r.userroleid");
         
         return [.. users];
     }
 
-    public async Task<UserModel> UpdateUserConfig(string GoogleSubject, string PlanetName, string NewUserName){
+    public async Task<UserModel> UpdateUserConfig(string GoogleSubject, string NewUserName){
         using var connection = _db.CreateConnection();
         return await connection.QuerySingleAsync<UserModel>(
             @"WITH Updated AS (
                 UPDATE ""User""
                 SET
-                    planetid = (SELECT planetid FROM planet WHERE name = @PlanetName),
                     name = @NewUserName
                 WHERE googlesubject = @GoogleSubject
-                RETURNING userid, userroleid, planetid, name, isactive, googlesubject
+                RETURNING userid, userroleid, name, isactive, googlesubject
             )
             SELECT
                 u.userid AS UserId,
                 u.name AS Name,
                 u.isactive AS IsActive,
-                p.Name AS PlanetName,
                 r.rolename AS RoleName,
                 u.googlesubject AS GoogleSubject
             FROM Updated u
-            LEFT JOIN planet p ON u.planetid = p.planetid
             LEFT JOIN userrole r ON u.userroleid = r.userroleid"
             ,
             new {
-                PlanetName,
                 NewUserName,
                 GoogleSubject
             });
@@ -140,17 +128,15 @@ public class UserRepository(DatabaseConnection db)
                 UPDATE ""User""
                 SET isactive = @IsActive
                 WHERE googlesubject = @GoogleSubject
-                RETURNING userid, userroleid, planetid, name, isactive, googlesubject
+                RETURNING userid, userroleid, name, isactive, googlesubject
             )
             SELECT
                 u.userid AS UserId,
                 u.name AS Name,
                 u.isactive AS IsActive,
-                p.Name AS PlanetName,
                 r.rolename AS RoleName,
                 u.googlesubject AS GoogleSubject
             FROM Updated u
-            LEFT JOIN planet p ON u.planetid = p.planetid
             LEFT JOIN userrole r ON u.userroleid = r.userroleid
             "
             ,
@@ -167,17 +153,15 @@ public class UserRepository(DatabaseConnection db)
                 UPDATE ""User""
                 SET isactive = @IsActive
                 WHERE userid = @UserId
-                RETURNING userid, userroleid, planetid, name, isactive, googlesubject
+                RETURNING userid, userroleid, name, isactive, googlesubject
             )
             SELECT
                 u.userid AS UserId,
                 u.name AS Name,
                 u.isactive AS IsActive,
-                p.name AS PlanetName,
                 r.rolename AS RoleName,
                 u.googlesubject AS GoogleSubject
             FROM Updated u
-            LEFT JOIN planet p ON u.planetid = p.planetid
             LEFT JOIN userrole r ON u.userroleid = r.userroleid
             "
             ,
@@ -195,17 +179,15 @@ public class UserRepository(DatabaseConnection db)
                 SET
                 userroleid = (SELECT userroleid FROM userrole WHERE rolename = @Role)
                 WHERE userid = @UserId
-                RETURNING userid, userroleid, planetid, name, isactive, googlesubject
+                RETURNING userid, userroleid, name, isactive, googlesubject
             )
             SELECT
                 u.userid AS UserId,
                 u.name AS Name,
                 u.isactive AS IsActive,
-                p.name AS PlanetName,
                 r.rolename AS RoleName,
                 u.googlesubject AS GoogleSubject
             FROM Updated u
-            LEFT JOIN planet p ON u.planetid = p.planetid
             LEFT JOIN userrole r ON u.userroleid = r.userroleid
             "
             ,

@@ -38,15 +38,14 @@ public class UserService
         }
     }
 
-    public static async Task<OneOf<string, UserModel>> UpdateUserConfig(string Username, string HomePlanet)
+    public static async Task<OneOf<string, UserModel>> UpdateUserConfig(string Username)
     {
         try
         {
             var jsonResponse = await HttpUtils.Patch(
                 $"{ConfigStore.Get(ConfigKeys.ServerUri)}/users",
                 new Dictionary<string, string> { 
-                    { "Username", Username }, 
-                    { "HomePlanet", HomePlanet} 
+                    { "Username", Username }
                 });
 
             if (jsonResponse.TryGetProperty("message", out var message) && jsonResponse.TryGetProperty("error", out var error))

@@ -12,7 +12,7 @@ namespace GalavisorApi.Data
             _connectionString = connectionString;
         }
 
-        public IDbConnection CreateConnection()
+        public virtual IDbConnection CreateConnection()
         {
             return new NpgsqlConnection(_connectionString);
         }

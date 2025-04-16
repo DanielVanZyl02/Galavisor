@@ -138,30 +138,25 @@ public static class Setup
 
     private static void RegisterCommandsWithHelp(HelpCommand helpCommand)
     {
-        // System commands
-        helpCommand.RegisterCommand<AddCommand.Settings>("add");
-        helpCommand.RegisterCommand<UpdateCommand.Settings>("update");
-        helpCommand.RegisterCommand<DeleteCommand.Settings>("delete");
-
         // Review commands
         helpCommand.RegisterCommand<ReviewCommand.Settings>("review");
-        helpCommand.RegisterCommand<GetReviewCommand.Settings>("reviews");
-        helpCommand.RegisterCommand<UpdateReviewCommand.Settings>("review update");
-        helpCommand.RegisterCommand<DeleteReviewCommand.Settings>("review delete");
+        helpCommand.RegisterCommand<GetReviewCommand.Settings>("get-review");
+        helpCommand.RegisterCommand<UpdateReviewCommand.Settings>("edit-review");
+        helpCommand.RegisterCommand<DeleteReviewCommand.Settings>("delete-review");
 
         // Planet commands
-        helpCommand.RegisterCommand<GetPlanetsCommand.Settings>("planets");
-        helpCommand.RegisterCommand<GetPlanetCommand.Settings>("planet");
-        helpCommand.RegisterCommand<GetPlanetWeatherCommand.Settings>("planet weather");
-        helpCommand.RegisterCommand<AddPlanetCommand.Settings>("planet add");
-        helpCommand.RegisterCommand<UpdatePlanetCommand.Settings>("planet update");
-        helpCommand.RegisterCommand<DeletePlanetCommand.Settings>("planet delete");
+        helpCommand.RegisterCommand<GetPlanetsCommand.Settings>(CommandsConstants.planets);
+        helpCommand.RegisterCommand<GetPlanetCommand.Settings>(CommandsConstants.getplanet);
+        helpCommand.RegisterCommand<GetPlanetWeatherCommand.Settings>(CommandsConstants.getweather);
+        helpCommand.RegisterCommand<AddPlanetCommand.Settings>(CommandsConstants.addplanet);
+        helpCommand.RegisterCommand<UpdatePlanetCommand.Settings>(CommandsConstants.updateplanet);
+        helpCommand.RegisterCommand<DeletePlanetCommand.Settings>(CommandsConstants.deleteplanet);
 
         // Activity commands
-        helpCommand.RegisterCommand<AddActivityCommand.Settings>("activity add");
-        helpCommand.RegisterCommand<GetActivityCommand.Settings>("activities");
-        helpCommand.RegisterCommand<UpdateActivityCommand.Settings>("activity update");
-        helpCommand.RegisterCommand<DeleteActivityCommand.Settings>("activity delete");
-        helpCommand.RegisterCommand<LinkActivityCommand.Settings>("activity link");
+        // helpCommand.RegisterCommand<AddActivityCommand.Settings>("activity add");
+        // helpCommand.RegisterCommand<GetActivityCommand.Settings>("activities");
+        // helpCommand.RegisterCommand<UpdateActivityCommand.Settings>("activity update");
+        // helpCommand.RegisterCommand<DeleteActivityCommand.Settings>("activity delete");
+        // helpCommand.RegisterCommand<LinkActivityCommand.Settings>("activity link");
     }
 }

@@ -37,6 +37,18 @@ public class PlanetRepository
             new { id = planetId });
         return planet.ToList()[0];
     }
+    public async Task<PlanetModel> GetByName(string name)
+    {
+        using var connection = _db.CreateConnection();
+        var planet = await connection.QueryAsync<PlanetModel>(
+            @"SELECT *
+            FROM planet
+            where name = @name;",
+            new { name = name });
+
+        Console.WriteLine(planet);
+        return planet.ToList()[0];
+    }
 
     public async Task<PlanetModel> Add(PlanetModel planet)
     {

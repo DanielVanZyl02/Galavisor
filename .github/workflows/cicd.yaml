@@ -45,4 +45,4 @@ jobs:
     env:
       SSH_PRIVATE_KEY: ${{secrets.SSH_PRIVATE_KEY}}
       SERVER_CONFIG: ${{secrets.SERVER_CONFIG}}
-      START_UP: ${{variables.START_UP}}
+      START_UP: ${{vars.START_UP}}

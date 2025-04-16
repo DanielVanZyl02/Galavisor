@@ -36,6 +36,12 @@ public class ReviewController : ControllerBase
         }
 
         request.UserId = await _authService.GetLoggedInUser(token);
+
+        if(request.Rating < 1 || request.Rating > 5)
+        {
+            return StatusCode(403, new { message = "Get failed", error = "You can only post reviews with a rating between 1 and 5" });
+        }
+
         var review = await _reviewService.AddReview(request);
 
         var planet = await _planetService.GetPlanetById(review.PlanetId.Value);
@@ -150,7 +156,8 @@ public class ReviewController : ControllerBase
         try
         {
             int userId = -1;
-            if(posted){
+            if(posted)
+            {
                 string token = "";
                 var authHeader = Request.Headers["Authorization"].FirstOrDefault();
                 if (authHeader != null && authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
@@ -209,14 +216,22 @@ public class ReviewController : ControllerBase
         var loggedInUser = await _authService.GetLoggedInUser(token);
         bool isLoggedInUser = false;
 
-        if(loggedInUser != -1){
+        if(request.Rating < 1 || request.Rating > 5)
+        {
+            return StatusCode(403, new { message = "Get failed", error = "You can only post reviews with a rating between 1 and 5" });
+        }
+
+        if(loggedInUser != -1)
+        {
             var review = await _reviewService.GetReviewById(id);
-            if(review.UserId == loggedInUser){
+            if(review.UserId == loggedInUser)
+            {
                 isLoggedInUser = true;
             }
         }
 
-        if(await _authService.IsSubAdmin(GoogleSubject) || isLoggedInUser){
+        if(await _authService.IsSubAdmin(GoogleSubject) || isLoggedInUser)
+        {
             var updatedReview = await _reviewService.UpdateReview(request);
             if (updatedReview == null)
                 return NotFound();
@@ -234,7 +249,9 @@ public class ReviewController : ControllerBase
             };    
 
             return Ok(new {status = "Success", review = reviewResponse});
-        } else{
+        } 
+        else
+        {
             return StatusCode(403, new { message = "Get failed", error = "You can only edit reviews you posted" });
         }
     }
@@ -255,17 +272,27 @@ public class ReviewController : ControllerBase
         var loggedInUser = await _authService.GetLoggedInUser(token);
         bool isLoggedInUser = false;
 
-        if(loggedInUser != -1){
+        if(loggedInUser != -1)
+        {
             var review = await _reviewService.GetReviewById(id);
-            if(review.UserId == loggedInUser){
+
+            if(review == null)
+            {
+                return  Ok(new {status = "Fail", message = $"Review {id} not found" });
+            }
+
+            if(review.UserId == loggedInUser)
+            {
                 isLoggedInUser = true;
             }
         }
 
-        if(await _authService.IsSubAdmin(GoogleSubject) || isLoggedInUser){
+        if(await _authService.IsSubAdmin(GoogleSubject) || isLoggedInUser)
+        {
             var deleted = await _reviewService.DeleteReview(id);
-            return deleted ? Ok(new { status = "Success", message = $"Review {id} succesfully deleted" }): Ok(new {status = "Fail", messgae = $"Review {id} not found" });
-        } else{
+            return deleted ? Ok(new { status = "Success", message = $"Review {id} succesfully deleted" }): Ok(new {status = "Fail", message = $"Review {id} not found" });
+        } else
+        {
             return StatusCode(403, new { message = "Get failed", error = "You can only delete reviews you posted" });
         }
 

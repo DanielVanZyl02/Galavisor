@@ -134,10 +134,10 @@ public static class Setup
         helpCommand.RegisterCommand<LogoutCommand.Settings>(CommandsConstants.logout);
 
         // Review commands
-        helpCommand.RegisterCommand<ReviewCommand.Settings>("review");
-        helpCommand.RegisterCommand<GetReviewCommand.Settings>("get-review");
-        helpCommand.RegisterCommand<UpdateReviewCommand.Settings>("edit-review");
-        helpCommand.RegisterCommand<DeleteReviewCommand.Settings>("delete-review");
+        helpCommand.RegisterCommand<ReviewCommand.Settings>(CommandsConstants.review);
+        helpCommand.RegisterCommand<GetReviewCommand.Settings>(CommandsConstants.getreview);
+        helpCommand.RegisterCommand<UpdateReviewCommand.Settings>(CommandsConstants.updatereview);
+        helpCommand.RegisterCommand<DeleteReviewCommand.Settings>(CommandsConstants.deletereview);
 
         // Planet commands
         helpCommand.RegisterCommand<GetPlanetsCommand.Settings>(CommandsConstants.planets);

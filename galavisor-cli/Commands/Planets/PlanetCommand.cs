@@ -1,10 +1,7 @@
 using Spectre.Console;
 using Spectre.Console.Cli;
-using System.ComponentModel;
 using System.Text.Json;
-using System.Net.Http;
 using System.Net.Http.Json;
-using System.Threading.Tasks;
 
 using GalavisorCli.Constants;
 using GalavisorCli.Utils;

@@ -61,7 +61,7 @@ public class UserController(UserService userService, AuthService authService) : 
         try {
             if(request.Active != null){
                 var GoogleSubject = HttpContext.User.FindFirst("sub")!.Value ?? "";
-                if(await _authService.IsSubAdmin(GoogleSubject)){
+                if(await _authService.IsSubAdmin(GoogleSubject) && id != -1){
                     return Ok(new { message = "Success", user = await _userService.UpdateActiveStatusById(request.Active ?? true, id)});
                 } else{
                     return Ok(new { message = "Success", user = await _userService.UpdateActiveStatusBySub(request.Active ?? true, GoogleSubject)});

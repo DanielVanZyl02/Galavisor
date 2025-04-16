@@ -3,12 +3,18 @@ using Spectre.Console;
 using Spectre.Console.Cli;
 using GalavisorCli.Utils;
 using GalavisorCli.Constants;
+using System.ComponentModel;
 
 namespace GalavisorCli.Commands.Users;
 
-public class UsersCommand : AsyncCommand
+public class UsersCommand : AsyncCommand<UsersCommand.Settings>
 {
-    public override async Task<int> ExecuteAsync(CommandContext context)
+    [Description("Get all users in the system")]
+    public class Settings : CommandSettings
+    {
+    }
+    
+    public override async Task<int> ExecuteAsync(CommandContext context, Settings settings)
     {
         if (!ConfigStore.Exists(ConfigKeys.JwtToken))
         {
@@ -35,7 +41,6 @@ public class UsersCommand : AsyncCommand
                     table.AddColumn("[bold]Planet Name[/]");
                     table.AddColumn("[bold]Role[/]");
                     table.AddColumn("[bold]Active[/]");
-                    table.AddColumn("[bold]Google Subject[/]");
 
                     foreach (var user in users)
                     {
@@ -44,8 +49,7 @@ public class UsersCommand : AsyncCommand
                             user.Name,
                             user.PlanetName,
                             user.RoleName,
-                            user.IsActive ? "[green]Active[/]" : "[red]Inactive[/]",
-                            user.GoogleSubject
+                            user.IsActive ? "[green]Active[/]" : "[red]Inactive[/]"
                         );
                     }
 

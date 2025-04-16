@@ -8,15 +8,15 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace GalavisorCli.Commands.Users;
 
-public class ToggleRoleSettings : CommandSettings
+public class ToggleRoleCommand : AsyncCommand<ToggleRoleCommand.ToggleRoleSettings>
 {
-    [CommandOption("--id <ID>")]
-    [Description("ID of the account to enable")]
-    public int? Id { get; set; }
-}
+    public class ToggleRoleSettings : CommandSettings
+    {
+        [CommandOption("--id <ID>")]
+        [Description("ID of the account to enable")]
+        public int? Id { get; set; }
+    }
 
-public class ToggleRoleCommand : AsyncCommand<ToggleRoleSettings>
-{
     public override async Task<int> ExecuteAsync([NotNull] CommandContext context, [NotNull] ToggleRoleSettings settings)
     {
         if (!ConfigStore.Exists(ConfigKeys.JwtToken))
@@ -59,15 +59,13 @@ public class ToggleRoleCommand : AsyncCommand<ToggleRoleSettings>
                 table.AddColumn("[bold]Planet Name[/]");
                 table.AddColumn("[bold]Role[/]");
                 table.AddColumn("[bold]Active[/]");
-                table.AddColumn("[bold]Google Subject[/]");
 
                 table.AddRow(
                     user.UserId.ToString(),
                     user.Name,
                     user.PlanetName,
                     user.RoleName,
-                    user.IsActive ? "[green]Active[/]" : "[red]Inactive[/]",
-                    user.GoogleSubject
+                    user.IsActive ? "[green]Active[/]" : "[red]Inactive[/]"
                 );
 
                 AnsiConsole.Write(table);

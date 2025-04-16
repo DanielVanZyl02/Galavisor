@@ -90,19 +90,12 @@ public static class HttpUtils
         }
         else if (StatusCode == 403)
         {
-            try
+            var JsonResponse = JsonSerializer.Deserialize<JsonElement>(await Response.Content.ReadAsStringAsync());
+            if (JsonResponse.TryGetProperty("message", out var message) && JsonResponse.TryGetProperty("error", out var error))
             {
-                var JsonResponse = JsonSerializer.Deserialize<JsonElement>(await Response.Content.ReadAsStringAsync());
-                if (JsonResponse.TryGetProperty("message", out var message) && JsonResponse.TryGetProperty("error", out var error))
-                {
-                    throw new Exception(message.GetString() ?? "");
-                } else {
-                    throw new Exception("You are not authorized to access this command");
-                }
-            }
-            catch (Exception Error)
-            {
-                throw new Exception($"Could not parse JSON Response body {Error.Message}");
+                throw new Exception(message.GetString() ?? "");
+            } else {
+                throw new Exception("You are not authorized to access this command");
             }
         }
         else if (StatusCode == 404)

@@ -16,10 +16,10 @@ public static class CommandsConstants
     public const string Exit = "exit";
     public const string Help = "help";
     public const string review = "review";
-    public const string getreview = "get-review";
+    public const string GetReview = "get-review";
 
-    public const string updatereview = "edit-review";
-    public const string deletereview = "delete-review";
+    public const string UpdateReview = "edit-review";
+    public const string DeleteReview = "delete-review";
 
     public const string planets = "planets";
     public const string getplanet = "get-planet";

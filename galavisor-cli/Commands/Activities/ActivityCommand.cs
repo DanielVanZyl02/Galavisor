@@ -63,10 +63,10 @@ internal sealed class AddActivityCommand : AsyncCommand<AddActivityCommand.Setti
                 panelStyle = Style.Parse("yellow");
             }
 
-            // Output the message above the panel with direct color
+            // Output the message above the panel
             AnsiConsole.MarkupLine($"[{messageColor}]{title}[/]");
 
-            // Create a panel with a simpler header
+            
             var panel = new Panel(table)
                 .Header("Activity Details", Justify.Center)
                 .Border(BoxBorder.Rounded)
@@ -279,10 +279,10 @@ internal sealed class LinkActivityCommand : AsyncCommand<LinkActivityCommand.Set
                 table.AddRow("Status", "Activity was already linked to this planet");
             }
 
-            // Output the message above the panel with direct color
+            // Output the message above the panel
             AnsiConsole.MarkupLine($"[{messageColor}]{title}[/]");
 
-            // Create a panel with a simpler header
+            
             var panel = new Panel(table)
                 .Header("Link Details", Justify.Center)
                 .Border(BoxBorder.Rounded)

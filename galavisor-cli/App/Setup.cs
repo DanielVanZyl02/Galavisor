@@ -91,11 +91,11 @@ public static class Setup
                 .WithDescription("Shows help information for available commands")
                 .WithData(HelpCommand);
 
-            config.AddCommand<ReviewCommand>(CommandsConstants.review);
-            config.AddCommand<GetReviewCommand>(CommandsConstants.getreview);
+            config.AddCommand<ReviewCommand>(CommandsConstants.Review);
+            config.AddCommand<GetReviewCommand>(CommandsConstants.GetReview);
 
-            config.AddCommand<UpdateReviewCommand>(CommandsConstants.updatereview);
-            config.AddCommand<DeleteReviewCommand>(CommandsConstants.deletereview);
+            config.AddCommand<UpdateReviewCommand>(CommandsConstants.UpdateReview);
+            config.AddCommand<DeleteReviewCommand>(CommandsConstants.DeleteReview);
 
             config.AddCommand<GetPlanetsCommand>(CommandsConstants.planets);
             config.AddCommand<GetPlanetCommand>(CommandsConstants.getplanet);
@@ -133,10 +133,10 @@ public static class Setup
         HelpCommand.RegisterCommand<LogoutCommand.Settings>(CommandsConstants.logout);
 
         // Review commands
-        HelpCommand.RegisterCommand<ReviewCommand.Settings>(CommandsConstants.review);
-        HelpCommand.RegisterCommand<GetReviewCommand.Settings>(CommandsConstants.getreview);
-        HelpCommand.RegisterCommand<UpdateReviewCommand.Settings>(CommandsConstants.updatereview);
-        HelpCommand.RegisterCommand<DeleteReviewCommand.Settings>(CommandsConstants.deletereview);
+        HelpCommand.RegisterCommand<ReviewCommand.Settings>(CommandsConstants.Review);
+        HelpCommand.RegisterCommand<GetReviewCommand.Settings>(CommandsConstants.GetReview);
+        HelpCommand.RegisterCommand<UpdateReviewCommand.Settings>(CommandsConstants.UpdateReview);
+        HelpCommand.RegisterCommand<DeleteReviewCommand.Settings>(CommandsConstants.DeleteReview);
 
         // Planet commands
         HelpCommand.RegisterCommand<GetPlanetsCommand.Settings>(CommandsConstants.planets);

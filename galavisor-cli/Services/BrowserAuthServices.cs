@@ -21,7 +21,7 @@ public static class BrowserAuthServices
                           $"&response_type=code" +
                           $"&scope=openid%20email%20profile";
         SystemUtils.OpenBrowser(LoginUrl);
-        AnsiConsole.WriteLine("[green]Waiting for Google authentication...[/]");
+        AnsiConsole.MarkupLine("[green]Waiting for Google authentication...[/]");
 
         _ = Task.Run(async () => //What happens if you remove the _
         {
@@ -61,7 +61,7 @@ public static class BrowserAuthServices
         var CompletedTask = await Task.WhenAny(Tcs.Task, Task.Delay(int.Parse(ConfigStore.Get(ConfigKeys.LocalAuthTimeout))));
         if (CompletedTask != Tcs.Task)
         {
-            AnsiConsole.WriteLine("[yellow]Login timed out. Please try again[/]");
+            AnsiConsole.MarkupLine("[yellow]Login timed out. Please try again[/]");
             return "";
         } else {
             return await Tcs.Task;

@@ -112,30 +112,6 @@ public class HelpCommand : Command<HelpCommand.HelpSettings>
                     }
                 }
                 
-                if (string.IsNullOrEmpty(optionTemplate))
-                {
-                    var templateProperty = optAttr.GetType().GetProperty("Template", BindingFlags.Public | BindingFlags.Instance);
-                    if (templateProperty != null)
-                    {
-                        optionTemplate = templateProperty.GetValue(optAttr)?.ToString() ?? "";
-                    }
-                    else
-                    {
-                        foreach (var fieldName in new[] { "_template", "Template", "_longName", "_shortName" })
-                        {
-                            var field = optAttr.GetType().GetField(fieldName, BindingFlags.NonPublic | BindingFlags.Instance);
-                            if (field != null)
-                            {
-                                optionTemplate = field.GetValue(optAttr)?.ToString() ?? "";
-                                if (!string.IsNullOrEmpty(optionTemplate))
-                                {
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-                
                 info.Options.Add(new OptionInfo
                 {
                     Name = optionTemplate,

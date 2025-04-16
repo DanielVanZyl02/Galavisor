@@ -4,7 +4,7 @@ class Program
 {
     static async Task Main(string[] args)
     {
-        var app = Setup.SetupCli();
-         await Run.RunCli(app);
+        var App = Setup.SetupCli();
+         await Run.RunCli(App);
     }
 }

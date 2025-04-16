@@ -8,120 +8,92 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace GalavisorCli.Commands.Users;
 
-public class DisableAccountSettings : CommandSettings
+public class DisableAccountCommand : AsyncCommand<DisableAccountCommand.DisableAccountSettings>
 {
-    [CommandOption("--id <ID>")]
-    [Description("ID of the account to disable (optional)")]
-    public int? Id { get; set; }
-}
+    [Description("Disable your or other peoples accounts")]
+    public class DisableAccountSettings : CommandSettings
+    {
+        [CommandOption("--id <ID>")]
+        [Description("ID of the account to disable (optional)")]
+        public int? Id { get; set; }
+    }
 
-public class DisableAccountCommand : AsyncCommand<DisableAccountSettings>
-{
     public override async Task<int> ExecuteAsync([NotNull] CommandContext context, [NotNull] DisableAccountSettings settings)
     {
         if (!ConfigStore.Exists(ConfigKeys.JwtToken))
         {
             AnsiConsole.MarkupLine("[red]Please login to use this command.[/]");
             return 0;
-        }
+        } else{
+            int TargetId = settings.Id ?? -1;
+            var IsSelf = TargetId == -1;
 
-        int targetId = settings.Id ?? -1;
-        var isSelf = targetId == -1;
-
-        if (isSelf)
-        {
-            if (!AnsiConsole.Confirm("[yellow]Are you sure you want to disable your account?[/]"))
+            if (IsSelf)
             {
-                AnsiConsole.MarkupLine("[grey]Your account will not be disabled.[/]");
-                return 0;
-            }
-        }
-        else
-        {
-            if (!AnsiConsole.Confirm($"[yellow]Are you sure you want to disable the account with ID: {targetId}?[/]"))
-            {
-                AnsiConsole.MarkupLine("[grey]No changes have been made.[/]");
-                return 0;
-            }
-        }
-
-        var enteredUsername = AnsiConsole.Ask<string>("Enter your [green]username[/]:");
-        var currentUsername = ConfigStore.Exists(ConfigKeys.GoogleName) ? ConfigStore.Get(ConfigKeys.GoogleName) : "not-set";
-
-        if (!enteredUsername.Equals(currentUsername))
-        {
-            AnsiConsole.MarkupLine("[grey]That is not the correct username of the currently logged-in user.[/]");
-            return 0;
-        }
-
-        if (!AnsiConsole.Confirm($"[red]Are you absolutely sure you want to disable {(isSelf ? "your own" : $"the account with ID: {targetId}")}?[/]\n" +
-                                 "[grey]The account can be re-enabled within the next 30 days by logging in again.[/]"))
-        {
-            AnsiConsole.MarkupLine("[grey]Phew! The account is safe.[/]");
-            return 0;
-        }
-
-        var result = await UserService.UpdateUserActiveStatus(targetId, false);
-
-        result.Switch(
-            message =>
-            {
-                AnsiConsole.MarkupLine($"[red]Encountered an error: {message}[/]");
-            },
-            user =>
-            {
-                if (isSelf)
+                if (!AnsiConsole.Confirm("[yellow]Are you sure you want to disable your account?[/]"))
                 {
-                    ConfigStore.Remove(ConfigKeys.JwtToken);
-                    AnsiConsole.MarkupLine($"[bold red]Your account '{enteredUsername}' has been disabled.[/]");
-                    AnsiConsole.MarkupLine("[grey]You have 30 days to re-enable it again by logging in.[/]");
-
-                    var table = new Table();
-                    table.AddColumn("[bold]User ID[/]");
-                    table.AddColumn("[bold]Name[/]");
-                    table.AddColumn("[bold]Planet Name[/]");
-                    table.AddColumn("[bold]Role[/]");
-                    table.AddColumn("[bold]Active[/]");
-                    table.AddColumn("[bold]Google Subject[/]");
-
-                    table.AddRow(
-                        user.UserId.ToString(),
-                        user.Name,
-                        user.PlanetName,
-                        user.RoleName,
-                        user.IsActive ? "[green]Active[/]" : "[red]Inactive[/]",
-                        user.GoogleSubject
-                    );
-
-                    AnsiConsole.Write(table);
-                }
-                else
-                {
-                    AnsiConsole.MarkupLine($"[bold red]{user.Name}'s account has been disabled.[/]");
-                    AnsiConsole.MarkupLine("[grey]They have 30 days to re-enable it again by logging in.[/]");
-
-                    var table = new Table();
-                    table.AddColumn("[bold]User ID[/]");
-                    table.AddColumn("[bold]Name[/]");
-                    table.AddColumn("[bold]Planet Name[/]");
-                    table.AddColumn("[bold]Role[/]");
-                    table.AddColumn("[bold]Active[/]");
-                    table.AddColumn("[bold]Google Subject[/]");
-
-                    table.AddRow(
-                        user.UserId.ToString(),
-                        user.Name,
-                        user.PlanetName,
-                        user.RoleName,
-                        user.IsActive ? "[green]Active[/]" : "[red]Inactive[/]",
-                        user.GoogleSubject
-                    );
-
-                    AnsiConsole.Write(table);
+                    AnsiConsole.MarkupLine("[grey]Your account will not be disabled.[/]");
+                    return 0;
+                } else{
+                    // User does want to disable their account
                 }
             }
-        );
+            else
+            {
+                if (!AnsiConsole.Confirm($"[yellow]Are you sure you want to disable the account with ID: {TargetId}?[/]"))
+                {
+                    AnsiConsole.MarkupLine("[grey]No changes have been made.[/]");
+                    return 0;
+                } else{
+                    // User does want to disable accoutn with the given id
+                }
+            }
 
-        return 0;
+            var EnteredUsername = AnsiConsole.Ask<string>("Enter your [green]username[/]:");
+            var CurrentUsername = ConfigStore.Exists(ConfigKeys.GoogleName) ? ConfigStore.Get(ConfigKeys.GoogleName) : "not-set";
+
+            if (!EnteredUsername.Equals(CurrentUsername))
+            {
+                AnsiConsole.MarkupLine("[grey]That is not the correct username of the currently logged-in User.[/]");
+                return 0;
+            } else{
+                // The username does match the logged in User
+            }
+
+            if (!AnsiConsole.Confirm($"[red]Are you absolutely sure you want to disable {(IsSelf ? "your own" : $"the account with ID: {TargetId}")}?[/]\n" +
+                                    "[grey]The account can be re-enabled by logging in again.[/]"))
+            {
+                AnsiConsole.MarkupLine("[grey]Phew! The account is safe.[/]");
+                return 0;
+            } else{
+                // User is completely certain they want to disable said User id
+            }
+
+            var Result = await UserService.UpdateUserActiveStatus(TargetId, false);
+
+            Result.Switch(
+                Message =>
+                {
+                    AnsiConsole.MarkupLine($"[red]Encountered an error: {Message}[/]");
+                },
+                User =>
+                {
+                    if (IsSelf)
+                    {
+                        ConfigStore.Remove(ConfigKeys.JwtToken);
+                        AnsiConsole.MarkupLine($"[bold red]Your account '{EnteredUsername}' has been disabled.[/]");
+                        AnsiConsole.MarkupLine("[grey]You can re-enable it again by logging in.[/]");
+                    }
+                    else
+                    {
+                        AnsiConsole.MarkupLine($"[bold red]{User.Name}'s account has been disabled.[/]");
+                        AnsiConsole.MarkupLine("[grey]They can re-enable it again by logging in.[/]");
+                    }
+                    AnsiConsole.Write(TableBuilderUtils.MakeUsersTable([User]));
+                }
+            );
+
+            return 0;
+        }
     }
 }

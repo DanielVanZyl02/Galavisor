@@ -12,13 +12,13 @@ public class UserService
     {
         try
         {
-            var jsonResponse = await HttpUtils.Get($"{ConfigStore.Get(ConfigKeys.ServerUri)}/users");
+            var JsonResponse = await HttpUtils.Get($"{ConfigStore.Get(ConfigKeys.ServerUri)}/users");
 
-            if (jsonResponse.TryGetProperty("message", out var message) && jsonResponse.TryGetProperty("error", out var error))
+            if (JsonResponse.TryGetProperty("message", out var Message) && JsonResponse.TryGetProperty("error", out var Error))
             {
-                return $"{message.GetString()}: {error}" ?? "Server response could not be extracted";
+                return $"{Message.GetString()}: {Error}" ?? "Server response could not be extracted";
             }
-            else if(jsonResponse.TryGetProperty("users", out var Users))
+            else if(JsonResponse.TryGetProperty("users", out var Users))
             {
                 var DeserializedUsers = Users.Deserialize<List<UserModel>>();
                 if(DeserializedUsers != null){
@@ -32,28 +32,27 @@ public class UserService
                 return "No response from server";
             }
         }
-        catch (Exception error)
+        catch (Exception Error)
         {
-            return $"Error encountered in accessing users : {error.Message}";
+            return $"Error encountered in accessing users : {Error.Message}";
         }
     }
 
-    public static async Task<OneOf<string, UserModel>> UpdateUserConfig(string Username, string HomePlanet)
+    public static async Task<OneOf<string, UserModel>> UpdateUserConfig(string Username)
     {
         try
         {
-            var jsonResponse = await HttpUtils.Patch(
+            var JsonResponse = await HttpUtils.Patch(
                 $"{ConfigStore.Get(ConfigKeys.ServerUri)}/users",
                 new Dictionary<string, string> { 
-                    { "Username", Username }, 
-                    { "HomePlanet", HomePlanet} 
+                    { "username", Username }
                 });
 
-            if (jsonResponse.TryGetProperty("message", out var message) && jsonResponse.TryGetProperty("error", out var error))
+            if (JsonResponse.TryGetProperty("message", out var Message) && JsonResponse.TryGetProperty("error", out var Error))
             {
-                return $"{message.GetString()}: {error}" ?? "Server response could not be extracted";
+                return $"{Message.GetString()}: {Error}" ?? "Server response could not be extracted";
             }
-            else if(jsonResponse.TryGetProperty("user", out var User))
+            else if(JsonResponse.TryGetProperty("user", out var User))
             {
                 var DeserializedUser = User.Deserialize<UserModel>();
                 if(DeserializedUser != null){
@@ -67,27 +66,27 @@ public class UserService
                 return "No response from server";
             }
         }
-        catch (Exception error)
+        catch (Exception Error)
         {
-            return $"Error encountered in updating your username or home planet : {error.Message}";
+            return $"Error encountered in updating your username or home planet : {Error.Message}";
         }
     }
 
-    public static async Task<OneOf<string, UserModel>> UpdateUserActiveStatus(int id, bool active)
+    public static async Task<OneOf<string, UserModel>> UpdateUserActiveStatus(int Id, bool Active)
     {
         try
         {
-            var jsonResponse = await HttpUtils.Patch(
-                $"{ConfigStore.Get(ConfigKeys.ServerUri)}/users/{id}",
+            var JsonResponse = await HttpUtils.Patch(
+                $"{ConfigStore.Get(ConfigKeys.ServerUri)}/users/{Id}",
                 new Dictionary<string, bool> { 
-                    { "Active", active }, 
+                    { "active", Active }, 
                 });
 
-            if (jsonResponse.TryGetProperty("message", out var message) && jsonResponse.TryGetProperty("error", out var error))
+            if (JsonResponse.TryGetProperty("message", out var Message) && JsonResponse.TryGetProperty("error", out var Error))
             {
-                return $"{message.GetString()}: {error}" ?? "Server response could not be extracted";
+                return $"{Message.GetString()}: {Error}" ?? "Server response could not be extracted";
             }
-            else if(jsonResponse.TryGetProperty("user", out var User))
+            else if(JsonResponse.TryGetProperty("user", out var User))
             {
                 var DeserializedUser = User.Deserialize<UserModel>();
                 if(DeserializedUser != null){
@@ -101,27 +100,27 @@ public class UserService
                 return "No response from server";
             }
         }
-        catch (Exception error)
+        catch (Exception Error)
         {
-            return $"Error encountered in updating active status: {error.Message}";
+            return $"Error encountered in updating Active status: {Error.Message}";
         }
     }
 
-    public static async Task<OneOf<string, UserModel>> UpdateUserRole(int id, string role)
+    public static async Task<OneOf<string, UserModel>> UpdateUserRole(int Id, string Role)
     {
         try
         {
-            var jsonResponse = await HttpUtils.Patch(
-                $"{ConfigStore.Get(ConfigKeys.ServerUri)}/users/{id}",
+            var JsonResponse = await HttpUtils.Patch(
+                $"{ConfigStore.Get(ConfigKeys.ServerUri)}/users/{Id}",
                 new Dictionary<string, string> { 
-                    { "Role", role }, 
+                    { "role", Role }, 
                 });
 
-            if (jsonResponse.TryGetProperty("message", out var message) && jsonResponse.TryGetProperty("error", out var error))
+            if (JsonResponse.TryGetProperty("message", out var Message) && JsonResponse.TryGetProperty("error", out var Error))
             {
-                return $"{message.GetString()}: {error}" ?? "Server response could not be extracted";
+                return $"{Message.GetString()}: {Error}" ?? "Server response could not be extracted";
             }
-            else if(jsonResponse.TryGetProperty("user", out var User))
+            else if(JsonResponse.TryGetProperty("user", out var User))
             {
                 var DeserializedUser = User.Deserialize<UserModel>();
                 if(DeserializedUser != null){
@@ -135,9 +134,9 @@ public class UserService
                 return "No response from server";
             }
         }
-        catch (Exception error)
+        catch (Exception Error)
         {
-            return $"Error encountered in updating users role: {error.Message}";
+            return $"Error encountered in updating users Role: {Error.Message}";
         }
     }
 }

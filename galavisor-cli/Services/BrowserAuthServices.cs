@@ -2,6 +2,7 @@ using System.Net;
 using System.Text;
 using GalavisorCli.Constants;
 using  GalavisorCli.Utils;
+using Spectre.Console;
 
 namespace GalavisorCli.Services;
 
@@ -9,65 +10,61 @@ public static class BrowserAuthServices
 {
     public static async Task<string> GetUsersGoogleAuthCodeAsync()
     {
-        var tcs = new TaskCompletionSource<string>();
-        var listener = new HttpListener();
-        listener.Prefixes.Add(ConfigStore.Get(ConfigKeys.RedirectUri) + "/");
-        listener.Start();
+        var Tcs = new TaskCompletionSource<string>();
+        var Listener = new HttpListener();
+        Listener.Prefixes.Add(ConfigStore.Get(ConfigKeys.RedirectUri) + "/");
+        Listener.Start();
 
-        // 🔗 Build login URL
-        string loginUrl = $"{ConfigStore.Get(ConfigKeys.AuthUrl)}" +
+        string LoginUrl = $"{ConfigStore.Get(ConfigKeys.AuthUrl)}" +
                           $"?client_id={ConfigStore.Get(ConfigKeys.ClientId)}" +
                           $"&redirect_uri={Uri.EscapeDataString(ConfigStore.Get(ConfigKeys.RedirectUri))}" +
                           $"&response_type=code" +
                           $"&scope=openid%20email%20profile";
-        SystemUtils.OpenBrowser(loginUrl);
-        Console.WriteLine("Waiting for Google authentication...");
+        SystemUtils.OpenBrowser(LoginUrl);
+        AnsiConsole.WriteLine("[green]Waiting for Google authentication...[/]");
 
-        _ = Task.Run(async () =>
+        _ = Task.Run(async () => //What happens if you remove the _
         {
             try
             {
-                var context = await listener.GetContextAsync();
-                var request = context.Request;
+                var Context = await Listener.GetContextAsync();
+                var Request = Context.Request;
 
-                if (!request.Url!.Query.Contains("code="))
+                if (!Request.Url!.Query.Contains("code="))
                 {
-                    tcs.TrySetException(new Exception("Authorization failed"));
+                    Tcs.TrySetException(new Exception("Authorization failed"));
                     return;
+                } else{
+                    string Query = Request.Url.Query;
+                    string Code = Query.Split("code=")[1].Split('&')[0];
+
+                    string responseText = "Authentication successful! You can close this tab.";
+                    var Buffer = Encoding.UTF8.GetBytes(responseText);
+                    var Response = Context.Response;
+                    Response.ContentLength64 = Buffer.Length;
+                    await Response.OutputStream.WriteAsync(Buffer);
+                    Response.Close();
+
+                    Tcs.TrySetResult(Code);
                 }
-
-                string query = request.Url.Query;
-                string code = query.Split("code=")[1].Split('&')[0];
-
-                string responseText = "Authentication successful! You can close this tab.";
-                var buffer = Encoding.UTF8.GetBytes(responseText);
-                var response = context.Response;
-                response.ContentLength64 = buffer.Length;
-                await response.OutputStream.WriteAsync(buffer);
-                response.Close();
-
-                tcs.TrySetResult(code);
             }
-            catch (Exception e)
+            catch (Exception Error)
             {
-                tcs.TrySetException(e);
+                Tcs.TrySetException(Error);
             }
             finally
             {
-                listener.Stop();
+                Listener.Stop();
             }
         });
 
-        // Timeout after 60 seconds
-        var completedTask = await Task.WhenAny(tcs.Task, Task.Delay(int.Parse(ConfigStore.Get(ConfigKeys.localAuthTimeout))));
-        if (completedTask != tcs.Task)
+        var CompletedTask = await Task.WhenAny(Tcs.Task, Task.Delay(int.Parse(ConfigStore.Get(ConfigKeys.LocalAuthTimeout))));
+        if (CompletedTask != Tcs.Task)
         {
-            Console.WriteLine("Login timed out.");
+            AnsiConsole.WriteLine("[yellow]Login timed out. Please try again[/]");
             return "";
+        } else {
+            return await Tcs.Task;
         }
-
-        var authCode = await tcs.Task;
-
-        return authCode;
     }
 }

@@ -5,33 +5,33 @@ using GalavisorCli.Utils;
 namespace GalavisorCli.App;
 
 public static class Run{
-    public static async Task RunCli(CommandApp app){
-        var knownCommands = GeneralUtils.GetKnownCommands();
+    public static async Task RunCli(CommandApp App){
+        var KnownCommands = GeneralUtils.GetKnownCommands();
 
         while (true)
         {
-            var input = ReadLine.Read("galavisor-cli> ");
-            if (string.IsNullOrWhiteSpace(input)) continue;
+            var Input = ReadLine.Read("galavisor-cli> ");
+            if (string.IsNullOrWhiteSpace(Input)) continue;
 
-            var inputArgs = CliHelper.ShellSplit(input);
-            if (inputArgs.Length == 0) continue;
+            var InputArgs = CliHelper.ShellSplit(Input);
+            if (InputArgs.Length == 0) continue;
 
-            ReadLine.AddHistory(input);
+            ReadLine.AddHistory(Input);
 
-            if (!knownCommands.Contains(inputArgs[0]))
+            if (!KnownCommands.Contains(InputArgs[0]))
             {
-                var suggestion = CliHelper.SuggestCommand(inputArgs[0], knownCommands);
-                AnsiConsole.MarkupLine($"[red]Unknown command:[/] {inputArgs[0]}. Did you mean [green]{suggestion}[/]?");
+                var Suggestion = CliHelper.SuggestCommand(InputArgs[0], KnownCommands);
+                AnsiConsole.MarkupLine($"[red]Unknown command:[/] {InputArgs[0]}. Did you mean [green]{Suggestion}[/]?");
                 continue;
             }
 
             try
             {
-                await app.RunAsync(inputArgs);
+                await App.RunAsync(InputArgs);
             }
-            catch (Exception ex)
+            catch (Exception Error)
             {
-                AnsiConsole.MarkupLine($"[red]Error:[/] {ex.Message}");
+                AnsiConsole.MarkupLine($"[red]Error:[/] {Error.Message}");
             }
         }
     }

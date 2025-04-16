@@ -7,23 +7,19 @@ public static class GeneralUtils{
     {
         return [ 
             // Auth
-            CommandsConstants.login, 
-            CommandsConstants.logout, 
+            CommandsConstants.Login, 
+            CommandsConstants.Logout, 
 
             // Users
-            CommandsConstants.config,
-            CommandsConstants.config,
-            CommandsConstants.disable,
-            CommandsConstants.enable,
-            CommandsConstants.role,
-            CommandsConstants.users,
-
-            CommandsConstants.add, 
-            CommandsConstants.list, 
-            CommandsConstants.update, 
-            CommandsConstants.delete, 
-            CommandsConstants.exit, 
-            CommandsConstants.help,
+            CommandsConstants.Config,
+            CommandsConstants.Config,
+            CommandsConstants.Disable,
+            CommandsConstants.Enable,
+            CommandsConstants.Role,
+            CommandsConstants.Users,
+            
+            CommandsConstants.Exit, 
+            CommandsConstants.Help,
             CommandsConstants.review,
             CommandsConstants.getreview,
             CommandsConstants.updatereview,
@@ -35,16 +31,16 @@ public static class GeneralUtils{
             CommandsConstants.updateplanet,
             CommandsConstants.deleteplanet,
             CommandsConstants.updateplanet,
-            CommandsConstants.addactivity,
-            CommandsConstants.getactivity,
-            CommandsConstants.updateactivity,
-            CommandsConstants.deleteactivity,
-            CommandsConstants.linkactivity,
-            CommandsConstants.addtransport,
-            CommandsConstants.gettransport,
-            CommandsConstants.updatetransport,
-            CommandsConstants.deletetransport,
-            CommandsConstants.linktransport
+            CommandsConstants.AddActivity,
+            CommandsConstants.GetActivity,
+            CommandsConstants.UpdateActivity,
+            CommandsConstants.DeleteActivity,
+            CommandsConstants.LinkActivity,
+            CommandsConstants.AddTransport,
+            CommandsConstants.GetTransport,
+            CommandsConstants.UpdateTransport,
+            CommandsConstants.DeleteTransport,
+            CommandsConstants.LinkTransport
         ];
     }
 }

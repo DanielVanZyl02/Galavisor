@@ -21,75 +21,75 @@ public static class Setup
 {
     public static CommandApp SetupCli()
     {
-        var services = new ServiceCollection();
-        services.AddSingleton<AuthService>();
+        var Services = new ServiceCollection();
+        Services.AddSingleton<AuthService>();
 
         // Auth
-        services.AddTransient<LoginCommand>();
-        services.AddTransient<LogoutCommand>();
+        Services.AddTransient<LoginCommand>();
+        Services.AddTransient<LogoutCommand>();
 
         // Users
-        services.AddTransient<ConfigCommand>();
-        services.AddTransient<DisableAccountCommand>();
-        services.AddTransient<EnableAccountCommand>();
-        services.AddTransient<ToggleRoleCommand>();
-        services.AddTransient<UsersCommand>();
+        Services.AddTransient<ConfigCommand>();
+        Services.AddTransient<DisableAccountCommand>();
+        Services.AddTransient<EnableAccountCommand>();
+        Services.AddTransient<ToggleRoleCommand>();
+        Services.AddTransient<UsersCommand>();
 
-        services.AddTransient<ExitCommand>();
-        services.AddTransient<HelpCommand>();
+        Services.AddTransient<ExitCommand>();
+        Services.AddTransient<HelpCommand>();
 
-        services.AddTransient<ConfigCommand>();
-        services.AddTransient<ReviewCommand>();
-        services.AddTransient<GetReviewCommand>();
+        Services.AddTransient<ConfigCommand>();
+        Services.AddTransient<ReviewCommand>();
+        Services.AddTransient<GetReviewCommand>();
 
-        services.AddTransient<UpdateReviewCommand>();
-        services.AddTransient<DeleteReviewCommand>();
+        Services.AddTransient<UpdateReviewCommand>();
+        Services.AddTransient<DeleteReviewCommand>();
 
-        services.AddTransient<GetPlanetsCommand>();
-        services.AddTransient<GetPlanetCommand>();
-        services.AddTransient<GetPlanetWeatherCommand>();
-        services.AddTransient<AddPlanetCommand>();
-        services.AddTransient<UpdatePlanetCommand>();
-        services.AddTransient<AddActivityCommand>();
-        services.AddTransient<GetActivityCommand>();
-        services.AddTransient<UpdateActivityCommand>();
-        services.AddTransient<DeleteActivityCommand>();
-        services.AddTransient<LinkActivityCommand>();
-        services.AddTransient<DeletePlanetCommand>();
+        Services.AddTransient<GetPlanetsCommand>();
+        Services.AddTransient<GetPlanetCommand>();
+        Services.AddTransient<GetPlanetWeatherCommand>();
+        Services.AddTransient<AddPlanetCommand>();
+        Services.AddTransient<UpdatePlanetCommand>();
+        Services.AddTransient<AddActivityCommand>();
+        Services.AddTransient<GetActivityCommand>();
+        Services.AddTransient<UpdateActivityCommand>();
+        Services.AddTransient<DeleteActivityCommand>();
+        Services.AddTransient<LinkActivityCommand>();
+        Services.AddTransient<DeletePlanetCommand>();
 
         // Transport commands
-        services.AddTransient<AddTransportCommand>();
-        services.AddTransient<GetTransportCommand>();
-        services.AddTransient<UpdateTransportCommand>();
-        services.AddTransient<DeleteTransportCommand>();
-        services.AddTransient<LinkTransportCommand>();
+        Services.AddTransient<AddTransportCommand>();
+        Services.AddTransient<GetTransportCommand>();
+        Services.AddTransient<UpdateTransportCommand>();
+        Services.AddTransient<DeleteTransportCommand>();
+        Services.AddTransient<LinkTransportCommand>();
       
-        var serviceProvider = services.BuildServiceProvider();
-        var registrar = new DependencyInjectionRegistrar(services);
-        var app = new CommandApp(registrar);
+        var ServicesProvider = Services.BuildServiceProvider();
+        var Registrar = new DependencyInjectionRegistrar(Services);
+        var App = new CommandApp(Registrar);
 
-        var helpCommand = new HelpCommand("Galavisor CLI", "A command-line interface for the Galavisor service");
+        var HelpCommand = new HelpCommand("Galavisor CLI", "A command-line interface for the Galavisor service");
         
-        RegisterCommandsWithHelp(helpCommand);
+        RegisterCommandsWithHelp(HelpCommand);
 
-        app.Configure(config =>
+        App.Configure(config =>
         {
             // Auth
-            config.AddCommand<LoginCommand>(CommandsConstants.login).WithDescription("login to the system");
-            config.AddCommand<LogoutCommand>(CommandsConstants.logout).WithDescription("logout of the system");
+            config.AddCommand<LoginCommand>(CommandsConstants.Login).WithDescription("Attempt to login to the system");
+            config.AddCommand<LogoutCommand>(CommandsConstants.Logout).WithDescription("Attempt to login to the system");
 
             // Users
-            config.AddCommand<ConfigCommand>(CommandsConstants.config).WithDescription("See your config information");
-            config.AddCommand<DisableAccountCommand>(CommandsConstants.disable).WithDescription("Disable your or other peoples accounts");
-            config.AddCommand<EnableAccountCommand>(CommandsConstants.enable).WithDescription("Enable other peoples accounts");
-            config.AddCommand<ToggleRoleCommand>(CommandsConstants.role).WithDescription("Change the role of a user");
-            config.AddCommand<UsersCommand>(CommandsConstants.users).WithDescription("See all users in the system");
+            config.AddCommand<ConfigCommand>(CommandsConstants.Config).WithDescription("See your config information");
+            config.AddCommand<DisableAccountCommand>(CommandsConstants.Disable).WithDescription("Disable your or other peoples accounts");
+            config.AddCommand<EnableAccountCommand>(CommandsConstants.Enable).WithDescription("Enable other peoples accounts");
+            config.AddCommand<ToggleRoleCommand>(CommandsConstants.Role).WithDescription("Change the role of a user");
+            config.AddCommand<UsersCommand>(CommandsConstants.Users).WithDescription("See all users in the system");
 
-            config.AddCommand<ExitCommand>(CommandsConstants.exit).WithDescription("Exit the cli");
+            config.AddCommand<ExitCommand>(CommandsConstants.Exit).WithDescription("Exit the cli");
             
             config.AddCommand<HelpCommand>("help")
                 .WithDescription("Shows help information for available commands")
-                .WithData(helpCommand);
+                .WithData(HelpCommand);
 
             config.AddCommand<ReviewCommand>(CommandsConstants.review);
             config.AddCommand<GetReviewCommand>(CommandsConstants.getreview);
@@ -101,53 +101,70 @@ public static class Setup
             config.AddCommand<GetPlanetCommand>(CommandsConstants.getplanet);
             config.AddCommand<GetPlanetWeatherCommand>(CommandsConstants.getweather);
             config.AddCommand<AddPlanetCommand>(CommandsConstants.addplanet);
-            config.AddCommand<AddActivityCommand>(CommandsConstants.addactivity).WithDescription("Add a new activity to the database");
-            config.AddCommand<GetActivityCommand>(CommandsConstants.getactivity).WithDescription("Get activities (use with --all or --planet)");
-            config.AddCommand<UpdateActivityCommand>(CommandsConstants.updateactivity).WithDescription("Update an activity's name");
-            config.AddCommand<DeleteActivityCommand>(CommandsConstants.deleteactivity).WithDescription("Delete an activity");
-            config.AddCommand<LinkActivityCommand>(CommandsConstants.linkactivity).WithDescription("Link an existing activity to a planet");
+            config.AddCommand<AddActivityCommand>(CommandsConstants.AddActivity).WithDescription("Add a new activity to the database");
+            config.AddCommand<GetActivityCommand>(CommandsConstants.GetActivity).WithDescription("Get activities (use with --all or --planet)");
+            config.AddCommand<UpdateActivityCommand>(CommandsConstants.UpdateActivity).WithDescription("Update an activity's name");
+            config.AddCommand<DeleteActivityCommand>(CommandsConstants.DeleteActivity).WithDescription("Delete an activity");
+            config.AddCommand<LinkActivityCommand>(CommandsConstants.LinkActivity).WithDescription("Link an existing activity to a planet");
             config.AddCommand<UpdatePlanetCommand>(CommandsConstants.updateplanet);
             config.AddCommand<DeletePlanetCommand>(CommandsConstants.deleteplanet);
 
             // Transport commands
-            config.AddCommand<AddTransportCommand>(CommandsConstants.addtransport).WithDescription("Add a new transport option");
-            config.AddCommand<GetTransportCommand>(CommandsConstants.gettransport).WithDescription("Get transport options (use with --all or --planet)");
-            config.AddCommand<UpdateTransportCommand>(CommandsConstants.updatetransport).WithDescription("Update a transport's name");
-            config.AddCommand<DeleteTransportCommand>(CommandsConstants.deletetransport).WithDescription("Delete a transport option");
-            config.AddCommand<LinkTransportCommand>(CommandsConstants.linktransport).WithDescription("Link an existing transport to a planet");
+            config.AddCommand<AddTransportCommand>(CommandsConstants.AddTransport).WithDescription("Add a new transport option");
+            config.AddCommand<GetTransportCommand>(CommandsConstants.GetTransport).WithDescription("Get transport options (use with --all or --planet)");
+            config.AddCommand<UpdateTransportCommand>(CommandsConstants.UpdateTransport).WithDescription("Update a transport's name");
+            config.AddCommand<DeleteTransportCommand>(CommandsConstants.DeleteTransport).WithDescription("Delete a transport option");
+            config.AddCommand<LinkTransportCommand>(CommandsConstants.LinkTransport).WithDescription("Link an existing transport to a planet");
         });
-
-        var knownCommands = GeneralUtils.GetKnownCommands();
+        
         ReadLine.HistoryEnabled = true;
         AnsiConsole.Write(
             new FigletText("Galavisor")
             .Color(Color.Teal));
         AnsiConsole.MarkupLine("[green]Welcome to Galavisor CLI![/] Type 'help' to see available commands.\n");
 
-        return app;
+        return App;
     }
 
-    private static void RegisterCommandsWithHelp(HelpCommand helpCommand)
+    private static void RegisterCommandsWithHelp(HelpCommand HelpCommand)
     {
+        // Auth
+        HelpCommand.RegisterCommand<LoginCommand.Settings>(CommandsConstants.Login);
+        HelpCommand.RegisterCommand<LogoutCommand.Settings>(CommandsConstants.Logout);
+
         // Review commands
-        helpCommand.RegisterCommand<ReviewCommand.Settings>("review");
-        helpCommand.RegisterCommand<GetReviewCommand.Settings>("get-review");
-        helpCommand.RegisterCommand<UpdateReviewCommand.Settings>("edit-review");
-        helpCommand.RegisterCommand<DeleteReviewCommand.Settings>("delete-review");
+        HelpCommand.RegisterCommand<ReviewCommand.Settings>(CommandsConstants.review);
+        HelpCommand.RegisterCommand<GetReviewCommand.Settings>(CommandsConstants.getreview);
+        HelpCommand.RegisterCommand<UpdateReviewCommand.Settings>(CommandsConstants.updatereview);
+        HelpCommand.RegisterCommand<DeleteReviewCommand.Settings>(CommandsConstants.deletereview);
 
         // Planet commands
-        helpCommand.RegisterCommand<GetPlanetsCommand.Settings>(CommandsConstants.planets);
-        helpCommand.RegisterCommand<GetPlanetCommand.Settings>(CommandsConstants.getplanet);
-        helpCommand.RegisterCommand<GetPlanetWeatherCommand.Settings>(CommandsConstants.getweather);
-        helpCommand.RegisterCommand<AddPlanetCommand.Settings>(CommandsConstants.addplanet);
-        helpCommand.RegisterCommand<UpdatePlanetCommand.Settings>(CommandsConstants.updateplanet);
-        helpCommand.RegisterCommand<DeletePlanetCommand.Settings>(CommandsConstants.deleteplanet);
+        HelpCommand.RegisterCommand<GetPlanetsCommand.Settings>(CommandsConstants.planets);
+        HelpCommand.RegisterCommand<GetPlanetCommand.Settings>(CommandsConstants.getplanet);
+        HelpCommand.RegisterCommand<GetPlanetWeatherCommand.Settings>(CommandsConstants.getweather);
+        HelpCommand.RegisterCommand<AddPlanetCommand.Settings>(CommandsConstants.addplanet);
+        HelpCommand.RegisterCommand<UpdatePlanetCommand.Settings>(CommandsConstants.updateplanet);
+        HelpCommand.RegisterCommand<DeletePlanetCommand.Settings>(CommandsConstants.deleteplanet);
 
         // Activity commands
-        // helpCommand.RegisterCommand<AddActivityCommand.Settings>("activity add");
-        // helpCommand.RegisterCommand<GetActivityCommand.Settings>("activities");
-        // helpCommand.RegisterCommand<UpdateActivityCommand.Settings>("activity update");
-        // helpCommand.RegisterCommand<DeleteActivityCommand.Settings>("activity delete");
-        // helpCommand.RegisterCommand<LinkActivityCommand.Settings>("activity link");
+        HelpCommand.RegisterCommand<AddActivityCommand.Settings>(CommandsConstants.AddActivity);
+        HelpCommand.RegisterCommand<GetActivityCommand.Settings>(CommandsConstants.GetActivity);
+        HelpCommand.RegisterCommand<UpdateActivityCommand.Settings>(CommandsConstants.UpdateActivity);
+        HelpCommand.RegisterCommand<DeleteActivityCommand.Settings>(CommandsConstants.DeleteActivity);
+        HelpCommand.RegisterCommand<LinkActivityCommand.Settings>(CommandsConstants.LinkActivity);
+
+        // Users
+        HelpCommand.RegisterCommand<ConfigCommand.ConfigSettings>(CommandsConstants.Config);
+        HelpCommand.RegisterCommand<DisableAccountCommand.DisableAccountSettings>(CommandsConstants.Disable);
+        HelpCommand.RegisterCommand<EnableAccountCommand.EnableAccountSettings>(CommandsConstants.Enable);
+        HelpCommand.RegisterCommand<ToggleRoleCommand.ToggleRoleSettings>(CommandsConstants.Role);
+        HelpCommand.RegisterCommand<UsersCommand.Settings>(CommandsConstants.Users);
+
+        // Transport commands
+        HelpCommand.RegisterCommand<AddTransportCommand.Settings>(CommandsConstants.AddTransport);
+        HelpCommand.RegisterCommand<GetTransportCommand.Settings>(CommandsConstants.GetTransport);
+        HelpCommand.RegisterCommand<UpdateTransportCommand.Settings>(CommandsConstants.UpdateTransport);
+        HelpCommand.RegisterCommand<DeleteTransportCommand.Settings>(CommandsConstants.DeleteTransport);
+        HelpCommand.RegisterCommand<LinkTransportCommand.Settings>(CommandsConstants.LinkTransport);
     }
 }

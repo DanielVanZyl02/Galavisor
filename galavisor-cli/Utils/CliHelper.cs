@@ -4,39 +4,39 @@ namespace GalavisorCli.Utils;
 
 public static partial class CliHelper
 {
-    public static string[] ShellSplit(string input)
+    public static string[] ShellSplit(string Input)
     {
-        var matches = MyRegex().Matches(input);
-        return matches.Select(m => m.Value.Trim('"')).ToArray();
+        var matches = MyRegex().Matches(Input);
+        return [.. matches.Select(m => m.Value.Trim('"'))];
     }
 
-    public static string SuggestCommand(string attempted, string[] knownCommands)
+    public static string SuggestCommand(string Attempted, string[] KnownCommands)
     {
-        return knownCommands
-            .OrderBy(cmd => LevenshteinDistance(cmd, attempted))
+        return KnownCommands
+            .OrderBy(cmd => LevenshteinDistance(cmd, Attempted))
             .FirstOrDefault() ?? "help";
     }
 
-    public static int LevenshteinDistance(string a, string b)
+    public static int LevenshteinDistance(string StringToCompareAgainst, string StringToCompareWith)
     {
-        var dp = new int[a.Length + 1, b.Length + 1];
-        for (int i = 0; i <= a.Length; i++) dp[i, 0] = i;
-        for (int j = 0; j <= b.Length; j++) dp[0, j] = j;
+        var Dp = new int[StringToCompareAgainst.Length + 1, StringToCompareWith.Length + 1];
+        for (int I = 0; I <= StringToCompareAgainst.Length; I++) Dp[I, 0] = I;
+        for (int J = 0; J <= StringToCompareWith.Length; J++) Dp[0, J] = J;
 
-        for (int i = 1; i <= a.Length; i++)
+        for (int I = 1; I <= StringToCompareAgainst.Length; I++)
         {
-            for (int j = 1; j <= b.Length; j++)
+            for (int J = 1; J <= StringToCompareWith.Length; J++)
             {
-                var cost = a[i - 1] == b[j - 1] ? 0 : 1;
-                dp[i, j] = new[] {
-                    dp[i - 1, j] + 1,
-                    dp[i, j - 1] + 1,
-                    dp[i - 1, j - 1] + cost
+                var Cost = StringToCompareAgainst[I - 1] == StringToCompareWith[J - 1] ? 0 : 1;
+                Dp[I, J] = new[] {
+                    Dp[I - 1, J] + 1,
+                    Dp[I, J - 1] + 1,
+                    Dp[I - 1, J - 1] + Cost
                 }.Min();
             }
         }
 
-        return dp[a.Length, b.Length];
+        return Dp[StringToCompareAgainst.Length, StringToCompareWith.Length];
     }
 
     [GeneratedRegex(@"[\""].+?[\""]|\S+")]

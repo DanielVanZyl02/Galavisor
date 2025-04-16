@@ -3,6 +3,7 @@ using GalavisorApi.Services;
 using GalavisorApi.Repositories;
 using GalavisorApi.Data;
 using GalavisorApi.Constants;
+using GalavisorApi.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,7 +26,6 @@ builder.Services.AddSingleton<PlanetRepository>();
 builder.Services.AddSingleton<TransportService>();
 
 var app = builder.Build();
-// app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 

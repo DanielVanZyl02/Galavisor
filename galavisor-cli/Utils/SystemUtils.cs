@@ -3,20 +3,20 @@ using System.Diagnostics;
 namespace GalavisorCli.Utils;
 
 public static class SystemUtils{
-    public static void OpenBrowser(string url)
+    public static void OpenBrowser(string Url)
     {
         try
         {
-            var psi = new ProcessStartInfo
+            var ProcessStartInfomation = new ProcessStartInfo
             {
-                FileName = url,
+                FileName = Url,
                 UseShellExecute = true
             };
-            Process.Start(psi);
+            Process.Start(ProcessStartInfomation);
         }
-        catch (Exception e)
+        catch (Exception Error)
         {
-            Console.WriteLine("Unable to open browser: " + e.Message);
+            Console.WriteLine("Unable to open browser because: " + Error);
         }
     }
 }

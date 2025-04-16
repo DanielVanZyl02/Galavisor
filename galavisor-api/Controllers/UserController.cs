@@ -29,9 +29,11 @@ public class UserController(UserService UserService, AuthService AuthService) : 
     public async Task<ActionResult<UserModel>> GetUser(int Id)
     {
         var GoogleSubject = HttpContext.User.FindFirst("sub")!.Value ?? "";
-        if(await _authService.IsSubAdmin(GoogleSubject)){
+        if(await _authService.IsSubAdmin(GoogleSubject) && Id != -1){
             var User = await _userService.GetUser(Id);
             return User != null ? Ok(new { message = "Success", user = User}) : NotFound();
+        } else if(Id <= 0){
+                    return BadRequest(new { message = "Request failed", error = "You can not pass in a negative id" });
         } else {
             return StatusCode(403, new { message = "Get failed", error = "You cannot access this command, only available to admins" });
         }    
@@ -68,8 +70,10 @@ public class UserController(UserService UserService, AuthService AuthService) : 
                 }
             } else if(Request.Role != null){
                 var GoogleSubject = HttpContext.User.FindFirst("sub")!.Value ?? "";
-                if(await _authService.IsSubAdmin(GoogleSubject)){
+                if(await _authService.IsSubAdmin(GoogleSubject) && Id != -1){
                     return Ok(new { message = "Success", user = await _userService.UpdateRole(Request.Role ?? "", Id)});
+                } else if(Id <= 0){
+                    return BadRequest(new { message = "Request failed", error = "You can not pass in a negative id" });
                 } else{
                     return StatusCode(403, new { message = "Update failed", error = "You cannot access this command, only available to admins" });
                 }

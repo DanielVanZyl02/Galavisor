@@ -37,6 +37,7 @@ public class PlanetService
 
     public async Task<string> GetPlanetWeatherById(int id)
     {
+        try {
         var planet = await _planetRepository.GetById(id);
         string name = planet.Name;
         string atmosphere = planet.Atmosphere;
@@ -72,6 +73,15 @@ public class PlanetService
             .GetString();
         var responseString = $"Date: {DateTime.Today.ToString("d")}\nPlanet: {name}\n\nWeather Report:\n"+message;
         return responseString;
+        }catch (HttpRequestException ex)
+        {
+            return "Failed to communicate with API";
+        }
+        catch (JsonException ex)
+        {
+            
+            return "Failed to recieve response from API"
+        }
     }
 
     public async Task<PlanetModel> AddPlanet(PlanetModel planet)

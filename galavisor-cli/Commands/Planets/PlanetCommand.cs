@@ -10,6 +10,7 @@ using GalavisorCli.Models;
 namespace GalavisorCli.Commands.Planets;
 internal sealed class GetPlanetsCommand : AsyncCommand<GetPlanetsCommand.Settings>
 {
+    [Description("Get all the planets")]
     public sealed class Settings : CommandSettings
     {
     }
@@ -66,6 +67,7 @@ internal sealed class GetPlanetsCommand : AsyncCommand<GetPlanetsCommand.Setting
 
 internal sealed class GetPlanetCommand : AsyncCommand<GetPlanetCommand.Settings>
 {
+    [Description("Get a planet from a given planet ID")]
     public sealed class Settings : CommandSettings
     {
         [CommandArgument(0, "<PLANET ID>")]
@@ -124,6 +126,7 @@ internal sealed class GetPlanetCommand : AsyncCommand<GetPlanetCommand.Settings>
 
 internal sealed class GetPlanetWeatherCommand : AsyncCommand<GetPlanetWeatherCommand.Settings>
 {
+    [Description("Get a planet's Weather from a given planet ID")]
     public sealed class Settings : CommandSettings
     {
         [CommandArgument(0, "<PLANET ID>")]
@@ -177,6 +180,7 @@ internal sealed class GetPlanetWeatherCommand : AsyncCommand<GetPlanetWeatherCom
 
 internal sealed class AddPlanetCommand : AsyncCommand<AddPlanetCommand.Settings>
 {
+    [Description("Add a planet to the system")]
     public sealed class Settings : CommandSettings
     {
         [CommandArgument(0, "<PLANET NAME>")]
@@ -253,6 +257,7 @@ internal sealed class AddPlanetCommand : AsyncCommand<AddPlanetCommand.Settings>
 
 internal sealed class UpdatePlanetCommand : AsyncCommand<UpdatePlanetCommand.Settings>
 {
+    [Description("Update a planet from a given planet ID")]
     public sealed class Settings : CommandSettings
     {
         [CommandArgument(0, "<PLANET ID>")]
@@ -339,6 +344,7 @@ internal sealed class UpdatePlanetCommand : AsyncCommand<UpdatePlanetCommand.Set
 
 internal sealed class DeletePlanetCommand : AsyncCommand<DeletePlanetCommand.Settings>
 {
+    [Description("Delete a planet")]
     public sealed class Settings : CommandSettings
     {
         [CommandArgument(0, "<PLANET ID>")]
